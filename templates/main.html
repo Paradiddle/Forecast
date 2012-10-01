@@ -1,0 +1,92 @@
+<html>
+	<head>
+		<title>Budget Forecaster</title>
+		
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/helper.js"></script>
+		<noscript>Your browser does not have Javascript enabled.</noscript>
+	</head>
+	
+	<body>
+		<div style="float: right;">
+			{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
+			<br />
+			<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />
+		</div>
+		{% if username %}
+		<div>
+			<b>Add Transactions</b>
+			<table style="background-color: #DDDDDD;">
+				<form id="form">
+					<tr>
+						<td>Transaction Name</td>
+						<td><input type="text" name="input_name"></td>
+					</tr>
+					<tr>
+						<td>Transaction Amount</td>
+						<td><input type="text" name="input_amount"></td>
+					</tr>
+					<tr>
+						<td>Monthly</td>
+						<td>
+							<input id="radio_monthly" type="radio" name="monthly" checked="checked" value="True" onchange="hideDateSelector()">True
+							<input type="radio" name="monthly" value="False" onchange="showDateSelector()">False
+						</td>
+					</tr>
+					<tr id="year_selector" style="display: none">
+						<td>Year</td>
+						<td>
+							<select name="selectorYear" class="selector">
+								<option>2011</option>
+								<option>2012</option>
+								<option>2013</option>
+							</select>
+						</td>
+					</tr>
+					<tr id="month_selector" style="display: none">
+						<td>Month</td>
+						<td>
+							<select name="selectorMonth" class="selector">
+								<option>January</option>
+								<option>February</option>
+								<option>March</option>
+								<option>April</option>
+								<option>May</option>
+								<option>June</option>
+								<option>July</option>
+								<option>August</option>
+								<option>September</option>
+								<option>October</option>
+								<option>November</option>
+								<option>December</option>
+							</select>
+						</td>
+					</tr>
+				</form>
+				<tr>
+					<td colspan="2">
+						<button style="width: 100%;" label="Add" onclick="addMonthlyTransactions(); updateTransactions()">Add</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div style="display: block;">
+			<h2>
+				Monthly Transactions
+			</h2>
+			<div id="monthly_transactions">{{ data }}</div>
+			<h2>
+				Transactions
+			</h2>
+			<label>Year</label>
+			<select id="idYearSelector" name="yearViewSelector">
+				<option>2011</option>
+				<option>2012</option>
+				<option>2013</option>
+			</select>
+			<button label="Add" onclick="updateTransactions()">Refresh</button>
+			<div id="transactions"></div>
+		</div>
+		{% endif %}
+	</body>
+</html>

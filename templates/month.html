@@ -1,0 +1,23 @@
+<div style="padding-top: 20px">
+	{% if month and year %}
+	<h3>{{ month }} - {{ year }}</h3>
+	{% endif %}
+	<table style='text-align: left;' cellspacing='0' cellpadding='10' border='1'>
+		<tr>
+			{% for h in headers %}
+				<th style="background-color: #EEEEEE">
+					{{ h }}
+				</th>
+			{% endfor %}
+		</tr>
+		{% for row in row_data %}
+			<tr>
+				{% for col in row %}
+					<td>
+						{{ col }}
+					</td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</table>
+</div>
