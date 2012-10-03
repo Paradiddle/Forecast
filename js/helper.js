@@ -21,7 +21,7 @@ var addMonthlyTransactions = function()
 		}
 	});
 	return false;
-}
+};
 
 var showFormUnderMonthly = function()
 {
@@ -50,7 +50,7 @@ var updateTransactions = function()
 			$('#transactions').html(getTable(['Name', 'Amount', 'Year', 'Month'], ['name', 'amount', 'year', 'month'], result['one_time']));
 		}
 	});
-}
+};
 
 var getTable = function(headers, props, data)
 {
@@ -84,4 +84,4 @@ var changeDateSelector = function()
 	{
 		$('.monthly_options').show();
 	}
-}
+};
