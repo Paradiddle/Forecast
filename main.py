@@ -27,7 +27,7 @@ class ModifiedMonthlyEntry(db.Model):
     amount = db.FloatProperty()
     
     def toDict(self):
-        return {'year': self.year, 'month': self.month, 'name': db.get(self.parent).name}
+        return {'year': self.year, 'amount': self.amount, 'month': self.month, 'name': db.get(self.parent).name}
 
 class OneTimeEntry(db.Model):
     userid = db.StringProperty()
@@ -95,8 +95,8 @@ class Login(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
-        name = self.request.get("input_name")
-        amount = float(self.request.get("input_amount"))
+        name = self.request.get("name")
+        amount = float(self.request.get("amount"))
         monthly = self.request.get("monthly")
         monthly = True if (monthly == "True") else False
         year = None
@@ -150,7 +150,7 @@ class Login(webapp.RequestHandler):
                 one_time_entry.put()
         return True
 
-class Transactions(webapp.RequestHandler):        
+class Transaction(webapp.RequestHandler):        
     def post(self):
         user = users.get_current_user()
         if not user:

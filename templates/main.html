@@ -2,9 +2,10 @@
 	<head>
 		<title>Budget Forecaster</title>
 		
-		<link type="text/css" href="css/smoothness/jquery-ui-1.8.24.custom.css" rel="Stylesheet" />	
-		<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
-		<script type="text/javascript" src="js/jquery-ui-1.8.23.custom.min.js"></script>
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/underscore.js"></script>
+		<script type="text/javascript" src="js/backbone.js"></script>
+		<script type="text/javascript" src="js/helper.js"></script>
 		<noscript>Your browser does not have Javascript enabled.</noscript>
 	</head>
 	
@@ -16,7 +17,6 @@
 			}
 		</style>
 		
-		<script type="text/javascript" src="js/helper.js"></script>
 		
 		<div style="float: right;">
 			{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
@@ -103,13 +103,31 @@
 			<h2>
 				Transactions
 			</h2>
-			<label>Year</label>
-			<select id="idYearSelector" name="yearViewSelector">
-				<option>2011</option>
-				<option>2012</option>
-				<option>2013</option>
-			</select>
-			<button label="Add" onclick="updateTransactions()">Refresh</button>
+			<table>
+				<tr>
+					<td>
+						<label>From</label>
+					</td>
+					<td>
+						<select id="from_month"></select>
+					</td>
+					<td>
+						<select id="from_year"></select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>To</label>
+					</td>
+					<td>
+						<select id="to_month"></select>
+					</td>
+					<td>
+						<select id="to_year"></select>
+					</td>
+				</tr>
+			</table>
+			<button label="Add" onclick="refreshTransactions()">Refresh</button>
 			<div id="transactions"></div>
 		</div>
 		{% endif %}
