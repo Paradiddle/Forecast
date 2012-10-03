@@ -2,39 +2,61 @@
 	<head>
 		<title>Budget Forecaster</title>
 		
-		<script type="text/javascript" src="js/jquery.js"></script>
-		<script type="text/javascript" src="js/helper.js"></script>
+		<link type="text/css" href="css/smoothness/jquery-ui-1.8.24.custom.css" rel="Stylesheet" />	
+		<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.23.custom.min.js"></script>
 		<noscript>Your browser does not have Javascript enabled.</noscript>
 	</head>
 	
-	<body>
+	<body>		
+		<style>
+			.fieldset 
+			{
+				border: solid;
+			}
+		</style>
+		
+		<script type="text/javascript" src="js/helper.js"></script>
+		
 		<div style="float: right;">
 			{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
 			<br />
 			<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />
 		</div>
+		
+		
 		{% if username %}
-		<div>
-			<b>Add Transactions</b>
-			<table style="background-color: #DDDDDD;">
-				<form id="form">
+		<div id="dialog-form" style="display: none;">
+			<form onsubmit="addMonthlyTransactions(); return false;">
+				<table class="fieldset">
 					<tr>
-						<td>Transaction Name</td>
-						<td><input type="text" name="input_name"></td>
-					</tr>
-					<tr>
-						<td>Transaction Amount</td>
-						<td><input type="text" name="input_amount"></td>
-					</tr>
-					<tr>
-						<td>Monthly</td>
 						<td>
-							<input id="radio_monthly" type="radio" name="monthly" checked="checked" value="True" onchange="hideDateSelector()">True
-							<input type="radio" name="monthly" value="False" onchange="showDateSelector()">False
+							<label for="input_name">Entry Name</label>								
+						</td>
+						<td>
+							<input type="text" class="in" id="input_name" name="input_name">
 						</td>
 					</tr>
-					<tr id="year_selector" style="display: none">
-						<td>Year</td>
+					<tr>
+						<td>
+							<label for="input_amount">Entry Amount</label>
+						</td>
+						<td>
+							<input type="text" class="in" id="input_amount" name="input_amount">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="radio_monthly">Monthly</label>
+						</td>
+						<td>
+							<input type="checkbox" id="checkbox_monthly" name="monthly" checked="checked" value="True" onchange="changeDateSelector()">
+						</td>
+					</tr>
+					<tr class="monthly_options" style="display: none;">
+						<td>
+							<label>Year</label>
+						</td>
 						<td>
 							<select name="selectorYear" class="selector">
 								<option>2011</option>
@@ -43,8 +65,10 @@
 							</select>
 						</td>
 					</tr>
-					<tr id="month_selector" style="display: none">
-						<td>Month</td>
+					<tr class="monthly_options" style="display: none;">
+						<td>
+							<label>Month</label>
+						</td>
 						<td>
 							<select name="selectorMonth" class="selector">
 								<option>January</option>
@@ -62,17 +86,18 @@
 							</select>
 						</td>
 					</tr>
-				</form>
-				<tr>
-					<td colspan="2">
-						<button style="width: 100%;" label="Add" onclick="addMonthlyTransactions(); updateTransactions()">Add</button>
-					</td>
-				</tr>
-			</table>
+					<tr>
+						<td colspan="2">
+							<button style="width: 100%;" id="addentry">Add Entry</button>
+						</td>
+					</tr>
+				</table>
+			</form>
 		</div>
+		
 		<div style="display: block;">
-			<h2>
-				Monthly Transactions
+			<h2 style="vertical-align: middle">
+				Monthly Transactions<button onclick="showFormUnderMonthly()">+</button>
 			</h2>
 			<div id="monthly_transactions">{{ data }}</div>
 			<h2>

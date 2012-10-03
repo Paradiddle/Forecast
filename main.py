@@ -3,6 +3,7 @@ import wsgiref.handlers
 import os
 import urllib
 import string
+import simplejson as json
 
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
@@ -16,9 +17,18 @@ class MonthlyEntry(db.Model):
     userid = db.StringProperty()
     name = db.StringProperty()
     default_amount = db.FloatProperty()
-    modification_keys = db.StringListProperty()
-    amount_modifications = db.ListProperty(float)
-        
+    
+    def toDict(self):
+        return {'name': self.name, 'default_amount': self.default_amount}
+    
+class ModifiedMonthlyEntry(db.Model):
+    year = db.IntegerProperty()
+    month = db.StringProperty()
+    amount = db.FloatProperty()
+    
+    def toDict(self):
+        return {'year': self.year, 'month': self.month, 'name': db.get(self.parent).name}
+
 class OneTimeEntry(db.Model):
     userid = db.StringProperty()
     name = db.StringProperty()
@@ -26,35 +36,39 @@ class OneTimeEntry(db.Model):
     month = db.StringProperty()
     amount = db.FloatProperty()
     
+    def toDict(self):
+        return {'name': self.name, 'amount': self.amount, 'year': self.year, 'month': self.month}
+
+def getMonthlyEntriesByUserId(userid):
+    monthly = db.GqlQuery("SELECT * FROM MonthlyEntry WHERE userid = :1", userid)
+    entries = []
+    for m in monthly:
+        entries.append(m.toDict())
+    return entries
+
+def getOneTimeEntriesByUserId(userid):
+    one_time = db.GqlQuery("SELECT * FROM OneTimeEntry WHERE userid = :1", userid)
+    entries = []
+    for e in one_time:
+        entries.append(e.toDict())
+    return entries
+
+def getModifiedMonthlyEntriesByUserId(userid):
+    modified = db.GqlQuery("SELECT * FROM ModifiedMonthlyEntry WHERE userid = :1", userid)
+    entries = []
+    for e in modified:
+        entries.append(e.toDict())
+    return entries
+        
 class Month(db.Model):
     starting_balance = db.FloatProperty()
     lastmonth_difference = db.FloatProperty()
 
-def getName(expense):
-    return expense.name
-
-def getOneTimeAmount(expense):
-    return expense.amount
-
-def getMonthlyAmount(expense):
-    return expense.default_amount
-
-def modification_key(year, month):
-    return year + ":" + month
-
 def monthly_key_name(userid, name):
-    return str(userid) + ":" + name
+    return userid + ":" + name
 
 def one_time_key_name(userid, name, year, month):
     return userid + ":" + name + ":" + year + ":" + month
-
-def expenseNameExistsInList(lst, expense):
-    if not lst:
-        return False
-    for e in lst:
-        if e.name == expense.name:
-            return True
-    return False
 
 class Login(webapp.RequestHandler):
     def get(self):
@@ -76,7 +90,6 @@ class Login(webapp.RequestHandler):
             'url_linktext': url_linktext,
             'message_pretext': message_pretext,
             'message_posttext': message_posttext,
-            'data': self.getDataScreen()
             }
         path = os.path.join(os.path.dirname(__file__), 'templates/main.html')
         self.response.out.write(template.render(path, template_values))
@@ -92,16 +105,17 @@ class Login(webapp.RequestHandler):
         if not monthly:
             year = self.request.get("year")
             month = self.request.get("month")
-            
+
         ret = self.addEntity(name, amount, monthly, year, month)
-        self.response.out.write(self.getDataScreen())
+        self.response.out.write("Success");
 
     def addEntity(self, name, amount, monthly, year, month):
         user = users.get_current_user()
         if not user:
             return False
 
-        if monthly: #Adding a MonthlyEntry
+        if monthly:
+            #Adding a MonthlyEntry
             #If there is already a OneTimeEntry with the same name, then cancel the add.
             if OneTimeEntry.all().filter('userid =', user.user_id()).filter('name =', name).get():
                 return False
@@ -116,7 +130,8 @@ class Login(webapp.RequestHandler):
                 monthly_entry.name = name
                 monthly_entry.default_amount = amount
                 monthly_entry.put()
-        else:       #Adding a OneTimeEntry
+        else:
+            #Adding a OneTimeEntry
             #If there is already a MonthlyEntry with the same name, then cancel the add
             if MonthlyEntry.all().filter('userid =', user.user_id()).filter('name =', name).get():
                 return False
@@ -134,68 +149,28 @@ class Login(webapp.RequestHandler):
                 one_time_entry.amount = amount
                 one_time_entry.put()
         return True
-    
-    def getDataScreen(self):
-        user = users.get_current_user()
-        if not user:
-            return
-        headers = ['Name', 'Amount']
-        column_functions = [getName, getMonthlyAmount]
-        monthly = db.GqlQuery("SELECT * FROM MonthlyEntry WHERE userid = :1", user.user_id())
-        
-        row_data = []
-        for m in monthly:
-            col_data = []
-            col_data.append(m.name)
-            col_data.append(m.default_amount)
-            row_data.append(col_data)
-            
-        template_values = {
-            'headers': headers,
-            'row_data': row_data,
-        }
-        path = os.path.join(os.path.dirname(__file__), 'templates/month.html')
-        return template.render(path, template_values)
-    
-class Transaction(webapp.RequestHandler):        
+
+class Transactions(webapp.RequestHandler):        
     def post(self):
         user = users.get_current_user()
         if not user:
             self.response.out.write("Invalid user.")
             return
-        str = ""
-        year = self.request.get("year")
-        for m in MONTHS:
-            str += self.getTableForYearMonth(year, m, user.user_id())
-        self.response.out.write(str)   
+        
+        monthly = getMonthlyEntriesByUserId(user.user_id())
+        one_time = getOneTimeEntriesByUserId(user.user_id())
+        modified = getModifiedMonthlyEntriesByUserId(user.user_id())
+        
+        dic = {}
+        dic["monthly"] = monthly
+        dic["one_time"] = one_time
+        dic["modified"] = modified
+        
+        js = json.dumps(dic)
+        
+        self.response.headers.add_header('content-type', 'applications/json', charset='utf-8')
+        self.response.out.write(js)
     
-    def getTableForYearMonth(self, year, month, userid):
-        monthly = db.GqlQuery("SELECT * FROM MonthlyEntry WHERE userid = :1", userid)
-        one_time = db.GqlQuery("SELECT * FROM OneTimeEntry WHERE userid = :1 AND year = :2 AND month = :3", userid, int(year), month)
-        headers = ['Name', 'Amount']
-        
-        row_data = []
-        for m in monthly:
-            col_data = []
-            col_data.append(m.name)
-            col_data.append(m.default_amount)
-            row_data.append(col_data)
-            
-        for o in one_time:
-            col_data = []
-            col_data.append(o.name)
-            col_data.append(o.amount)
-            row_data.append(col_data)
-
-        template_values = {
-            'headers': headers,
-            'row_data': row_data,
-            'month': month,
-            'year': year
-        }
-        path = os.path.join(os.path.dirname(__file__), 'templates/month.html')
-        return template.render(path, template_values)
-        
 application = webapp.WSGIApplication([
     ('/', Login),
     ('/Transactions', Transaction)
