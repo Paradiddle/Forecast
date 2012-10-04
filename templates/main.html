@@ -14,6 +14,17 @@
 			.fieldset 
 			{
 				border: solid;
+				background-color: #DDDDDD;
+			}
+			td
+			{
+				border-width: 0px;
+				padding: 3px;
+				text-align: left;
+			}
+			th
+			{
+				text-align: left;
 			}
 		</style>
 		
@@ -26,14 +37,19 @@
 		
 		
 		{% if username %}
-		<div id="dialog-form" style="display: none;">
-			<form onsubmit="addMonthlyTransactions(); return false;">
+		<div id="dialog-form" style="display=none; position=absolute;">
+			<form onsubmit="return false;">
 				<table class="fieldset">
 					<tr>
-						<td>
+						<td colspan="2">
+							<label style="font-size: large; font-weight: bold;" id="dialog_status">Add Monthly Entry</label>
+						</td>
+					</tr>
+					<tr>
+						<td width="50%">
 							<label for="input_name">Entry Name</label>								
 						</td>
-						<td>
+						<td width="50%">
 							<input type="text" class="in" id="input_name" name="input_name">
 						</td>
 					</tr>
@@ -47,30 +63,39 @@
 					</tr>
 					<tr>
 						<td>
-							<label for="radio_monthly">Monthly</label>
+							<label for="entry_type">Type</label>
+						</td>
+						<td>
+							<input type="radio" name="entry_type" title="Income"> Income<br>
+							<input type="radio" name="entry_type" title="Expense" checked="checked"> Expense
+						</td>
+					</tr>
+					<tr class="month_option">
+						<td>
+							<label for="checkbox_monthly">Monthly</label>
 						</td>
 						<td>
 							<input type="checkbox" id="checkbox_monthly" name="monthly" checked="checked" value="True" onchange="changeDateSelector()">
 						</td>
 					</tr>
-					<tr class="monthly_options" style="display: none;">
+					<tr class="month_option monthly_options" style="display: none;">
 						<td>
 							<label>Year</label>
 						</td>
 						<td>
-							<select name="selectorYear" class="selector">
+							<select id="selectorYear" name="selectorYear" class="selector">
 								<option>2011</option>
 								<option>2012</option>
 								<option>2013</option>
 							</select>
 						</td>
 					</tr>
-					<tr class="monthly_options" style="display: none;">
+					<tr class="month_option monthly_options" style="display: none;">
 						<td>
 							<label>Month</label>
 						</td>
 						<td>
-							<select name="selectorMonth" class="selector">
+							<select id="selectorMonth" name="selectorMonth" class="selector">
 								<option>January</option>
 								<option>February</option>
 								<option>March</option>
@@ -87,8 +112,11 @@
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2">
-							<button style="width: 100%;" id="addentry">Add Entry</button>
+						<td>
+							<button style="width: 100%;" onclick="addMonthlyTransactions();" id="addentry">Add Entry</button>
+						</td>
+						<td>
+							<button style="width: 100%;" onclick="$('#dialog-form').hide();">Cancel</button>
 						</td>
 					</tr>
 				</table>
@@ -97,13 +125,13 @@
 		
 		<div style="display: block;">
 			<h2 style="vertical-align: middle">
-				Monthly Transactions<button onclick="showFormUnderMonthly()">+</button>
+				Monthly Transactions<button id="monthly_button" onclick="showFormUnderMonthly()">+</button>
 			</h2>
 			<div id="monthly_transactions">{{ data }}</div>
-			<h2>
-				Transactions
+			<h2 id="transactions_header">
+				Transactions<button id="transactions_button" onclick="showFormUnderTransactions()">+</button>
 			</h2>
-			<table>
+			<table border="1">
 				<tr>
 					<td>
 						<label>From</label>
@@ -126,9 +154,18 @@
 						<select id="to_year"></select>
 					</td>
 				</tr>
+				<tr>
+					<td></td>
+					<td colspan="2">
+						<button style="width: 100%" label="Add" onclick="refreshTransactions()">Refresh</button>
+					</td>
+				</tr>
 			</table>
-			<button label="Add" onclick="refreshTransactions()">Refresh</button>
-			<div id="transactions"></div>
+			<div id="transactions">
+				<table id="transactions_table">
+					
+				</table>
+			</div>
 		</div>
 		{% endif %}
 	</body>

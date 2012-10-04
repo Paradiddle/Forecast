@@ -15,6 +15,8 @@ $(document).ready(function()
 	populateSelector($('#to_year'), years);
 	populateSelector($('#from_year'), years);
 
+	$('#dialog-form').hide();
+	$('#dialog-form').css('position', 'absolute');
 	$('#to_month').val('December');
 });
 
@@ -26,7 +28,7 @@ var years =
 
 var monthly;
 var one_time;
-var modified;
+var selected;
 
 function validateFilter()
 {
@@ -53,39 +55,53 @@ var addMonthlyTransactions = function()
 		amount : $('[name=input_amount]').val(),
 		monthly : $('[name=monthly]:checked').val(),
 		month : $('[name=selectorMonth]').val(),
-		year : $('[name=selectorYear]').val()
+		year : $('[name=selectorYear]').val(),
+		type : $('[name=entry_type]:checked').attr('title')
 	};
-
+	
+	if(data.type == "Income")
+		data.income = data.amount;
+	else
+		data.expense = data.amount;
+	
 	if (data.monthly)
 	{
-		if (monthly.hasOwnProperty(data.input_name))
+		var existing = monthly.get(data.name);
+		if (existing)
 		{
-			var prev_amount = monthly[data.input_name].default_amount;
-			if (prev_amount == data.input_amount)
+			var prev_amount = existing.get('amount');
+			if (prev_amount == data.amount)
 				return false;
-			var update = confirm("There is already a monthly entry with the name " + data.input_name
-					+ ". Would you like to update the default amount from " + prev_amount + " to " + data.input_amount);
-			if (!update)
-				return false;
-		}
-		monthly[data.input_name] = data;
-	} else
-	{
-		var coll = one_time.filter(yearMonthNameFilter(data.year, data.month, data.name));
-		if (coll.length >= 1)
-		{
-			var matching = coll[0];
-			var prev_amount = matching.get('amount');
-			if (prev_amount == data.input_amount)
-				return false;
-			var update = confirm("There is already a one time entry with the name " + data.name
-					+ " for the month " + data.month + " of " + data.year
-					+ ". Would you like to update that entry's amount from " + prev_amount + " to " + data.input_amount);
+			var update = confirm("There is already a monthly entry with the name " + data.name
+					+ ". Would you like to update the default amount from " + prev_amount + " to " + data.amount);
 			if (!update)
 				return false;
 		}
 		var m = new Backbone.Model(data);
-		one_time.add(m);
+		m.id = data.name;
+		monthly.add(m);
+	} else
+	{
+		var existing = one_time.get(data.year + ":" + data.month + ":" + data.name);
+		if (existing)
+		{
+			var prev_amount = existing.get('amount');
+			if (prev_amount == data.amount)
+				return false;
+			var update = confirm("There is already a one time entry with the name " + data.name
+					+ " for the month " + data.month + " of " + data.year
+					+ ". Would you like to update that entry's amount from " + prev_amount + " to " + data.amount);
+			if (!update)
+				return false;
+			existing.set('amount', data.amount);
+			expandExpenseProperty(existing);
+		}
+		else
+		{
+			var m = new Backbone.Model(data);
+			m.id = (data.year + ":" + data.month + ":" + data.name);
+			one_time.add(m);
+		}
 	}
 
 	$.ajax(
@@ -137,7 +153,11 @@ var refreshTransactions = function()
 
 	var $t = $('#transactions');
 	$t.html("");
+	
+	var $ttable = $('#transactions_table');
 
+	var $outerTable = $('<table />');
+	
 	for ( var y = fyearindex; y <= tyearindex; y++)
 	{
 		var currentYear = years[y];
@@ -155,38 +175,57 @@ var refreshTransactions = function()
 			tmonth = 11;
 		for (; m <= tmonth; m++)
 		{
+			var $rowOne = $('<tr />');
+			
 			var year = years[y];
 			var month = months[m];
 
-			var $div = $('<div />');
-			$div.css('background-color', "#EEEEEE");
-			$div.append("<h3>" + month + " - " + year + "</h3>");
-			$div.append("<h4>One Time</h4>");
+			var $button = $('<button>+</button>');
+			$button.attr('onclick', "moveFormToYearMonth(" + year + ",'" + month + "');");
+			$button.attr('id', year + "-" + month);
 
+			$rowOne.append('<td>' + year + ' - ' + month + '</td>');
+			$rowOne.css('font-style', 'bold');
+			
+			var $addButtonCell = $('<td />');
+			$addButtonCell.append($button);
+			$rowOne.append($addButtonCell);
+			
+			$outerTable.append($rowOne);
+			
+			var $rowTwo = $('<tr />');
+			
 			var coll = one_time.filter(yearMonthFilter(year, month));
-
-			var $table = getTable(
-				[ 'Name', 'Amount' ],
-				[ 'name', 'amount' ], coll);
-				$div.append($table);
-				$div.append("<h4>Monthly</h4>");
-
-			$div.append(getTable(
-				[ 'Name', 'Amount' ],
-				[ 'name', 'default_amount' ], monthly.toArray()));
-				$t.append($div);
+			if(coll.length > 0)
+			{
+				var $table = getTable(
+					[ 'Name', 'Expense', 'Income' ],
+					[ 'name', 'expense', 'income' ], coll);
+				var $dataCell = $('<td />');
+				$dataCell.append($table);
+				$rowTwo.append($dataCell);
+			}
+			else
+				$rowTwo.append('<td />');
+			$outerTable.append($rowTwo);
+			var $addCell = $('<td />');
+			$rowTwo.append($addCell);
+			$addCell.css('padding-bottom', '30px');
+			$rowOne.css('background-color', '#CCCCCC');
+			$rowTwo.css('background-color', '#EEEEEE');
 		}
+		$t.append($outerTable);
 	}
-	$('#monthly_transactions').html(getTable(
-	[ 'Name', 'Amount' ],
-	[ 'name', 'default_amount' ], monthly.toArray()));
+	$('#monthly_transactions').html(getTable([ 'Name', 'Expense', 'Income'], [ 'name', 'expense', 'income' ], monthly.toArray()));
 };
 
 function parseData(data)
 {
 	monthly = new Backbone.Collection(data['monthly']);
 	one_time = new Backbone.Collection(data['one_time']);
-	modified = new Backbone.Collection(data['modified']);
+	
+	monthly.each(expandExpenseProperties());
+	one_time.each(expandExpenseProperties());
 }
 
 function oneTimeKey(year, month, name)
@@ -217,7 +256,6 @@ var getTable = function(headers, props, data)
 		}
 		$table.append($row);
 	}
-
 	return $table;
 };
 
@@ -232,15 +270,82 @@ var changeDateSelector = function()
 	}
 };
 
+var offsetElementFrom = function($toMove, $toOffsetFrom)
+{
+	var off = $toOffsetFrom.offset();
+	off.left += 35;
+	off.top += 15;
+	$toMove.css(off);
+};
+
 var showFormUnderMonthly = function()
 {
 	var $input = $('#dialog-form');
-	$input.insertBefore($('#monthly_transactions'));
-	if ($input.css('display') === 'block')
-		$input.css('display', 'none');
-	else
-		$input.css('display', 'block');
+	if(selected == "monthly")
+	{
+		selected = "";
+		$input.hide();
+		return;
+	}
+	selected = "monthly";
+	$('#dialog_status').html('Add Monthly Entry');
+	$input.show();
+	var $b = $('#monthly_button');
+	offsetElementFrom($input, $b);
+	
+	$('#checkbox_monthly').attr("checked", "checked");
+	changeDateSelector();
+	$('#selectorYear').removeAttr('disabled', 'disabled');
+	$('#selectorMonth').removeAttr('disabled', 'disabled');
+	$('#checkbox_monthly').attr('disabled', 'disabled');
+	$('.month_option').hide();
 };
+
+var showFormUnderTransactions = function()
+{
+	var $input = $('#dialog-form');
+	if(selected == "transactions")
+	{
+		selected = "";
+		$input.hide();
+		return;
+	}
+	selected = "transactions";
+	$('#dialog_status').html('Add Entry');
+	$input.show();
+	offsetElementFrom($input, $('#transactions_button'));
+	
+	$('#checkbox_monthly').removeAttr("checked");
+	changeDateSelector();
+	$('#selectorYear').removeAttr('disabled', 'disabled');
+	$('#selectorMonth').removeAttr('disabled', 'disabled');
+	$('#checkbox_monthly').removeAttr('disabled', 'disabled');
+	$('.month_option').show();
+};
+
+function moveFormToYearMonth(year, month)
+{
+	var $input = $('#dialog-form');
+	if(selected == year + ":" + month)
+	{
+		selected = "";
+		$input.hide();
+		return;
+	}
+	selected = year + ":" + month;
+	$('#dialog_status').html('Add Entry for ' + month + " " + year);
+	$input.show();
+	var $toInsertAfter = $("#" + year + "-" + month);
+	offsetElementFrom($input, $toInsertAfter);
+	$('#checkbox_monthly').removeAttr("checked");
+	changeDateSelector();
+	$('#selectorYear').val(year);
+	$('#selectorMonth').val(month);
+	$('#selectorYear').attr('disabled', 'disabled');
+	$('#selectorMonth').attr('disabled', 'disabled');
+	$('#checkbox_monthly').attr('disabled', 'disabled');
+	$('.month_option').hide();
+}
 
 function yearMonthFilter(year, month)
 {
@@ -248,6 +353,22 @@ function yearMonthFilter(year, month)
 	{
 		return obj.get('year') == year && obj.get('month') == month;
 	}
+}
+
+function expandExpenseProperties()
+{
+	return function(value, index)
+	{
+		expandExpenseProperty(value);
+	}
+}
+
+function expandExpenseProperty(value)
+{
+	if(value.get('type') == "Income")
+		value.set('income', value.get('amount'));
+	else
+		value.set('expense', value.get('amount'));
 }
 
 function yearMonthNameFilter(year, month, name)
@@ -263,6 +384,6 @@ function populateSelector(selector, options)
 	var $sel = $(selector);
 	for ( var i = 0; i < options.length; i++)
 	{
-		$sel.append("<option>" + options[i] + "</option>");
+		$sel.append("<option value='" + options[i] + "'>" + options[i] + "</option>");
 	}
 }

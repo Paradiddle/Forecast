@@ -17,17 +17,10 @@ class MonthlyEntry(db.Model):
     userid = db.StringProperty()
     name = db.StringProperty()
     default_amount = db.FloatProperty()
+    type = db.StringProperty()
     
     def toDict(self):
-        return {'name': self.name, 'default_amount': self.default_amount}
-    
-class ModifiedMonthlyEntry(db.Model):
-    year = db.IntegerProperty()
-    month = db.StringProperty()
-    amount = db.FloatProperty()
-    
-    def toDict(self):
-        return {'year': self.year, 'amount': self.amount, 'month': self.month, 'name': db.get(self.parent).name}
+        return {'name': self.name, 'type': self.type, 'amount': self.default_amount, 'id': self.name}
 
 class OneTimeEntry(db.Model):
     userid = db.StringProperty()
@@ -35,9 +28,10 @@ class OneTimeEntry(db.Model):
     year = db.IntegerProperty()
     month = db.StringProperty()
     amount = db.FloatProperty()
+    type = db.StringProperty()
     
     def toDict(self):
-        return {'name': self.name, 'amount': self.amount, 'year': self.year, 'month': self.month}
+        return {'name': self.name, 'type': self.type, 'amount': self.amount, 'year': self.year, 'month': self.month, 'id': (str(self.year) + ":" + self.month + ":" + self.name)}
 
 def getMonthlyEntriesByUserId(userid):
     monthly = db.GqlQuery("SELECT * FROM MonthlyEntry WHERE userid = :1", userid)
@@ -53,13 +47,6 @@ def getOneTimeEntriesByUserId(userid):
         entries.append(e.toDict())
     return entries
 
-def getModifiedMonthlyEntriesByUserId(userid):
-    modified = db.GqlQuery("SELECT * FROM ModifiedMonthlyEntry WHERE userid = :1", userid)
-    entries = []
-    for e in modified:
-        entries.append(e.toDict())
-    return entries
-        
 class Month(db.Model):
     starting_balance = db.FloatProperty()
     lastmonth_difference = db.FloatProperty()
@@ -97,8 +84,12 @@ class Login(webapp.RequestHandler):
     def post(self):
         name = self.request.get("name")
         amount = float(self.request.get("amount"))
+
         monthly = self.request.get("monthly")
         monthly = True if (monthly == "True") else False
+
+        type = self.request.get("type");
+
         year = None
         month = None       
         
@@ -106,10 +97,10 @@ class Login(webapp.RequestHandler):
             year = self.request.get("year")
             month = self.request.get("month")
 
-        ret = self.addEntity(name, amount, monthly, year, month)
+        ret = self.addEntity(name, amount, type, monthly, year, month)
         self.response.out.write("Success");
 
-    def addEntity(self, name, amount, monthly, year, month):
+    def addEntity(self, name, amount, type, monthly, year, month):
         user = users.get_current_user()
         if not user:
             return False
@@ -129,12 +120,9 @@ class Login(webapp.RequestHandler):
                 monthly_entry.userid = user.user_id()
                 monthly_entry.name = name
                 monthly_entry.default_amount = amount
+                monthly_entry.type = type
                 monthly_entry.put()
         else:
-            #Adding a OneTimeEntry
-            #If there is already a MonthlyEntry with the same name, then cancel the add
-            if MonthlyEntry.all().filter('userid =', user.user_id()).filter('name =', name).get():
-                return False
             already_entered = OneTimeEntry.get_by_key_name(one_time_key_name(user.user_id(), name, year, month))
             if already_entered:
                 if already_entered.amount != amount:
@@ -146,6 +134,7 @@ class Login(webapp.RequestHandler):
                 one_time_entry.name = name
                 one_time_entry.year = int(year)
                 one_time_entry.month = month
+                one_time_entry.type = type
                 one_time_entry.amount = amount
                 one_time_entry.put()
         return True
@@ -159,12 +148,10 @@ class Transaction(webapp.RequestHandler):
         
         monthly = getMonthlyEntriesByUserId(user.user_id())
         one_time = getOneTimeEntriesByUserId(user.user_id())
-        modified = getModifiedMonthlyEntriesByUserId(user.user_id())
         
         dic = {}
         dic["monthly"] = monthly
         dic["one_time"] = one_time
-        dic["modified"] = modified
         
         js = json.dumps(dic)
         
