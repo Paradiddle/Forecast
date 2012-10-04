@@ -39,15 +39,10 @@ var selected;
 
 function validateFilter()
 {
-	$tmonth = $('#to_month');
-	$fmonth = $('#from_month');
-	$tyear = $('#to_year');
-	$fyear = $('#from_year');
-
-	var tmonthindex = $tmonth.prop('selectedIndex');
-	var fmonthindex = $fmonth.prop('selectedIndex');
-	var tyearindex = $tyear.prop('selectedIndex');
-	var fyearindex = $fyear.prop('selectedIndex');
+	var tmonthindex = $('#to_month').prop('selectedIndex');
+	var fmonthindex = $('#from_month').prop('selectedIndex');
+	var tyearindex = $('#to_year').prop('selectedIndex');
+	var fyearindex = $('#from_year').prop('selectedIndex');
 
 	if (fyearindex <= tyearindex && fmonthindex <= tmonthindex)
 		return true;
