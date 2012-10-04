@@ -26,6 +26,16 @@
 			{
 				text-align: left;
 			}
+			.entries_first
+			{
+				background-color: #CCCCCC;
+				font-weight: bold;
+			}
+			.entries_second
+			{
+				background-color: #EEEEEE;
+				width: 100%;
+			}
 		</style>
 		
 		
@@ -131,42 +141,124 @@
 			<h2 id="transactions_header">
 				Transactions<button id="transactions_button" onclick="showFormUnderTransactions()">+</button>
 			</h2>
-			<table border="1">
-				<tr>
-					<td>
-						<label>From</label>
-					</td>
-					<td>
-						<select id="from_month"></select>
-					</td>
-					<td>
-						<select id="from_year"></select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<label>To</label>
-					</td>
-					<td>
-						<select id="to_month"></select>
-					</td>
-					<td>
-						<select id="to_year"></select>
-					</td>
-				</tr>
-				<tr>
-					<td></td>
-					<td colspan="2">
-						<button style="width: 100%" label="Add" onclick="refreshTransactions()">Refresh</button>
-					</td>
-				</tr>
-			</table>
-			<div id="transactions">
-				<table id="transactions_table">
-					
+			<div style="width: 400px;">
+				<table border="1" style="width: 100%;">
+					<tr>
+						<td>
+							<label>From</label>
+						</td>
+						<td>
+							<select id="from_month"></select>
+						</td>
+						<td>
+							<select id="from_year"></select>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label>To</label>
+						</td>
+						<td>
+							<select id="to_month"></select>
+						</td>
+						<td>
+							<select id="to_year"></select>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2">
+							<button style="width: 100%" label="Add" onclick="refreshTransactions()">Refresh</button>
+						</td>
+					</tr>
 				</table>
+				<div id="transactions" style="width: 100%;">
+					<table id="transactions_table">
+						
+					</table>
+				</div>
 			</div>
 		</div>
 		{% endif %}
 	</body>
 </html>
+
+<!-- Underscore Templates -->
+
+<script type="text/template" class="template">
+	<table>
+		<tr>
+			<th>
+				Name
+			</th>
+			<th>
+				Expense
+			</th>
+			<th>
+				Income
+			</th>
+		</tr>
+		<% _.each(rc, function(value, key, list) { %>
+			<tr>
+				<td>
+					<%- value.get('name') %>
+				</td>
+				<td>
+					<%- value.get('expense') %>
+				</td>
+				<td>
+					<%- value.get('income') %>
+				</td>
+			</tr>
+		<% }); %>
+	</table>
+</script>
+
+<script type="text/template" class="entries">
+	<table>
+		<% _.each(rc.months, function(value, key, list) { %>
+			<tr class="entries_first">
+				<td>
+					<%- value.year + " - " + value.month %>
+				</td>
+				<td>
+					<% var buttonid = value.year + "-" + value.month; %>
+					<button id=<%- buttonid %> onclick="moveFormToYearMonth(<%- value.year %>, '<%- value.month %>');">+</button>
+				</td>
+			</tr>
+			<tr class="entries_second">
+				<td style="width: 100%;">
+					<% if (value.entries.length > 0) { %>
+						<table>
+							<tr>
+								<th>
+									Name
+								</th>
+								<th>
+									Expense
+								</th>
+								<th>
+									Income
+								</th>
+							</tr>
+							<% _.each(value.entries, function(value, key, list) { %>
+									<tr>
+										<td>
+											<%- value.get('name') %>
+										</td>
+										<td>
+											<%- value.get('expense') %>
+										</td>
+										<td>
+											<%- value.get('income') %>
+										</td>
+									</tr>							
+							<% }); %>
+						</table>
+					<% } %>
+				</td>
+				<td style="padding-bottom: 50px;"></td>
+			</tr>	
+		<% }); %>
+	</table>
+</script>

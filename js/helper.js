@@ -18,7 +18,14 @@ $(document).ready(function()
 	$('#dialog-form').hide();
 	$('#dialog-form').css('position', 'absolute');
 	$('#to_month').val('December');
+	
+	_.templateSettings.variable = "rc";
+	template = _.template($( "script.template").html());
+	entries = _.template($("script.entries").html());
 });
+
+var template;
+var entries;
 
 var months =
 [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
@@ -154,69 +161,29 @@ var refreshTransactions = function()
 	var $t = $('#transactions');
 	$t.html("");
 	
-	var $ttable = $('#transactions_table');
-
-	var $outerTable = $('<table />');
+	var data = {};
+	data.months = [];
 	
 	for ( var y = fyearindex; y <= tyearindex; y++)
 	{
-		var currentYear = years[y];
+		var useStartMonth = (fyearindex == tyearindex || y == fyearindex);
+		var m = useStartMonth? fmonthindex: 0;
 
-		var m;
-		if (fyearindex == tyearindex || y == fyearindex)
-			m = fmonthindex;
-		else
-			m = 0;
+		var useToMonth = (y == tyearindex);
+		var tmonth = useToMonth? tmonthindex: 11;
 
-		var tmonth;
-		if (y == fyearindex)
-			tmonth = tmonthindex;
-		else
-			tmonth = 11;
 		for (; m <= tmonth; m++)
 		{
-			var $rowOne = $('<tr />');
+			month = {};
+			month.month = months[m];
+			month.year = years[y];
+			month.entries = one_time.filter(yearMonthFilter(month.year, month.month));
 			
-			var year = years[y];
-			var month = months[m];
-
-			var $button = $('<button>+</button>');
-			$button.attr('onclick', "moveFormToYearMonth(" + year + ",'" + month + "');");
-			$button.attr('id', year + "-" + month);
-
-			$rowOne.append('<td>' + year + ' - ' + month + '</td>');
-			$rowOne.css('font-style', 'bold');
-			
-			var $addButtonCell = $('<td />');
-			$addButtonCell.append($button);
-			$rowOne.append($addButtonCell);
-			
-			$outerTable.append($rowOne);
-			
-			var $rowTwo = $('<tr />');
-			
-			var coll = one_time.filter(yearMonthFilter(year, month));
-			if(coll.length > 0)
-			{
-				var $table = getTable(
-					[ 'Name', 'Expense', 'Income' ],
-					[ 'name', 'expense', 'income' ], coll);
-				var $dataCell = $('<td />');
-				$dataCell.append($table);
-				$rowTwo.append($dataCell);
-			}
-			else
-				$rowTwo.append('<td />');
-			$outerTable.append($rowTwo);
-			var $addCell = $('<td />');
-			$rowTwo.append($addCell);
-			$addCell.css('padding-bottom', '30px');
-			$rowOne.css('background-color', '#CCCCCC');
-			$rowTwo.css('background-color', '#EEEEEE');
+			data.months.push(month);
 		}
-		$t.append($outerTable);
 	}
-	$('#monthly_transactions').html(getTable([ 'Name', 'Expense', 'Income'], [ 'name', 'expense', 'income' ], monthly.toArray()));
+	$t.append(entries(data));
+	$('#monthly_transactions').html(template(monthly.toArray()));
 };
 
 function parseData(data)
@@ -235,7 +202,7 @@ function oneTimeKey(year, month, name)
 
 var getTable = function(headers, props, data)
 {
-	var $table = $('<table />');
+	var $table = $('<table cellspacing="5" />');
 
 	for ( var i = 0; i < headers.length; i++)
 	{
