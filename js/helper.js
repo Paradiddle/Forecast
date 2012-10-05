@@ -13,8 +13,8 @@ $(document).ready(function()
 	populateSelector($('#from_year'), years);
 	populateSelector($('#selectorYear'), years);
 
-	$('#dialog-form').hide();
-	$('#dialog-form').css('position', 'absolute');
+	hideEntryDialog();
+	getEntryDialog().css('position', 'absolute');
 	$('#to_month').val('December');
 
 	_.templateSettings.variable = "rc";
@@ -36,11 +36,10 @@ var monthly;
 var one_time;
 var selected;
 
-
-/**
- * Called when the 'Add' button is pressed on the entry dialog
- * @returns {Boolean}
+/*
+ * Client-server communications 
  */
+
 function addEntry()
 {
 	var data =
@@ -74,7 +73,8 @@ function addEntry()
 		var m = new Backbone.Model(data);
 		m.id = data.name;
 		monthly.add(m);
-	} else
+	} 
+	else
 	{
 		var existing = one_time.get(data.year + ":" + data.month + ":" + data.name);
 		if (existing)
@@ -96,7 +96,9 @@ function addEntry()
 			one_time.add(m);
 		}
 	}
-
+	
+	// TODO print out the response of this ajax to a notification area
+	// TODO design a meaningful serverside response other than 'success'
 	$.ajax(
 	{
 		url : "/",
@@ -128,121 +130,14 @@ function retrieveEntries()
 		success : function(result)
 		{
 			parseData(result);
-			refreshEntries();
+			$('#monthly_entries').html(getEntriesHtml());
 		}
 	});
 }
 
-function refreshEntries()
-{
-	var valid = validateFilter();
-	if (!valid)
-	{
-		alert("Not a valid to and from filter.");
-		return;
-	}
-
-	var toMonth = $('#to_month').prop('selectedIndex');
-	var fromMonth = $('#from_month').prop('selectedIndex');
-	var toYear = $('#to_year').prop('selectedIndex');
-	var fromYear = $('#from_year').prop('selectedIndex');
-
-	var $transactionsDiv = $('#transactions');
-	$transactionsDiv.html("");
-
-	var templateData = {};
-	templateData.monthsData = [];
-
-	// Iterate through each year from the starting year to the ending year
-	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
-	{
-		// If the current year is the first year of the selection then the starting 
-		// month will be the selected starting month, otherwise we start at January.
-		var startingMonthNum = (currentYearNum == fromYear) ? fromMonth : 0;
-
-		// If the current year is the last year of the selection then the ending
-		// month will be the selected ending month, otherwise we end at December.
-		var endingMonthNum = (currentYearNum == toYear) ? toMonth : 11;
-
-		for ( var currentMonthNum = startingMonthNum; currentMonthNum <= endingMonthNum; currentMonthNum++)
-		{
-			var currentMonthStr = months[currentMonthNum];
-			var currentYearStr = years[currentYearNum];
-			monthData = {};
-			monthData.month = currentMonthStr;
-			monthData.year = currentYearStr;
-			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
-
-			templateData.monthsData.push(monthData);
-		}
-	}
-	$transactionsDiv.append(templateEntries(templateData));
-	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
-}
-
-function parseData(data)
-{
-	monthly = new Backbone.Collection(data['monthly']);
-	one_time = new Backbone.Collection(data['one_time']);
-
-	monthly.each(expandExpenseProperties());
-	one_time.each(expandExpenseProperties());
-}
-
-function oneTimeKey(year, month, name)
-{
-	return year + ":" + month + ":" + name;
-}
-
-function getTable(headers, props, data)
-{
-	var $table = $('<table cellspacing="5" />');
-
-	for ( var i = 0; i < headers.length; i++)
-	{
-		var header = headers[i];
-		$table.append('<th>' + header + '</th>');
-	}
-
-	for ( var j = 0; j < data.length; j++)
-	{
-		var elem = data[j];
-		var $row = $('<tr />');
-		for ( var i = 0; i < props.length; i++)
-		{
-			var prop = props[i];
-			var val = elem.has(prop) ? elem.get(prop) : "-";
-			var $cell = $('<td>' + val + '</td>');
-			$row.append($cell);
-		}
-		$table.append($row);
-	}
-	return $table;
-}
-
-function changeDateSelector()
-{
-	if ($('#checkbox_monthly').is(':checked'))
-	{
-		$('.monthly_options').hide();
-	} else
-	{
-		$('.monthly_options').show();
-	}
-}
-
-function offsetElementFrom($toMove, $toOffsetFrom, offsetX, offsetY)
-{
-	if(offsetX === undefined)
-		offsetX = 35;
-	if(offsetY === undefined)
-		offsetY = 15;
-	
-	var off = $toOffsetFrom.offset();
-	off.left += offsetX;
-	off.top += offsetY;
-	$toMove.css(off);
-}
+/*
+ * Entry dialog modifiers
+ */
 
 function showEntryDialogUnderMonthly(el)
 {
@@ -283,10 +178,6 @@ function showEntryDialogUnderYearMonth(year, month)
 	updateEntryDialog(status, false, $moveTo, true, true, year, month);
 }
 
-/*
- * Entry dialog modifiers
- */
-
 function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, disableMonthlyOptions, yearSelection, monthSelection)
 {
 	$('#dialog_status').html(statusText);
@@ -326,7 +217,7 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 
 function getEntryDialog()
 {
-	return $('#dialog-form');
+	return $('#dialog_form');
 }
 
 function hideEntryDialog()
@@ -342,6 +233,19 @@ function showEntryDialog()
 /*
  * JQuery helper functions
  */
+
+function offsetElementFrom($toMove, $toOffsetFrom, offsetX, offsetY)
+{
+	if(offsetX === undefined)
+		offsetX = 35;
+	if(offsetY === undefined)
+		offsetY = 15;
+	
+	var off = $toOffsetFrom.offset();
+	off.left += offsetX;
+	off.top += offsetY;
+	$toMove.css(off);
+}
 
 function populateSelector(selector, options)
 {
@@ -362,6 +266,17 @@ function validateFilter()
 	if (fromYear <= toYear && fromMonth <= toMonth)
 		return true;
 	return false;
+}
+
+function changeDateSelector()
+{
+	if ($('#checkbox_monthly').is(':checked'))
+	{
+		$('.monthly_options').hide();
+	} else
+	{
+		$('.monthly_options').show();
+	}
 }
 
 /*
@@ -388,6 +303,15 @@ function yearMonthNameFilter(year, month, name)
  * Data helper functions
  */
 
+function parseData(data)
+{
+	monthly = new Backbone.Collection(data['monthly']);
+	one_time = new Backbone.Collection(data['one_time']);
+
+	monthly.each(expandExpenseProperties());
+	one_time.each(expandExpenseProperties());
+}
+
 function expandExpenseProperties()
 {
 	return function(value, index)
@@ -402,4 +326,53 @@ function expandExpenseProperty(value)
 		value.set('income', value.get('amount'));
 	else
 		value.set('expense', value.get('amount'));
+}
+
+function getEntriesHtml()
+{
+	var valid = validateFilter();
+	if (!valid)
+	{
+		alert("Not a valid to and from filter.");
+		return;
+	}
+
+	var toMonth = $('#to_month').prop('selectedIndex');
+	var fromMonth = $('#from_month').prop('selectedIndex');
+	var toYear = $('#to_year').prop('selectedIndex');
+	var fromYear = $('#from_year').prop('selectedIndex');
+
+	var $entriesDiv = $('#entries');
+	
+	// Clear out the existing entries div contents
+	$entriesDiv.html("");
+
+	var templateData = {};
+	templateData.monthsData = [];
+
+	// Iterate through each year from the starting year to the ending year
+	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
+	{
+		// If the current year is the first year of the selection then the starting 
+		// month will be the selected starting month, otherwise we start at January.
+		var startingMonthNum = (currentYearNum == fromYear) ? fromMonth : 0;
+
+		// If the current year is the last year of the selection then the ending
+		// month will be the selected ending month, otherwise we end at December.
+		var endingMonthNum = (currentYearNum == toYear) ? toMonth : 11;
+
+		for ( var currentMonthNum = startingMonthNum; currentMonthNum <= endingMonthNum; currentMonthNum++)
+		{
+			var currentMonthStr = months[currentMonthNum];
+			var currentYearStr = years[currentYearNum];
+			monthData = {};
+			monthData.month = currentMonthStr;
+			monthData.year = currentYearStr;
+			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
+
+			templateData.monthsData.push(monthData);
+		}
+	}
+	$entriesDiv.append(templateEntries(templateData));
+	return templateMonthly(monthly.toArray());
 }

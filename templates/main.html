@@ -49,7 +49,7 @@
 		
 		<!-- Entry data input form -->
 		
-		<div id="dialog-form" style="display=none; position=absolute;">
+		<div id="dialog_form" style="display=none; position=absolute;">
 			<form onsubmit="return false;">
 				<table class="fieldset">
 					<tr>
@@ -111,7 +111,7 @@
 							<button style="width: 100%;" onclick="addEntry();" id="addentry">Add Entry</button>
 						</td>
 						<td>
-							<button style="width: 100%;" onclick="$('#dialog-form').hide();">Cancel</button>
+							<button style="width: 100%;" onclick="hideEntryDialog();">Cancel</button>
 						</td>
 					</tr>
 				</table>
@@ -145,7 +145,7 @@
 						</td>
 					</tr>
 				</table>
-				<div id="transactions"></div>
+				<div id="entries"></div>
 			</div>
 		</div>
 		{% endif %}
