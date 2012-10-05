@@ -170,8 +170,7 @@ var refreshTransactions = function()
 		{
 			var currentMonthStr = months[currentMonthNum];
 			var currentYearStr = years[currentYearNum];
-			monthData =
-			{};
+			monthData = {};
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
