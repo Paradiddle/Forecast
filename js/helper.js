@@ -150,10 +150,8 @@ var refreshTransactions = function()
 	var $transactionsDiv = $('#transactions');
 	$transactionsDiv.html("");
 
-	var templateData =
-	{};
-	templateData.monthsData =
-	[];
+	var templateData = {};
+	templateData.monthsData = [];
 
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
