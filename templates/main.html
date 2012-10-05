@@ -108,7 +108,7 @@
 					</tr>
 					<tr>
 						<td>
-							<button style="width: 100%;" onclick="addMonthlyTransactions();" id="addentry">Add Entry</button>
+							<button style="width: 100%;" onclick="addEntry();" id="addentry">Add Entry</button>
 						</td>
 						<td>
 							<button style="width: 100%;" onclick="$('#dialog-form').hide();">Cancel</button>
@@ -120,11 +120,11 @@
 		
 		<div style="display: block;">
 			<h2 style="vertical-align: middle">
-				Monthly Transactions<button id="monthly_button" onclick="showFormUnderMonthly()">+</button>
+				Monthly Entries<button onclick="showEntryDialogUnderMonthly(this)">+</button>
 			</h2>
-			<div id="monthly_transactions">{{ data }}</div>
-			<h2 id="transactions_header">
-				Transactions<button id="transactions_button" onclick="showFormUnderTransactions()">+</button>
+			<div id="monthly_entries">{{ data }}</div>
+			<h2>
+				Entries<button onclick="showEntryDialogUnderEntryHeader(this)">+</button>
 			</h2>
 			<div>
 				<table border="1">
@@ -141,7 +141,7 @@
 					<tr>
 						<td></td>
 						<td colspan="2">
-							<button style="width: 100%" onclick="refreshTransactions()">Refresh</button>
+							<button style="width: 100%" onclick="refreshEntries()">Refresh</button>
 						</td>
 					</tr>
 				</table>
@@ -195,7 +195,7 @@
 				<td></td>
 				<td>
 					<% var buttonid = value.year + "-" + value.month; %>
-					<button id=<%- buttonid %> onclick="moveFormToYearMonth(<%- value.year %>, '<%- value.month %>');">+</button>
+					<button id=<%- buttonid %> onclick="showEntryDialogUnderYearMonth(<%- value.year %>, '<%- value.month %>');">+</button>
 				</td>
 			</tr>
 			<tr>

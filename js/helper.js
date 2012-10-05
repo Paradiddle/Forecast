@@ -1,6 +1,6 @@
 $(document).ready(function()
 {
-	retrieveTransactions();
+	retrieveEntries();
 	/*
 	 * if (typeof String.prototype.startsWith != 'function') {
 	 * String.prototype.startsWith = function(str) { return this.slice(0,
@@ -18,12 +18,16 @@ $(document).ready(function()
 	$('#to_month').val('December');
 
 	_.templateSettings.variable = "rc";
-	template = _.template($("script.template").html());
-	entries = _.template($("script.entries").html());
+	templateMonthly = _.template($("script.template").html());
+	templateEntries = _.template($("script.entries").html());
 });
 
-var template;
-var entries;
+/*
+ * Global variables
+ */
+
+var templateMonthly;
+var templateEntries;
 
 var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 var years = [ 2011, 2012, 2013 ];
@@ -32,19 +36,12 @@ var monthly;
 var one_time;
 var selected;
 
-function validateFilter()
-{
-	var toMonth = $('#to_month').prop('selectedIndex');
-	var fromMonth = $('#from_month').prop('selectedIndex');
-	var toYear = $('#to_year').prop('selectedIndex');
-	var fromYear = $('#from_year').prop('selectedIndex');
 
-	if (fromYear <= toYear && fromMonth <= toMonth)
-		return true;
-	return false;
-}
-
-var addMonthlyTransactions = function()
+/**
+ * Called when the 'Add' button is pressed on the entry dialog
+ * @returns {Boolean}
+ */
+function addEntry()
 {
 	var data =
 	{
@@ -107,13 +104,16 @@ var addMonthlyTransactions = function()
 		data : data,
 		success : function(result)
 		{
-			refreshTransactions();
+			refreshEntries();
 		}
 	});
 	return false;
-};
+}
 
-var retrieveTransactions = function()
+/**
+ * Retrieves the entries from the server in JSON format
+ */
+function retrieveEntries()
 {
 	var data =
 	{
@@ -128,12 +128,12 @@ var retrieveTransactions = function()
 		success : function(result)
 		{
 			parseData(result);
-			refreshTransactions();
+			refreshEntries();
 		}
 	});
-};
+}
 
-var refreshTransactions = function()
+function refreshEntries()
 {
 	var valid = validateFilter();
 	if (!valid)
@@ -176,9 +176,9 @@ var refreshTransactions = function()
 			templateData.monthsData.push(monthData);
 		}
 	}
-	$transactionsDiv.append(entries(templateData));
-	$('#monthly_transactions').html(template(monthly.toArray()));
-};
+	$transactionsDiv.append(templateEntries(templateData));
+	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
+}
 
 function parseData(data)
 {
@@ -194,7 +194,7 @@ function oneTimeKey(year, month, name)
 	return year + ":" + month + ":" + name;
 }
 
-var getTable = function(headers, props, data)
+function getTable(headers, props, data)
 {
 	var $table = $('<table cellspacing="5" />');
 
@@ -218,9 +218,9 @@ var getTable = function(headers, props, data)
 		$table.append($row);
 	}
 	return $table;
-};
+}
 
-var changeDateSelector = function()
+function changeDateSelector()
 {
 	if ($('#checkbox_monthly').is(':checked'))
 	{
@@ -229,9 +229,9 @@ var changeDateSelector = function()
 	{
 		$('.monthly_options').show();
 	}
-};
+}
 
-var offsetElementFrom = function($toMove, $toOffsetFrom, offsetX, offsetY)
+function offsetElementFrom($toMove, $toOffsetFrom, offsetX, offsetY)
 {
 	if(offsetX === undefined)
 		offsetX = 35;
@@ -242,9 +242,9 @@ var offsetElementFrom = function($toMove, $toOffsetFrom, offsetX, offsetY)
 	off.left += offsetX;
 	off.top += offsetY;
 	$toMove.css(off);
-};
+}
 
-function showFormUnderMonthly()
+function showEntryDialogUnderMonthly(el)
 {
 	if (selected == "monthly")
 	{
@@ -253,11 +253,10 @@ function showFormUnderMonthly()
 		return;
 	}
 	selected = "monthly";
-	var $moveTo = $('#monthly_button');
-	updateEntryDialog('Add Monthly Entry', true, $moveTo, true, true);
+	updateEntryDialog('Add Monthly Entry', true, $(el), true, true);
 }
 
-function showFormUnderTransactions()
+function showEntryDialogUnderEntryHeader(el)
 {
 	if (selected == "transactions")
 	{
@@ -266,11 +265,10 @@ function showFormUnderTransactions()
 		return;
 	}
 	selected = "transactions";
-	var $moveTo = $('#transactions_button');
-	updateEntryDialog('Add Entry', false, $moveTo, false, false);
+	updateEntryDialog('Add Entry', false, $(el), false, false);
 }
 
-function moveFormToYearMonth(year, month)
+function showEntryDialogUnderYearMonth(year, month)
 {
 	var key = year + ":" + month;
 	if (selected == key)
@@ -284,6 +282,10 @@ function moveFormToYearMonth(year, month)
 	var $moveTo = $('#' + year + "-" + month);
 	updateEntryDialog(status, false, $moveTo, true, true, year, month);
 }
+
+/*
+ * Entry dialog modifiers
+ */
 
 function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, disableMonthlyOptions, yearSelection, monthSelection)
 {
@@ -337,6 +339,35 @@ function showEntryDialog()
 	getEntryDialog().show();
 }
 
+/*
+ * JQuery helper functions
+ */
+
+function populateSelector(selector, options)
+{
+	var $sel = $(selector);
+	for ( var i = 0; i < options.length; i++)
+	{
+		$sel.append("<option value='" + options[i] + "'>" + options[i] + "</option>");
+	}
+}
+
+function validateFilter()
+{
+	var toMonth = $('#to_month').prop('selectedIndex');
+	var fromMonth = $('#from_month').prop('selectedIndex');
+	var toYear = $('#to_year').prop('selectedIndex');
+	var fromYear = $('#from_year').prop('selectedIndex');
+
+	if (fromYear <= toYear && fromMonth <= toMonth)
+		return true;
+	return false;
+}
+
+/*
+ * Underscore collection filters
+ */
+
 function yearMonthFilter(year, month)
 {
 	return function(obj)
@@ -344,6 +375,18 @@ function yearMonthFilter(year, month)
 		return obj.get('year') == year && obj.get('month') == month;
 	}
 }
+
+function yearMonthNameFilter(year, month, name)
+{
+	return function(obj)
+	{
+		return obj.get('year') == year && obj.get('month') == month && obj.get('name') == name;
+	}
+}
+
+/*
+ * Data helper functions
+ */
 
 function expandExpenseProperties()
 {
@@ -359,21 +402,4 @@ function expandExpenseProperty(value)
 		value.set('income', value.get('amount'));
 	else
 		value.set('expense', value.get('amount'));
-}
-
-function yearMonthNameFilter(year, month, name)
-{
-	return function(obj)
-	{
-		return obj.get('year') == year && obj.get('month') == month && obj.get('name') == name;
-	}
-}
-
-function populateSelector(selector, options)
-{
-	var $sel = $(selector);
-	for ( var i = 0; i < options.length; i++)
-	{
-		$sel.append("<option value='" + options[i] + "'>" + options[i] + "</option>");
-	}
 }
