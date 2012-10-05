@@ -1,37 +1,32 @@
 $(document).ready(function()
 {
 	retrieveTransactions();
-
-	if (typeof String.prototype.startsWith != 'function')
-	{
-		String.prototype.startsWith = function(str)
-		{
-			return this.slice(0, str.length) == str;
-		};
-	}
-
+	/*
+	 * if (typeof String.prototype.startsWith != 'function') {
+	 * String.prototype.startsWith = function(str) { return this.slice(0,
+	 * str.length) == str; }; }
+	 */
 	populateSelector($('#to_month'), months);
 	populateSelector($('#from_month'), months);
+	populateSelector($('#selectorMonth'), months);
 	populateSelector($('#to_year'), years);
 	populateSelector($('#from_year'), years);
+	populateSelector($('#selectorYear'), years);
 
 	$('#dialog-form').hide();
 	$('#dialog-form').css('position', 'absolute');
 	$('#to_month').val('December');
-	
+
 	_.templateSettings.variable = "rc";
-	template = _.template($( "script.template").html());
+	template = _.template($("script.template").html());
 	entries = _.template($("script.entries").html());
 });
 
 var template;
 var entries;
 
-var months =
-[ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
-		"December" ];
-var years =
-[ 2011, 2012, 2013 ];
+var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+var years = [ 2011, 2012, 2013 ];
 
 var monthly;
 var one_time;
@@ -39,12 +34,12 @@ var selected;
 
 function validateFilter()
 {
-	var tmonthindex = $('#to_month').prop('selectedIndex');
-	var fmonthindex = $('#from_month').prop('selectedIndex');
-	var tyearindex = $('#to_year').prop('selectedIndex');
-	var fyearindex = $('#from_year').prop('selectedIndex');
+	var toMonth = $('#to_month').prop('selectedIndex');
+	var fromMonth = $('#from_month').prop('selectedIndex');
+	var toYear = $('#to_year').prop('selectedIndex');
+	var fromYear = $('#from_year').prop('selectedIndex');
 
-	if (fyearindex <= tyearindex && fmonthindex <= tmonthindex)
+	if (fromYear <= toYear && fromMonth <= toMonth)
 		return true;
 	return false;
 }
@@ -60,12 +55,12 @@ var addMonthlyTransactions = function()
 		year : $('[name=selectorYear]').val(),
 		type : $('[name=entry_type]:checked').attr('title')
 	};
-	
-	if(data.type == "Income")
+
+	if (data.type == "Income")
 		data.income = data.amount;
 	else
 		data.expense = data.amount;
-	
+
 	if (data.monthly)
 	{
 		var existing = monthly.get(data.name);
@@ -90,15 +85,14 @@ var addMonthlyTransactions = function()
 			var prev_amount = existing.get('amount');
 			if (prev_amount == data.amount)
 				return false;
-			var update = confirm("There is already a one time entry with the name " + data.name
-					+ " for the month " + data.month + " of " + data.year
-					+ ". Would you like to update that entry's amount from " + prev_amount + " to " + data.amount);
+			var update = confirm("There is already a one time entry with the name " + data.name + " for the month "
+					+ data.month + " of " + data.year + ". Would you like to update that entry's amount from "
+					+ prev_amount + " to " + data.amount);
 			if (!update)
 				return false;
 			existing.set('amount', data.amount);
 			expandExpenseProperty(existing);
-		}
-		else
+		} else
 		{
 			var m = new Backbone.Model(data);
 			m.id = (data.year + ":" + data.month + ":" + data.name);
@@ -148,36 +142,44 @@ var refreshTransactions = function()
 		return;
 	}
 
-	var tmonthindex = $('#to_month').prop('selectedIndex');
-	var fmonthindex = $('#from_month').prop('selectedIndex');
-	var tyearindex = $('#to_year').prop('selectedIndex');
-	var fyearindex = $('#from_year').prop('selectedIndex');
+	var toMonth = $('#to_month').prop('selectedIndex');
+	var fromMonth = $('#from_month').prop('selectedIndex');
+	var toYear = $('#to_year').prop('selectedIndex');
+	var fromYear = $('#from_year').prop('selectedIndex');
 
-	var $t = $('#transactions');
-	$t.html("");
-	
-	var data = {};
-	data.months = [];
-	
-	for ( var y = fyearindex; y <= tyearindex; y++)
+	var $transactionsDiv = $('#transactions');
+	$transactionsDiv.html("");
+
+	var templateData =
+	{};
+	templateData.monthsData =
+	[];
+
+	// Iterate through each year from the starting year to the ending year
+	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
 	{
-		var useStartMonth = (fyearindex == tyearindex || y == fyearindex);
-		var m = useStartMonth? fmonthindex: 0;
+		// If the current year is the first year of the selection then the starting 
+		// month will be the selected starting month, otherwise we start at January.
+		var startingMonthNum = (currentYearNum == fromYear) ? fromMonth : 0;
 
-		var useToMonth = (y == tyearindex);
-		var tmonth = useToMonth? tmonthindex: 11;
+		// If the current year is the last year of the selection then the ending
+		// month will be the selected ending month, otherwise we end at December.
+		var endingMonthNum = (currentYearNum == toYear) ? toMonth : 11;
 
-		for (; m <= tmonth; m++)
+		for ( var currentMonthNum = startingMonthNum; currentMonthNum <= endingMonthNum; currentMonthNum++)
 		{
-			month = {};
-			month.month = months[m];
-			month.year = years[y];
-			month.entries = one_time.filter(yearMonthFilter(month.year, month.month));
-			
-			data.months.push(month);
+			var currentMonthStr = months[currentMonthNum];
+			var currentYearStr = years[currentYearNum];
+			monthData =
+			{};
+			monthData.month = currentMonthStr;
+			monthData.year = currentYearStr;
+			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
+
+			templateData.monthsData.push(monthData);
 		}
 	}
-	$t.append(entries(data));
+	$transactionsDiv.append(entries(templateData));
 	$('#monthly_transactions').html(template(monthly.toArray()));
 };
 
@@ -185,7 +187,7 @@ function parseData(data)
 {
 	monthly = new Backbone.Collection(data['monthly']);
 	one_time = new Backbone.Collection(data['one_time']);
-	
+
 	monthly.each(expandExpenseProperties());
 	one_time.each(expandExpenseProperties());
 }
@@ -232,81 +234,110 @@ var changeDateSelector = function()
 	}
 };
 
-var offsetElementFrom = function($toMove, $toOffsetFrom)
+var offsetElementFrom = function($toMove, $toOffsetFrom, offsetX, offsetY)
 {
+	if(offsetX === undefined)
+		offsetX = 35;
+	if(offsetY === undefined)
+		offsetY = 15;
+	
 	var off = $toOffsetFrom.offset();
-	off.left += 35;
-	off.top += 15;
+	off.left += offsetX;
+	off.top += offsetY;
 	$toMove.css(off);
 };
 
-var showFormUnderMonthly = function()
+function showFormUnderMonthly()
 {
-	var $input = $('#dialog-form');
-	if(selected == "monthly")
+	if (selected == "monthly")
 	{
 		selected = "";
-		$input.hide();
+		hideEntryDialog();
 		return;
 	}
 	selected = "monthly";
-	$('#dialog_status').html('Add Monthly Entry');
-	$input.show();
-	var $b = $('#monthly_button');
-	offsetElementFrom($input, $b);
-	
-	$('#checkbox_monthly').attr("checked", "checked");
-	changeDateSelector();
-	$('#selectorYear').removeAttr('disabled', 'disabled');
-	$('#selectorMonth').removeAttr('disabled', 'disabled');
-	$('#checkbox_monthly').attr('disabled', 'disabled');
-	$('.month_option').hide();
-};
+	var $moveTo = $('#monthly_button');
+	updateEntryDialog('Add Monthly Entry', true, $moveTo, true, true);
+}
 
-var showFormUnderTransactions = function()
+function showFormUnderTransactions()
 {
-	var $input = $('#dialog-form');
-	if(selected == "transactions")
+	if (selected == "transactions")
 	{
 		selected = "";
-		$input.hide();
+		hideEntryDialog();
 		return;
 	}
 	selected = "transactions";
-	$('#dialog_status').html('Add Entry');
-	$input.show();
-	offsetElementFrom($input, $('#transactions_button'));
-	
-	$('#checkbox_monthly').removeAttr("checked");
-	changeDateSelector();
-	$('#selectorYear').removeAttr('disabled', 'disabled');
-	$('#selectorMonth').removeAttr('disabled', 'disabled');
-	$('#checkbox_monthly').removeAttr('disabled', 'disabled');
-	$('.month_option').show();
-};
+	var $moveTo = $('#transactions_button');
+	updateEntryDialog('Add Entry', false, $moveTo, false, false);
+}
 
 function moveFormToYearMonth(year, month)
 {
-	var $input = $('#dialog-form');
-	if(selected == year + ":" + month)
+	var key = year + ":" + month;
+	if (selected == key)
 	{
 		selected = "";
-		$input.hide();
+		hideEntryDialog();
 		return;
 	}
-	selected = year + ":" + month;
-	$('#dialog_status').html('Add Entry for ' + month + " " + year);
-	$input.show();
-	var $toInsertAfter = $("#" + year + "-" + month);
-	offsetElementFrom($input, $toInsertAfter);
-	$('#checkbox_monthly').removeAttr("checked");
+	selected = key;
+	var status = 'Add Entry for ' + month + " " + year;
+	var $moveTo = $('#' + year + "-" + month);
+	updateEntryDialog(status, false, $moveTo, true, true, year, month);
+}
+
+function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, disableMonthlyOptions, yearSelection, monthSelection)
+{
+	$('#dialog_status').html(statusText);
+	offsetElementFrom(getEntryDialog(), $moveTo);
+	if(checkMonthlyCheckbox)
+		$('#checkbox_monthly').attr('checked', 'checked');
+	else
+		$('#checkbox_monthly').removeAttr("checked");
+	
 	changeDateSelector();
-	$('#selectorYear').val(year);
-	$('#selectorMonth').val(month);
-	$('#selectorYear').attr('disabled', 'disabled');
-	$('#selectorMonth').attr('disabled', 'disabled');
-	$('#checkbox_monthly').attr('disabled', 'disabled');
-	$('.month_option').hide();
+	showEntryDialog();
+	
+	if(!disableMonthlyOptions)
+	{
+		$('#selectorYear').removeAttr('disabled', 'disabled');
+		$('#selectorMonth').removeAttr('disabled', 'disabled');
+		$('#checkbox_monthly').removeAttr('disabled', 'disabled');
+	}
+	else
+	{
+		$('#selectorYear').attr('disabled', 'disabled');
+		$('#selectorMonth').attr('disabled', 'disabled');
+		$('#checkbox_monthly').attr('disabled', 'disabled');
+	}
+	
+	if(yearSelection !== undefined)
+		$('#selectorYear').val(yearSelection);
+
+	if(monthSelection !== undefined)
+		$('#selectorMonth').val(monthSelection);
+	
+	if(hideMonthOption)
+		$('.month_option').hide();
+	else
+		$('.month_option').show();
+}
+
+function getEntryDialog()
+{
+	return $('#dialog-form');
+}
+
+function hideEntryDialog()
+{
+	getEntryDialog().hide();
+}
+
+function showEntryDialog()
+{
+	getEntryDialog().show();
 }
 
 function yearMonthFilter(year, month)
@@ -327,7 +358,7 @@ function expandExpenseProperties()
 
 function expandExpenseProperty(value)
 {
-	if(value.get('type') == "Income")
+	if (value.get('type') == "Income")
 		value.set('income', value.get('amount'));
 	else
 		value.set('expense', value.get('amount'));

@@ -24,6 +24,7 @@
 			}
 			th
 			{
+				border-width: 0px;
 				text-align: left;
 			}
 			.entries_first
@@ -38,15 +39,16 @@
 			}
 		</style>
 		
-		
 		<div style="float: right;">
 			{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
 			<br />
 			<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />
 		</div>
 		
-		
 		{% if username %}
+		
+		<!-- Entry data input form -->
+		
 		<div id="dialog-form" style="display=none; position=absolute;">
 			<form onsubmit="return false;">
 				<table class="fieldset">
@@ -93,11 +95,7 @@
 							<label>Year</label>
 						</td>
 						<td>
-							<select id="selectorYear" name="selectorYear" class="selector">
-								<option>2011</option>
-								<option>2012</option>
-								<option>2013</option>
-							</select>
+							<select id="selectorYear" name="selectorYear" class="selector"></select>
 						</td>
 					</tr>
 					<tr class="month_option monthly_options" style="display: none;">
@@ -105,20 +103,7 @@
 							<label>Month</label>
 						</td>
 						<td>
-							<select id="selectorMonth" name="selectorMonth" class="selector">
-								<option>January</option>
-								<option>February</option>
-								<option>March</option>
-								<option>April</option>
-								<option>May</option>
-								<option>June</option>
-								<option>July</option>
-								<option>August</option>
-								<option>September</option>
-								<option>October</option>
-								<option>November</option>
-								<option>December</option>
-							</select>
+							<select id="selectorMonth" name="selectorMonth" class="selector"></select>
 						</td>
 					</tr>
 					<tr>
@@ -141,42 +126,26 @@
 			<h2 id="transactions_header">
 				Transactions<button id="transactions_button" onclick="showFormUnderTransactions()">+</button>
 			</h2>
-			<div style="width: 400px;">
-				<table border="1" style="width: 100%;">
+			<div>
+				<table border="1">
 					<tr>
-						<td>
-							<label>From</label>
-						</td>
-						<td>
-							<select id="from_month"></select>
-						</td>
-						<td>
-							<select id="from_year"></select>
-						</td>
+						<td><label>From</label></td>
+						<td><select id="from_month"></select></td>
+						<td><select id="from_year"></select></td>
 					</tr>
 					<tr>
-						<td>
-							<label>To</label>
-						</td>
-						<td>
-							<select id="to_month"></select>
-						</td>
-						<td>
-							<select id="to_year"></select>
-						</td>
+						<td><label>To</label></td>
+						<td><select id="to_month"></select></td>
+						<td><select id="to_year"></select></td>
 					</tr>
 					<tr>
 						<td></td>
 						<td colspan="2">
-							<button style="width: 100%" label="Add" onclick="refreshTransactions()">Refresh</button>
+							<button style="width: 100%" onclick="refreshTransactions()">Refresh</button>
 						</td>
 					</tr>
 				</table>
-				<div id="transactions" style="width: 100%;">
-					<table id="transactions_table">
-						
-					</table>
-				</div>
+				<div id="transactions"></div>
 			</div>
 		</div>
 		{% endif %}
@@ -216,20 +185,22 @@
 
 <script type="text/template" class="entries">
 	<table>
-		<% _.each(rc.months, function(value, key, list) { %>
+		<% _.each(rc.monthsData, function(value, key, list) { %>
 			<tr class="entries_first">
 				<td>
 					<%- value.year + " - " + value.month %>
 				</td>
 				<td>
+				</td>
+				<td></td>
+				<td>
 					<% var buttonid = value.year + "-" + value.month; %>
 					<button id=<%- buttonid %> onclick="moveFormToYearMonth(<%- value.year %>, '<%- value.month %>');">+</button>
 				</td>
 			</tr>
-			<tr class="entries_second">
-				<td style="width: 100%;">
+			<tr>
+				<td>
 					<% if (value.entries.length > 0) { %>
-						<table>
 							<tr>
 								<th>
 									Name
@@ -254,7 +225,6 @@
 										</td>
 									</tr>							
 							<% }); %>
-						</table>
 					<% } %>
 				</td>
 				<td style="padding-bottom: 50px;"></td>

@@ -11,8 +11,6 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 
-MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
 class MonthlyEntry(db.Model):
     userid = db.StringProperty()
     name = db.StringProperty()
