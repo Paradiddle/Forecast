@@ -1,0 +1,25 @@
+.fieldset {
+	border: solid;
+	background-color: #DDDDDD;
+}
+
+td {
+	border-width: 0px;
+	padding: 3px;
+	text-align: left;
+}
+
+th {
+	border-width: 0px;
+	text-align: left;
+}
+
+.entries_first {
+	background-color: #CCCCCC;
+	font-weight: bold;
+}
+
+.entries_second {
+	background-color: #EEEEEE;
+	width: 100%;
+}
