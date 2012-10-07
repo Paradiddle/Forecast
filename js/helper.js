@@ -239,13 +239,13 @@ function showEntryDialog()
 function offsetElementFrom($toMove, $toOffsetFrom, offsetX, offsetY)
 {
 	if(offsetX === undefined)
-		offsetX = 35;
+		offsetX = 0; //35;
 	if(offsetY === undefined)
-		offsetY = 15;
+		offsetY = 0; //15;
 	
 	var off = $toOffsetFrom.offset();
-	off.left += offsetX;
-	off.top += offsetY;
+	off.left -= (offsetX + $toMove.width());
+	off.top -= (offsetY + $toMove.height());
 	$toMove.css(off);
 }
 
@@ -372,4 +372,30 @@ function getEntriesHtml()
 	}
 	return templateEntries(templateData);
 }
+
+/*
+ * Window helpers
+ */
+
+function f_clientWidth() {
+	return f_filterResults (
+		window.innerWidth ? window.innerWidth : 0,
+		document.documentElement ? document.documentElement.clientWidth : 0,
+		document.body ? document.body.clientWidth : 0
+	);
+}
+
+function f_clientHeight() {
+	return f_filterResults (
+		window.innerHeight ? window.innerHeight : 0,
+		document.documentElement ? document.documentElement.clientHeight : 0,
+		document.body ? document.body.clientHeight : 0
+	);
+}
+
+function f_filterResults(n_win, n_docel, n_body) {
+	var n_result = n_win ? n_win : 0;
+	if (n_docel && (!n_result || (n_result > n_docel)))
+		n_result = n_docel;
+	return n_body && (!n_result || (n_result > n_body)) ? n_body : n_result;
 }
