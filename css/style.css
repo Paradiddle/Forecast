@@ -49,3 +49,7 @@ tr.entries_first td{
 	float:left;
 	margin-left:15px;
 }
+
+.button{
+	font-size:12px!important;
+}

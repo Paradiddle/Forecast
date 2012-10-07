@@ -139,6 +139,8 @@ function refreshEntries()
 {
 	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
 	$('#entries').html(getEntriesHtml());	
+	$("button").button();
+	$('#addentry').validate();
 }
 
 /*

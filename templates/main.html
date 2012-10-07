@@ -2,15 +2,17 @@
 	<head>
 		<title>Budget Forecaster</title>
 		
-		<script type="text/javascript" src="js/jquery.js"></script>
-		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="js/underscore.js"></script>
-		<script type="text/javascript" src="js/backbone.js"></script>
-		<script type="text/javascript" src="js/helper.js"></script>
+		
 		<noscript>Your browser does not have Javascript enabled.</noscript>
 		<link href="css/style.css" type="text/css" rel="stylesheet">
 		<link href="css/jquery-ui.css" type="text/css" rel="stylesheet">
 		<link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700' rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/jquery-validate.js"></script>
+		<script type="text/javascript" src="js/underscore.js"></script>
+		<script type="text/javascript" src="js/backbone.js"></script>
+		<script type="text/javascript" src="js/helper.js"></script>
 	</head>
 
 	<body>		
@@ -37,7 +39,7 @@
 							<label for="input_name">Entry Name</label>								
 						</td>
 						<td width="50%">
-							<input type="text" class="in" id="input_name" name="input_name">
+							<input type="text" class="in required" id="input_name" name="input_name">
 						</td>
 					</tr>
 					<tr>
@@ -45,7 +47,7 @@
 							<label for="input_amount">Entry Amount</label>
 						</td>
 						<td>
-							<input type="text" class="in" id="input_amount" name="input_amount">
+							<input type="text" class="in required" id="input_amount" name="input_amount">
 						</td>
 					</tr>
 					<tr>
@@ -95,11 +97,11 @@
 		
 		<div style="display: block;">
 			<h2 style="vertical-align: middle">
-				Monthly Entries<button onclick="showEntryDialogUnderMonthly(this)">+</button>
+				Monthly Entries<button class="button" onclick="showEntryDialogUnderMonthly(this)">ADD</button>
 			</h2>
 			<div id="monthly_entries">{{ data }}</div>
 			<h2>
-				Entries<button onclick="showEntryDialogUnderEntryHeader(this)">+</button>
+				Entries<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">ADD</button>
 			</h2>
 			<div>
 				<table border="1">
@@ -116,7 +118,7 @@
 					<tr>
 						<td></td>
 						<td colspan="2">
-							<button style="width: 100%" onclick="refreshEntries()">Refresh</button>
+							<button class="button" style="width: 100%" onclick="refreshEntries()">Refresh</button>
 						</td>
 					</tr>
 				</table>
@@ -174,7 +176,7 @@
 							</td>
 							<td align="right">
 								<% var buttonid = value.year + "-" + value.month; %>
-								<button style="float:right" class="button" id=<%- buttonid %> onclick="showEntryDialogUnderYearMonth(<%- value.year %>, '<%- value.month %>');">+</button>
+								<button style="float:right" class="button" id=<%- buttonid %> onclick="showEntryDialogUnderYearMonth(<%- value.year %>, '<%- value.month %>');">ADD</button>
 							</td>
 						</tr>
 						<% if (value.entries.length > 0) { %>
