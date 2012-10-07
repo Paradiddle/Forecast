@@ -1,25 +1,51 @@
-.fieldset {
+body{
+	font-family: 'PT Sans Narrow', sans-serif;
+	font-weight:400;
+}
+
+.fieldset{
 	border: solid;
 	background-color: #DDDDDD;
 }
 
-td {
+td{
 	border-width: 0px;
 	padding: 3px;
 	text-align: left;
 }
 
-th {
+th{
 	border-width: 0px;
 	text-align: left;
 }
 
-.entries_first {
-	background-color: #CCCCCC;
-	font-weight: bold;
+tr.entries_first{
+	background-color: #2383c0;
+	color: white;
+	font-weight: 700;
+	height:20px;
 }
 
-.entries_second {
+tr.entries_first td{
+	padding:0;
+}
+
+.entries_second{
 	background-color: #EEEEEE;
 	width: 100%;
+}
+
+.year{
+	font-size:40px;
+	line-height:15px;
+	margin:5px 0 0px 0;
+	padding:0;
+	float:left;
+	color:#91cff6;
+}
+
+.month{
+	font-size:20px;
+	float:left;
+	margin-left:15px;
 }

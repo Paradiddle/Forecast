@@ -1,5 +1,6 @@
 $(document).ready(function()
 {
+	$('.button').button();
 	retrieveEntries();
 	/*
 	 * if (typeof String.prototype.startsWith != 'function') {
