@@ -224,6 +224,7 @@ function getEntryDialog()
 
 function hideEntryDialog()
 {
+	selected = "";
 	getEntryDialog().hide();
 }
 
