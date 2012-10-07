@@ -1,6 +1,5 @@
 $(document).ready(function()
 {
-	$('.button').button();
 	retrieveEntries();
 	/*
 	 * if (typeof String.prototype.startsWith != 'function') {
@@ -107,7 +106,8 @@ function addEntry()
 		data : data,
 		success : function(result)
 		{
-			refreshEntries();
+			$('#monthly_entries').html(templateMonthly(monthly.toArray()));
+			$('#entries').html(getEntriesHtml());
 		}
 	});
 	return false;
@@ -131,7 +131,8 @@ function retrieveEntries()
 		success : function(result)
 		{
 			parseData(result);
-			$('#monthly_entries').html(getEntriesHtml());
+			$('#monthly_entries').html(templateMonthly(monthly.toArray()));
+			$('#entries').html(getEntriesHtml());
 		}
 	});
 }
@@ -343,11 +344,6 @@ function getEntriesHtml()
 	var toYear = $('#to_year').prop('selectedIndex');
 	var fromYear = $('#from_year').prop('selectedIndex');
 
-	var $entriesDiv = $('#entries');
-	
-	// Clear out the existing entries div contents
-	$entriesDiv.html("");
-
 	var templateData = {};
 	templateData.monthsData = [];
 
@@ -374,6 +370,6 @@ function getEntriesHtml()
 			templateData.monthsData.push(monthData);
 		}
 	}
-	$entriesDiv.append(templateEntries(templateData));
-	return templateMonthly(monthly.toArray());
+	return templateEntries(templateData);
+}
 }
