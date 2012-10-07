@@ -150,7 +150,7 @@ function showEntryDialogUnderMonthly(el)
 		return;
 	}
 	selected = "monthly";
-	updateEntryDialog('Add Monthly Entry', true, $(el), true, true);
+	updateEntryDialog('Add Monthly Entry', true, $(el), true, true, false);
 }
 
 function showEntryDialogUnderEntryHeader(el)
@@ -162,7 +162,7 @@ function showEntryDialogUnderEntryHeader(el)
 		return;
 	}
 	selected = "transactions";
-	updateEntryDialog('Add Entry', false, $(el), false, false);
+	updateEntryDialog('Add Entry', false, $(el), false, false, false);
 }
 
 function showEntryDialogUnderYearMonth(year, month)
@@ -177,13 +177,12 @@ function showEntryDialogUnderYearMonth(year, month)
 	selected = key;
 	var status = 'Add Entry for ' + month + " " + year;
 	var $moveTo = $('#' + year + "-" + month);
-	updateEntryDialog(status, false, $moveTo, true, true, year, month);
+	updateEntryDialog(status, false, $moveTo, true, true, year, month, true);
 }
 
-function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, disableMonthlyOptions, yearSelection, monthSelection)
+function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, disableMonthlyOptions, yearSelection, monthSelection, topLeft)
 {
 	$('#dialog_status').html(statusText);
-	offsetElementFrom(getEntryDialog(), $moveTo);
 	if(checkMonthlyCheckbox)
 		$('#checkbox_monthly').attr('checked', 'checked');
 	else
@@ -215,6 +214,8 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 		$('.month_option').hide();
 	else
 		$('.month_option').show();
+
+	offsetElementFrom(getEntryDialog(), $moveTo, topLeft);
 }
 
 function getEntryDialog()
@@ -237,16 +238,27 @@ function showEntryDialog()
  * JQuery helper functions
  */
 
-function offsetElementFrom($toMove, $toOffsetFrom, offsetX, offsetY)
+function offsetElementFrom($toMove, $toOffsetFrom, topLeft)
 {
-	if(offsetX === undefined)
-		offsetX = 0; //35;
-	if(offsetY === undefined)
-		offsetY = 0; //15;
+	var offsetX, offsetY;
+	
+	if(topLeft)
+	{
+		offsetX = -$toMove.width();
+		offsetY = -$toMove.height() + $toOffsetFrom.height();
+	}
+	else
+	{
+		offsetX = $toOffsetFrom.width() + 15;
+		offsetY = $toOffsetFrom.height() + 5;
+	}
+	
+	console.log(offsetX);
+	console.log(offsetY);
 	
 	var off = $toOffsetFrom.offset();
-	off.left -= (offsetX + $toMove.width());
-	off.top -= (offsetY + $toMove.height());
+	off.left += offsetX;
+	off.top += offsetY;
 	$toMove.css(off);
 }
 
