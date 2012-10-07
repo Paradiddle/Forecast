@@ -106,8 +106,7 @@ function addEntry()
 		data : data,
 		success : function(result)
 		{
-			$('#monthly_entries').html(templateMonthly(monthly.toArray()));
-			$('#entries').html(getEntriesHtml());
+			refreshEntries();
 		}
 	});
 	return false;
@@ -131,10 +130,15 @@ function retrieveEntries()
 		success : function(result)
 		{
 			parseData(result);
-			$('#monthly_entries').html(templateMonthly(monthly.toArray()));
-			$('#entries').html(getEntriesHtml());
+			refreshEntries();
 		}
 	});
+}
+
+function refreshEntries()
+{
+	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
+	$('#entries').html(getEntriesHtml());	
 }
 
 /*
@@ -383,6 +387,7 @@ function getEntriesHtml()
 			templateData.monthsData.push(monthData);
 		}
 	}
+	console.log(templateData);
 	return templateEntries(templateData);
 }
 
