@@ -4,6 +4,7 @@ import os
 import urllib
 import string
 import simplejson as json
+import logging
 
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
@@ -31,6 +32,15 @@ class OneTimeEntry(db.Model):
     def toDict(self):
         return {'name': self.name, 'type': self.type, 'amount': self.amount, 'year': self.year, 'month': self.month, 'id': (str(self.year) + ":" + self.month + ":" + self.name)}
 
+class Month(db.Model):
+    month = db.StringProperty()
+    year = db.IntegerProperty()
+    userid = db.StringProperty()
+    start_balance = db.FloatProperty()
+    
+    def toDict(self):
+        return {'start_balance': self.start_balance, 'id': (str(self.year) + ":" + self.month)};
+
 def getMonthlyEntriesByUserId(userid):
     monthly = db.GqlQuery("SELECT * FROM MonthlyEntry WHERE userid = :1", userid)
     entries = []
@@ -45,15 +55,60 @@ def getOneTimeEntriesByUserId(userid):
         entries.append(e.toDict())
     return entries
 
-class Month(db.Model):
-    starting_balance = db.FloatProperty()
-    lastmonth_difference = db.FloatProperty()
+def getMonthsByUserId(userid):
+    months = db.GqlQuery("SELECT * FROM Month WHERE userid = :1", userid)
+    entries = []
+    for m in months:
+        entries.append(m.toDict())
+    return entries
 
 def monthly_key_name(userid, name):
     return userid + ":" + name
 
 def one_time_key_name(userid, name, year, month):
     return userid + ":" + name + ":" + year + ":" + month
+
+def month_key_name(userid, year, month):
+    return userid + ":" + year + ":" + month
+
+def addEntity(cur_user, name, amount, type, monthly, year, month):
+        if not cur_user:
+            return False
+
+        userid = cur_user.user_id();
+        if monthly:
+            #Adding a MonthlyEntry
+            #If there is already a OneTimeEntry with the same name, then cancel the add.
+            if OneTimeEntry.all().filter('userid =', userid).filter('name =', name).get():
+                return False
+            already_entered = MonthlyEntry.get_by_key_name(monthly_key_name(userid, name))
+            if already_entered:
+                if already_entered.default_amount != amount:
+                    already_entered.default_amount = amount
+                    already_entered.put()
+            else:
+                monthly_entry = MonthlyEntry(key_name=monthly_key_name(userid, name))
+                monthly_entry.userid = userid
+                monthly_entry.name = name
+                monthly_entry.default_amount = amount
+                monthly_entry.type = type
+                monthly_entry.put()
+        else:
+            already_entered = OneTimeEntry.get_by_key_name(one_time_key_name(userid, name, year, month))
+            if already_entered:
+                if already_entered.amount != amount:
+                    already_entered.amount = amount
+                    already_entered.put()
+            else:
+                one_time_entry = OneTimeEntry(key_name=one_time_key_name(userid, name, year, month))
+                one_time_entry.userid = userid
+                one_time_entry.name = name
+                one_time_entry.year = int(year)
+                one_time_entry.month = month
+                one_time_entry.type = type
+                one_time_entry.amount = amount
+                one_time_entry.put()
+        return True
 
 class Login(webapp.RequestHandler):
     def get(self):
@@ -80,6 +135,11 @@ class Login(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
+        user = users.get_current_user()
+        if not user:
+            self.response.out.write("Invalid user.")
+            return
+        
         name = self.request.get("name")
         amount = float(self.request.get("amount"))
 
@@ -95,73 +155,58 @@ class Login(webapp.RequestHandler):
             year = self.request.get("year")
             month = self.request.get("month")
 
-        ret = self.addEntity(name, amount, type, monthly, year, month)
-        self.response.out.write("Success");
+        ret = addEntity(users.get_current_user(), name, amount, type, monthly, year, month)
+        self.response.out.write(ret);
 
-    def addEntity(self, name, amount, type, monthly, year, month):
-        user = users.get_current_user()
-        if not user:
-            return False
-
-        if monthly:
-            #Adding a MonthlyEntry
-            #If there is already a OneTimeEntry with the same name, then cancel the add.
-            if OneTimeEntry.all().filter('userid =', user.user_id()).filter('name =', name).get():
-                return False
-            already_entered = MonthlyEntry.get_by_key_name(monthly_key_name(user.user_id(), name))
-            if already_entered:
-                if already_entered.default_amount != amount:
-                    already_entered.default_amount = amount
-                    already_entered.put()
-            else:
-                monthly_entry = MonthlyEntry(key_name=monthly_key_name(user.user_id(), name))
-                monthly_entry.userid = user.user_id()
-                monthly_entry.name = name
-                monthly_entry.default_amount = amount
-                monthly_entry.type = type
-                monthly_entry.put()
-        else:
-            already_entered = OneTimeEntry.get_by_key_name(one_time_key_name(user.user_id(), name, year, month))
-            if already_entered:
-                if already_entered.amount != amount:
-                    already_entered.amount = amount
-                    already_entered.put()
-            else:
-                one_time_entry = OneTimeEntry(key_name=one_time_key_name(user.user_id(), name, year, month))
-                one_time_entry.userid = user.user_id()
-                one_time_entry.name = name
-                one_time_entry.year = int(year)
-                one_time_entry.month = month
-                one_time_entry.type = type
-                one_time_entry.amount = amount
-                one_time_entry.put()
-        return True
-
-class Transaction(webapp.RequestHandler):        
-    def post(self):
+class Entries(webapp.RequestHandler):        
+    def get(self):
         user = users.get_current_user()
         if not user:
             self.response.out.write("Invalid user.")
             return
         
-        monthly = getMonthlyEntriesByUserId(user.user_id())
-        one_time = getOneTimeEntriesByUserId(user.user_id())
-        
         dic = {}
-        dic["monthly"] = monthly
-        dic["one_time"] = one_time
+        dic["monthly"] = getMonthlyEntriesByUserId(user.user_id())
+        dic["one_time"] = getOneTimeEntriesByUserId(user.user_id())
+        dic["months"] = getMonthsByUserId(user.user_id())
         
         js = json.dumps(dic)
         
         self.response.headers.add_header('content-type', 'applications/json', charset='utf-8')
         self.response.out.write(js)
     
+class UpdateMonth(webapp.RequestHandler):
+    def post(self):
+        user = users.get_current_user()
+        if not user:
+            self.response.out.write("Invalid user.");
+            return
+        userid = user.user_id()
+        
+        month = self.request.get("month");
+        year = self.request.get("year");
+        start_balance = self.request.get("start_balance");
+
+        existing_month = Month.get_by_key_name(month_key_name(userid, year, month))
+        if existing_month:
+            existing_month.start_balance = float(start_balance)
+            existing_month.put()
+        else:
+            m = Month(key_name=month_key_name(userid, year, month))
+            m.userid = user.user_id()
+            m.month = month
+            m.year = int(year)
+            m.start_balance = float(start_balance)
+            m.put()
+
 application = webapp.WSGIApplication([
     ('/', Login),
-    ('/Transactions', Transaction)
+    ('/Entries', Entries),
+    ('/UpdateMonth', UpdateMonth)
 ], debug=True)
 
 def main():
+    logging.getLogger().setLevel(logging.DEBUG)
     run_wsgi_app(application)
 
 if __name__ == '__main__':

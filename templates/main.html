@@ -26,7 +26,7 @@
 		
 		<!-- Entry data input form -->
 		
-		<div id="dialog_form" style="display=none; position=absolute;">
+		<div id="dialog_form" style="display=none; position=absolute; z-index:5">
 			<form onsubmit="return false;">
 				<table class="fieldset">
 					<tr>
@@ -85,10 +85,10 @@
 					</tr>
 					<tr>
 						<td>
-							<button style="width: 100%;" onclick="addEntry(); hideEntryDialog();" id="addentry">Add Entry</button>
+							<button class="button" style="width: 100%;" onclick="addEntry(); hideEntryDialog();" id="addentry">Add Entry</button>
 						</td>
 						<td>
-							<button style="width: 100%;" onclick="hideEntryDialog();">Close</button>
+							<button class="button" style="width: 100%;" onclick="hideEntryDialog();">Close</button>
 						</td>
 					</tr>
 				</table>
@@ -164,11 +164,11 @@
 	<table width="100%">
 		<tr>
 			<% _.each(rc.monthsData, function(value, key, list) { %>
-				<% if (key % 4 == 0) { %>
+				<% if (key % 4 == 0 && key != 0) { %>
 				</tr>
 				<tr>
 				<% } %>
-				<td width="25%" valign="top">
+				<td id=<%- value.month + value.year %> width="25%" valign="top" style="padding-top: 25px; height: 100%;">
 					<table width="100%" cellspacing="0">
 						<tr class="entries_first">
 							<td colspan="2">
@@ -179,8 +179,19 @@
 								<button style="float:right" class="button" id=<%- buttonid %> onclick="showEntryDialogUnderYearMonth(<%- value.year %>, '<%- value.month %>');">ADD</button>
 							</td>
 						</tr>
+						<tr style="background-color: #DBDE90;">
+							<td colspan="3">
+								<form onsubmit="return false;" style="padding: 0px; margin: 0px;">
+									<label>Starting Balance: </label>
+									<% var sbid = value.month + value.year; %>
+									<label id="start_balance_label<%-sbid%>" style="font-weight: bold;" onclick="showInputForStartingBalance(<%-value.year%>, '<%-value.month%>');"><%- value.start_balance? value.start_balance: "---" %><%- value.difference? "(" + (value.difference > 0? "+": "") + value.difference + ")": "" %></label>
+									<input id="start_balance_input<%-sbid%>" style="display: none;" on type="text" />
+									<button id="start_balance_button<%-sbid%>" class="button" style="display: none;" onclick="updateStartingBalance(<%-value.year%>, '<%-value.month%>');">Update</button>
+								</form>
+							</td>
+						</tr>
 						<% if (value.entries.length > 0) { %>
-						<tr>
+						<tr style="background-color: #FCEFA1;">
 							<th width="33%">
 								Name
 							</th>
@@ -192,7 +203,7 @@
 							</th>
 						</tr>
 							<% _.each(value.entries, function(value, key, list) { %>
-						<tr>
+						<tr style="background-color: #FDFFB2;">
 							<td>
 								<%- value.get('name') %>
 							</td>
@@ -206,6 +217,15 @@
 							<% }); %>
 						<% } %>
 					</table>
+					<!--
+					<label>Total Expenses</label>
+					<label><%- value.total_expenses %></label>
+					<br>
+					<label>Total Income</label>
+					<label><%- value.total_income %></label>
+					<br>
+					<label>Difference</label>
+					-->
 				</td>
 				
 			<% }); %>

@@ -34,6 +34,7 @@ var years = [ 2011, 2012, 2013 ];
 
 var monthly;
 var one_time;
+var monthsMeta;
 var selected;
 
 /*
@@ -117,22 +118,9 @@ function addEntry()
  */
 function retrieveEntries()
 {
-	var data =
-	{
-		year : $('#idYearSelector').val()
-	};
-	$.ajax(
-	{
-		url : "/Transactions",
-		dataType : "json",
-		data : data,
-		type : "POST",
-		success : function(result)
-		{
-			parseData(result);
-			refreshEntries();
-		}
-	});
+	var data = {};
+	data.year = $('#idYearSelector').val();
+	$.get("/Entries", data, onReceiveJsonEntries, "json");
 }
 
 function refreshEntries()
@@ -141,6 +129,12 @@ function refreshEntries()
 	$('#entries').html(getEntriesHtml());	
 	$("button").button();
 	$('#addentry').validate();
+}
+
+function onReceiveJsonEntries(jsonData)
+{
+	parseData(jsonData);
+	refreshEntries();
 }
 
 /*
@@ -224,6 +218,41 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 	offsetElementFrom(getEntryDialog(), $moveTo, topLeft);
 }
 
+function updateStartingBalance(year, month)
+{
+	var $input = $('#start_balance_input' + month + year);
+	var $label = $('#start_balance_label' + month + year);
+	var new_start_bal = parseInt($input.val());
+	
+	var m = monthsMeta.get(year + ":" + month);
+	if(m == undefined)
+	{
+		m = new Backbone.Model();
+		m.set('id', year + ":" + month);
+		monthsMeta.add(m);
+	}
+	var data = {
+		month: month,
+		year: year,
+		start_balance: new_start_bal
+	};
+	$.post("/UpdateMonth", data);
+	m.set('start_balance', new_start_bal);
+	refreshEntries();
+}
+
+function showInputForStartingBalance(year, month)
+{
+	var $input = $('#start_balance_input' + month + year);
+	var $label = $('#start_balance_label' + month + year);
+	var $button = $('#start_balance_button' + month + year);
+	$input.show();
+	$button.show();
+	$input.val($label.html());
+	$input.focus();
+	$label.hide();
+}
+
 function getEntryDialog()
 {
 	return $('#dialog_form');
@@ -258,9 +287,6 @@ function offsetElementFrom($toMove, $toOffsetFrom, topLeft)
 		offsetX = $toOffsetFrom.width() + 15;
 		offsetY = $toOffsetFrom.height() + 5;
 	}
-	
-	console.log(offsetX);
-	console.log(offsetY);
 	
 	var off = $toOffsetFrom.offset();
 	off.left += offsetX;
@@ -328,6 +354,7 @@ function parseData(data)
 {
 	monthly = new Backbone.Collection(data['monthly']);
 	one_time = new Backbone.Collection(data['one_time']);
+	monthsMeta = new Backbone.Collection(data['months']);
 
 	monthly.each(expandExpenseProperties());
 	one_time.each(expandExpenseProperties());
@@ -365,7 +392,12 @@ function getEntriesHtml()
 
 	var templateData = {};
 	templateData.monthsData = [];
-
+	var previousStartingBalance;
+	var previousExpenses;
+	var previousIncome;
+	var previousEstimate;
+	var maxEntries = 0;
+	
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
 	{
@@ -381,16 +413,71 @@ function getEntriesHtml()
 		{
 			var currentMonthStr = months[currentMonthNum];
 			var currentYearStr = years[currentYearNum];
+			var currentMonth = monthsMeta.get(currentYearStr + ":" + currentMonthStr);
+			var currentStartBalance = undefined;
+			if(currentMonth != undefined)
+			{
+				currentStartBalance = parseInt(currentMonth.get('start_balance'));
+			}
 			monthData = {};
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
+			
+			total_expenses = 0
+			total_income = 0
+			
+			if(monthData.entries.length > maxEntries)
+				maxEntries = monthData.entries.length;
+			for(var e in monthData.entries)
+			{
+				var entry = monthData.entries[e];
+				var amount = parseInt(entry.get('amount'));
+				if(entry.get('type') == "Income")
+					total_income += parseInt(amount);
+				else
+					total_expenses += parseInt(amount);
+			}
 
+			monthData.total_expenses = total_expenses;
+			monthData.total_income = total_income;
+			
+			if(currentStartBalance != undefined)
+			{
+				monthData.start_balance = currentStartBalance;
+				if(previousEstimate != undefined)
+				{
+					monthData.difference = (currentStartBalance - previousEstimate);
+				}
+			}
+			else if(previousStartingBalance != undefined)
+			{
+				var newBalance = previousStartingBalance;
+				if(previousExpenses != undefined)
+					newBalance -= previousExpenses;
+				if(previousIncome != undefined)
+					newBalance += previousIncome;
+				monthData.start_balance = newBalance;
+			}
+			
+			previousIncome = total_income;
+			previousExpenses = total_expenses;
+			previousStartingBalance = monthData.start_balance;
+			previousEstimate = previousStartingBalance + previousIncome - previousExpenses;
+			
 			templateData.monthsData.push(monthData);
 		}
 	}
-	console.log(templateData);
+	templateData.maxEntries = maxEntries;
 	return templateEntries(templateData);
+}
+
+function getMonthMetaAfterYearMonth(year, month)
+{
+	if(month == "December")
+	{
+		return monthsMeta.get("")
+	}
 }
 
 /*
