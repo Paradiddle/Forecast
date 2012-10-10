@@ -53,3 +53,7 @@ tr.entries_first td{
 .button{
 	font-size:12px!important;
 }
+
+label.preMonthMeta{
+	font-weight: bold;
+}

@@ -129,6 +129,7 @@ function refreshEntries()
 	$('#entries').html(getEntriesHtml());	
 	$("button").button();
 	$('#addentry').validate();
+	$('.start_balance_input').hide();
 }
 
 function onReceiveJsonEntries(jsonData)
@@ -220,8 +221,8 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 
 function updateStartingBalance(year, month)
 {
-	var $input = $('#start_balance_input' + month + year);
-	var $label = $('#start_balance_label' + month + year);
+	var $input = $('#start_balance_input' + year + month);
+	var $label = $('#start_balance_label' + year + month);
 	var new_start_bal = parseInt($input.val());
 	
 	var m = monthsMeta.get(year + ":" + month);
@@ -243,13 +244,16 @@ function updateStartingBalance(year, month)
 
 function showInputForStartingBalance(year, month)
 {
-	var $input = $('#start_balance_input' + month + year);
-	var $label = $('#start_balance_label' + month + year);
-	var $button = $('#start_balance_button' + month + year);
+	var $input = $('#start_balance_input' + year + month);
+	var $label = $('#start_balance_label' + year + month);
+	var $button = $('#start_balance_button' + year + month);
+	$('.start_balance_input').hide();
+	$('.start_balance_label').show();
 	$input.show();
 	$button.show();
 	$input.val($label.html());
 	$input.focus();
+	$input.select();
 	$label.hide();
 }
 
@@ -391,12 +395,16 @@ function getEntriesHtml()
 	var fromYear = $('#from_year').prop('selectedIndex');
 
 	var templateData = {};
-	templateData.monthsData = [];
+	templateData.rowData = [];
+	templateData.numCols = 5;
 	var previousStartingBalance;
 	var previousExpenses;
 	var previousIncome;
 	var previousEstimate;
 	var maxEntries = 0;
+	
+	var rowMonthsData = [];
+	var curIndex = 0;
 	
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
@@ -420,6 +428,7 @@ function getEntriesHtml()
 				currentStartBalance = parseInt(currentMonth.get('start_balance'));
 			}
 			monthData = {};
+			monthData.monthid = currentYearStr + ", '" + currentMonthStr + "'";
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
@@ -438,7 +447,7 @@ function getEntriesHtml()
 				else
 					total_expenses += parseInt(amount);
 			}
-
+			
 			monthData.total_expenses = total_expenses;
 			monthData.total_income = total_income;
 			
@@ -464,10 +473,21 @@ function getEntriesHtml()
 			previousExpenses = total_expenses;
 			previousStartingBalance = monthData.start_balance;
 			previousEstimate = previousStartingBalance + previousIncome - previousExpenses;
-			
-			templateData.monthsData.push(monthData);
+
+			curIndex++;
+			rowMonthsData.push(monthData);
+			if(curIndex == templateData.numCols)
+			{
+				curIndex = 0;
+				templateData.rowData.push(rowMonthsData);
+				rowMonthsData = [];
+			}
 		}
 	}
+	if(rowMonthsData.length > 0)
+		templateData.rowData.push(rowMonthsData);
+	console.log(templateData);
+	
 	templateData.maxEntries = maxEntries;
 	return templateEntries(templateData);
 }
