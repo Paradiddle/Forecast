@@ -1,11 +1,10 @@
 $(document).ready(function()
 {
-	retrieveEntries();
-	/*
-	 * if (typeof String.prototype.startsWith != 'function') {
-	 * String.prototype.startsWith = function(str) { return this.slice(0,
-	 * str.length) == str; }; }
-	 */
+	var d = new Date();
+	for(var i = d.getFullYear() - 1; i <= d.getFullYear() + 2; i++)
+	{
+		years.push(i);
+	}
 	populateSelector($(idDropdownToMonth), months);
 	populateSelector($(idDropdownFromMonth), months);
 	populateSelector($('#selectorMonth'), months);
@@ -13,10 +12,16 @@ $(document).ready(function()
 	populateSelector($(idDropdownFromYear), years);
 	populateSelector($('#selectorYear'), years);
 	populateSelector($(idDropdownNumCols), num_cols);
+	
+	$(idDropdownFromYear).val(d.getFullYear());
+	$(idDropdownFromMonth).val(months[d.getMonth()]);
+	$(idDropdownToMonth).val(months[d.getMonth()]);
+	$(idDropdownToYear).val(d.getFullYear() + 1);
+	
+	retrieveEntries();
 
 	hideEntryDialog();
 	getEntryDialog().css('position', 'absolute');
-	$('#to_month').val('December');
 
 	_.templateSettings.variable = "data";
 	templateMonthly = _.template($("script.template").html());
@@ -39,7 +44,7 @@ var templateMonthly;
 var templateEntries;
 
 var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-var years = [ 2011, 2012, 2013 ];
+var years = [];
 var num_cols = [ 3, 4, 5, 6];
 
 var monthly;
@@ -115,8 +120,9 @@ function addEntry()
  */
 function retrieveEntries()
 {
-	var data = {};
-	data.year = $('#idYearSelector').val();
+	var data = {
+		year: $('#idYearSelector').val()
+	};
 	$.get("/Entries", data, onReceiveJsonEntries, "json");
 }
 
@@ -148,7 +154,7 @@ function showEntryDialogUnderMonthly(el)
 		return;
 	}
 	selected = "monthly";
-	updateEntryDialog('Add Monthly Entry', true, $(el), true, true, false);
+	updateEntryDialog('Add Monthly Entry', true, $(el), true, false);
 }
 
 function showEntryDialogUnderEntryHeader(el)
@@ -160,7 +166,7 @@ function showEntryDialogUnderEntryHeader(el)
 		return;
 	}
 	selected = "transactions";
-	updateEntryDialog('Add Entry', false, $(el), false, false, false);
+	updateEntryDialog('Add Entry', false, $(el), false, false);
 }
 
 function showEntryDialogUnderYearMonth(year, month)
@@ -175,10 +181,10 @@ function showEntryDialogUnderYearMonth(year, month)
 	selected = key;
 	var status = 'Add Entry for ' + month + " " + year;
 	var $moveTo = $('#' + year + "-" + month);
-	updateEntryDialog(status, false, $moveTo, true, true, year, month, true);
+	updateEntryDialog(status, false, $moveTo, true, year, month, true);
 }
 
-function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, disableMonthlyOptions, yearSelection, monthSelection, topLeft)
+function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, yearSelection, monthSelection, topLeft)
 {
 	$('#dialog_status').html(statusText);
 	if(checkMonthlyCheckbox)
@@ -188,19 +194,6 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 	
 	changeDateSelector();
 	showEntryDialog();
-	
-	if(!disableMonthlyOptions)
-	{
-		$('#selectorYear').removeAttr('disabled', 'disabled');
-		$('#selectorMonth').removeAttr('disabled', 'disabled');
-		$('#checkbox_monthly').removeAttr('disabled', 'disabled');
-	}
-	else
-	{
-		$('#selectorYear').attr('disabled', 'disabled');
-		$('#selectorMonth').attr('disabled', 'disabled');
-		$('#checkbox_monthly').attr('disabled', 'disabled');
-	}
 	
 	if(yearSelection !== undefined)
 		$('#selectorYear').val(yearSelection);
@@ -415,6 +408,7 @@ function getEntriesHtml()
 	
 	var rowMonthsData = [];
 	var curIndex = 0;
+	var lastMonthData = undefined;
 	
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
@@ -483,7 +477,14 @@ function getEntriesHtml()
 			previousExpenses = total_expenses;
 			previousStartingBalance = monthData.start_balance;
 			previousEstimate = previousStartingBalance + previousIncome - previousExpenses;
-
+			
+			monthData.end_balance = previousEstimate;
+			
+			if(lastMonthData != undefined && lastMonthData.end_balance != undefined)
+			{
+				lastMonthData.discrepancy = monthData.start_balance - lastMonthData.end_balance;
+			}
+			
 			curIndex++;
 			rowMonthsData.push(monthData);
 			if(curIndex == templateData.numCols)
@@ -492,6 +493,7 @@ function getEntriesHtml()
 				templateData.rowData.push(rowMonthsData);
 				rowMonthsData = [];
 			}
+			lastMonthData = monthData;
 		}
 	}
 	if(rowMonthsData.length > 0)
