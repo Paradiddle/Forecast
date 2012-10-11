@@ -6,18 +6,19 @@ $(document).ready(function()
 	 * String.prototype.startsWith = function(str) { return this.slice(0,
 	 * str.length) == str; }; }
 	 */
-	populateSelector($('#to_month'), months);
-	populateSelector($('#from_month'), months);
+	populateSelector($(idDropdownToMonth), months);
+	populateSelector($(idDropdownFromMonth), months);
 	populateSelector($('#selectorMonth'), months);
-	populateSelector($('#to_year'), years);
-	populateSelector($('#from_year'), years);
+	populateSelector($(idDropdownToYear), years);
+	populateSelector($(idDropdownFromYear), years);
 	populateSelector($('#selectorYear'), years);
+	populateSelector($(idDropdownNumCols), num_cols);
 
 	hideEntryDialog();
 	getEntryDialog().css('position', 'absolute');
 	$('#to_month').val('December');
 
-	_.templateSettings.variable = "rc";
+	_.templateSettings.variable = "data";
 	templateMonthly = _.template($("script.template").html());
 	templateEntries = _.template($("script.entries").html());
 });
@@ -26,11 +27,20 @@ $(document).ready(function()
  * Global variables
  */
 
+var idDropdownToMonth = '#to_month';
+var idDropdownToYear = '#to_year';
+var idDropdownFromMonth = '#from_month';
+var idDropdownFromYear = '#from_year';
+
+var idDropdownNumCols = '#num_cols';
+
+
 var templateMonthly;
 var templateEntries;
 
 var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 var years = [ 2011, 2012, 2013 ];
+var num_cols = [ 3, 4, 5, 6];
 
 var monthly;
 var one_time;
@@ -43,8 +53,7 @@ var selected;
 
 function addEntry()
 {
-	var data =
-	{
+	var data = {
 		name : $('[name=input_name]').val(),
 		amount : $('[name=input_amount]').val(),
 		monthly : $('[name=monthly]:checked').val(),
@@ -97,19 +106,7 @@ function addEntry()
 			one_time.add(m);
 		}
 	}
-	
-	// TODO print out the response of this ajax to a notification area
-	// TODO design a meaningful serverside response other than 'success'
-	$.ajax(
-	{
-		url : "/",
-		type : "POST",
-		data : data,
-		success : function(result)
-		{
-			refreshEntries();
-		}
-	});
+	refreshEntries();
 	return false;
 }
 
@@ -222,7 +219,6 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 function updateStartingBalance(year, month)
 {
 	var $input = $('#start_balance_input' + year + month);
-	var $label = $('#start_balance_label' + year + month);
 	var new_start_bal = parseInt($input.val());
 	
 	var m = monthsMeta.get(year + ":" + month);
@@ -232,12 +228,6 @@ function updateStartingBalance(year, month)
 		m.set('id', year + ":" + month);
 		monthsMeta.add(m);
 	}
-	var data = {
-		month: month,
-		year: year,
-		start_balance: new_start_bal
-	};
-	$.post("/UpdateMonth", data);
 	m.set('start_balance', new_start_bal);
 	refreshEntries();
 }
@@ -309,12 +299,12 @@ function populateSelector(selector, options)
 
 function validateFilter()
 {
-	var toMonth = $('#to_month').prop('selectedIndex');
-	var fromMonth = $('#from_month').prop('selectedIndex');
-	var toYear = $('#to_year').prop('selectedIndex');
-	var fromYear = $('#from_year').prop('selectedIndex');
+	var toMonth = getSelectedIndex(idDropdownToMonth);
+	var fromMonth = getSelectedIndex(idDropdownFromMonth);
+	var toYear = getSelectedIndex(idDropdownToYear);
+	var fromYear = getSelectedIndex(idDropdownFromYear);
 
-	if (fromYear <= toYear && fromMonth <= toMonth)
+	if (fromYear <= toYear && (fromMonth <= toMonth || toYear > fromYear))
 		return true;
 	return false;
 }
@@ -330,6 +320,16 @@ function changeDateSelector()
 	}
 }
 
+function getNumCols()
+{
+	return $(idDropdownNumCols).prop('selectedIndex');
+}
+
+function getSelectedIndex(id)
+{
+	return $(id).prop('selectedIndex');
+}
+
 /*
  * Underscore collection filters
  */
@@ -339,7 +339,7 @@ function yearMonthFilter(year, month)
 	return function(obj)
 	{
 		return obj.get('year') == year && obj.get('month') == month;
-	}
+	};
 }
 
 function yearMonthNameFilter(year, month, name)
@@ -347,12 +347,22 @@ function yearMonthNameFilter(year, month, name)
 	return function(obj)
 	{
 		return obj.get('year') == year && obj.get('month') == month && obj.get('name') == name;
-	}
+	};
 }
 
 /*
  * Data helper functions
  */
+
+function saveData()
+{
+	data = {
+		'monthly': monthly.toJSON(),
+		'one_time': one_time.toJSON(),
+		'months': monthsMeta.toJSON()
+	};
+	$.post("/Entries", JSON.stringify(data), function(result) {refreshEntries();});	
+}
 
 function parseData(data)
 {
@@ -369,7 +379,7 @@ function expandExpenseProperties()
 	return function(value, index)
 	{
 		expandExpenseProperty(value);
-	}
+	};
 }
 
 function expandExpenseProperty(value)
@@ -389,18 +399,18 @@ function getEntriesHtml()
 		return;
 	}
 
-	var toMonth = $('#to_month').prop('selectedIndex');
-	var fromMonth = $('#from_month').prop('selectedIndex');
-	var toYear = $('#to_year').prop('selectedIndex');
-	var fromYear = $('#from_year').prop('selectedIndex');
+	var toMonth = getSelectedIndex(idDropdownToMonth);
+	var fromMonth = getSelectedIndex(idDropdownFromMonth);
+	var toYear = getSelectedIndex(idDropdownToYear);
+	var fromYear = getSelectedIndex(idDropdownFromYear);
 
 	var templateData = {};
 	templateData.rowData = [];
-	templateData.numCols = 5;
-	var previousStartingBalance;
-	var previousExpenses;
-	var previousIncome;
-	var previousEstimate;
+	templateData.numCols = num_cols[getNumCols()];
+	var previousStartingBalance = undefined;
+	var previousExpenses = undefined;
+	var previousIncome = undefined;
+	var previousEstimate = undefined;
 	var maxEntries = 0;
 	
 	var rowMonthsData = [];
@@ -431,10 +441,10 @@ function getEntriesHtml()
 			monthData.monthid = currentYearStr + ", '" + currentMonthStr + "'";
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
-			monthData.entries = one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr));
+			monthData.entries = monthly.toArray().concat(one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr)));
 			
-			total_expenses = 0
-			total_income = 0
+			total_expenses = 0;
+			total_income = 0;
 			
 			if(monthData.entries.length > maxEntries)
 				maxEntries = monthData.entries.length;
@@ -486,7 +496,6 @@ function getEntriesHtml()
 	}
 	if(rowMonthsData.length > 0)
 		templateData.rowData.push(rowMonthsData);
-	console.log(templateData);
 	
 	templateData.maxEntries = maxEntries;
 	return templateEntries(templateData);
@@ -496,33 +505,6 @@ function getMonthMetaAfterYearMonth(year, month)
 {
 	if(month == "December")
 	{
-		return monthsMeta.get("")
+		return monthsMeta.get("");
 	}
-}
-
-/*
- * Window helpers
- */
-
-function f_clientWidth() {
-	return f_filterResults (
-		window.innerWidth ? window.innerWidth : 0,
-		document.documentElement ? document.documentElement.clientWidth : 0,
-		document.body ? document.body.clientWidth : 0
-	);
-}
-
-function f_clientHeight() {
-	return f_filterResults (
-		window.innerHeight ? window.innerHeight : 0,
-		document.documentElement ? document.documentElement.clientHeight : 0,
-		document.body ? document.body.clientHeight : 0
-	);
-}
-
-function f_filterResults(n_win, n_docel, n_body) {
-	var n_result = n_win ? n_win : 0;
-	if (n_docel && (!n_result || (n_result > n_docel)))
-		n_result = n_docel;
-	return n_body && (!n_result || (n_result > n_body)) ? n_body : n_result;
 }
