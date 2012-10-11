@@ -29,6 +29,14 @@ tr.entries_first td{
 	padding:0;
 }
 
+tr.entries:hover {
+	background-color: #C77405;
+}
+
+tr.entries {
+	background-color: #FDFFB2;
+}
+
 .entries_second{
 	background-color: #EEEEEE;
 	width: 100%;
