@@ -504,7 +504,7 @@ function getEntriesHtml()
 
 			coll.reset();
 			coll.add(monthly.toArray());
-			coll.add(one_time.toArray());
+			coll.add(one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr)));
 			
 			var obj = coll.groupBy(function(value) {return value.get('type');});
 			for(var key in obj)
