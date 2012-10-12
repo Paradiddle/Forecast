@@ -1,5 +1,29 @@
 $(document).ready(function()
 {
+	jQuery.validator.addMethod("alphanumeric", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
+	});
+	jQuery.validator.addMethod("numeric", function(value, element) {
+        return this.optional(element) || /^[0-9]+$/.test(value);
+	}); 
+	validator = $('#dform').validate({
+		rules: {
+			input_name: {
+				required: true,
+				alphanumeric: true
+			},
+			input_amount: {
+				required: true,
+				numeric: true
+			}
+		},
+		messages: {
+			input_name: "",
+			input_amount: ""
+		},
+		onkeyup: false
+	});
+	
 	var d = new Date();
 	for(var i = d.getFullYear() - 1; i <= d.getFullYear() + 2; i++)
 	{
@@ -38,7 +62,7 @@ var idDropdownFromMonth = '#from_month';
 var idDropdownFromYear = '#from_year';
 
 var idDropdownNumCols = '#num_cols';
-
+var validator;
 
 var templateMonthly;
 var templateEntries;
@@ -58,6 +82,12 @@ var selected;
 
 function addEntry()
 {
+	if(!validator.form())
+	{
+		console.log("Form not validated.");
+		return false;
+	}
+	
 	var data = {
 		name : $('[name=input_name]').val(),
 		amount : $('[name=input_amount]').val(),
@@ -82,12 +112,18 @@ function addEntry()
 				return false;
 			var update = confirm("There is already a monthly entry with the name " + data.name
 					+ ". Would you like to update the default amount from " + prev_amount + " to " + data.amount);
-			if (!update)
-				return false;
+			if (update)
+			{
+				existing.set('amount', data.amount);
+				expandExpenseProperty(existing);
+			}
 		}
-		var m = new Backbone.Model(data);
-		m.id = data.name;
-		monthly.add(m);
+		else
+		{
+			var m = new Backbone.Model(data);
+			m.id = data.name;
+			monthly.add(m);
+		}
 	} 
 	else
 	{
@@ -100,18 +136,22 @@ function addEntry()
 			var update = confirm("There is already a one time entry with the name " + data.name + " for the month "
 					+ data.month + " of " + data.year + ". Would you like to update that entry's amount from "
 					+ prev_amount + " to " + data.amount);
-			if (!update)
-				return false;
-			existing.set('amount', data.amount);
-			expandExpenseProperty(existing);
-		} else
+			if (update)
+			{
+				existing.set('amount', data.amount);
+				expandExpenseProperty(existing);
+			}
+		} 
+		else
 		{
 			var m = new Backbone.Model(data);
 			m.id = (data.year + ":" + data.month + ":" + data.name);
 			one_time.add(m);
 		}
 	}
-	refreshEntries();
+	
+	hideEntryDialog();
+	refreshEntries(); 
 	return false;
 }
 
@@ -131,7 +171,6 @@ function refreshEntries()
 	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
 	$('#entries').html(getEntriesHtml());	
 	$("button").button();
-	$('#addentry').validate();
 	$('.start_balance_input').hide();
 }
 
@@ -253,6 +292,7 @@ function hideEntryDialog()
 
 function showEntryDialog()
 {
+	validator.resetForm();
 	getEntryDialog().show();
 }
 
