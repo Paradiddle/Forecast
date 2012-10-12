@@ -12,15 +12,15 @@ $(document).ready(function()
 		var year = $('[name=selectorYear]').val();
 		var monthly_exists = monthly.get(value);
 		var one_time_exists = one_time.get(year + ":" + month + ":" + value);
+		var lst = one_time.filter(nameFilter(value));
 		if(is_monthly)
-			return !monthly_exists;
+			return !(monthly_exists || lst.length > 0);
 		return !monthly_exists && !one_time_exists;
 	});
 	validator = $('#dform').validate({
 		rules: {
 			input_name: {
 				required: true,
-				alphanumeric: true,
 				existing_name: true
 			},
 			input_amount: {
@@ -392,6 +392,14 @@ function yearMonthFilter(year, month)
 	};
 }
 
+function nameFilter(name)
+{
+	return function(obj)
+	{
+		return obj.get('name') == name;
+	};
+}
+
 function yearMonthNameFilter(year, month, name)
 {
 	return function(obj)
@@ -466,6 +474,7 @@ function getEntriesHtml()
 	var rowMonthsData = [];
 	var curIndex = 0;
 	var lastMonthData = undefined;
+	var coll = new Backbone.Collection();
 	
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
@@ -492,7 +501,24 @@ function getEntriesHtml()
 			monthData.monthid = currentYearStr + ", '" + currentMonthStr + "'";
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
-			monthData.entries = monthly.toArray().concat(one_time.filter(yearMonthFilter(currentYearStr, currentMonthStr)));
+
+			coll.reset();
+			coll.add(monthly.toArray());
+			coll.add(one_time.toArray());
+			
+			var obj = coll.groupBy(function(value) {return value.get('type');});
+			for(var key in obj)
+			{
+				obj[key] = _.sortBy(obj[key], function(value) {
+					return -value.get('amount');
+				});
+			}
+			
+			var arr = _.values(obj);
+			arr.reverse();
+			
+			var flattened = _.flatten(arr);
+			monthData.entries = flattened;
 			
 			total_expenses = 0;
 			total_income = 0;
