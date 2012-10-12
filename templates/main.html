@@ -4,15 +4,15 @@
 		
 		
 		<noscript>Your browser does not have Javascript enabled.</noscript>
-		<link href="css/style.css" type="text/css" rel="stylesheet">
-		<link href="css/jquery-ui.css" type="text/css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<link href="css/jquery-ui.css" rel="stylesheet">
 		<link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700' rel='stylesheet' type='text/css'>
-		<script type="text/javascript" src="js/jquery.js"></script>
-		<script type="text/javascript" src="js/jquery-ui-1.9.0.js"></script>
-		<script type="text/javascript" src="js/jquery-validate.js"></script>
-		<script type="text/javascript" src="js/underscore.js"></script>
-		<script type="text/javascript" src="js/backbone.js"></script>
-		<script type="text/javascript" src="js/helper.js"></script>
+		<script src="js/jquery.js"></script>
+		<script src="js/jquery-ui-1.9.0.js"></script>
+		<script src="js/jquery-validate.js"></script>
+		<script src="js/underscore.js"></script>
+		<script src="js/backbone.js"></script>
+		<script src="js/helper.js"></script>
 	</head>
 
 	<body>		
@@ -143,30 +143,30 @@
 <!-- Underscore Templates -->
 
 <script type="text/template" class="template">
-	<table>
-		<tr>
-			<th>
+	<table cellspacing = "0" cellpadding="5">
+		<tr style="background-color: #FCEFA1;">
+			<th width="33%">
 				Name
 			</th>
-			<th>
+			<th width="33%">
 				Expense
 			</th>
-			<th>
+			<th width="33%">
 				Income
 			</th>
 		</tr>
-		<% _.each(data, function(value, key, list) { %>
-			<tr>
-				<td>
-					<%- value.get('name') %>
-				</td>
-				<td>
-					<%- value.get('expense') %>
-				</td>
-				<td>
-					<%- value.get('income') %>
-				</td>
-			</tr>
+		<% _.each(data, function(entry, key, list) { %>
+		<tr class="entries">
+			<td>
+				<%- entry.get('name') %>
+			</td>
+			<td>
+				<%- entry.get('expense') %>
+			</td>
+			<td>
+				<%- entry.get('income') %>
+			</td>
+		</tr>
 		<% }); %>
 	</table>
 </script>
