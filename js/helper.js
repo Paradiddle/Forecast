@@ -5,12 +5,23 @@ $(document).ready(function()
 	});
 	jQuery.validator.addMethod("numeric", function(value, element) {
         return this.optional(element) || /^[0-9]+$/.test(value);
-	}); 
+	});
+	jQuery.validator.addMethod("existing_name", function(value, element) {
+		var is_monthly = $('[name=monthly]:checked').val();
+		var month = $('[name=selectorMonth]').val();
+		var year = $('[name=selectorYear]').val();
+		var monthly_exists = monthly.get(value);
+		var one_time_exists = one_time.get(year + ":" + month + ":" + value);
+		if(is_monthly)
+			return !monthly_exists;
+		return !monthly_exists && !one_time_exists;
+	});
 	validator = $('#dform').validate({
 		rules: {
 			input_name: {
 				required: true,
-				alphanumeric: true
+				alphanumeric: true,
+				existing_name: true
 			},
 			input_amount: {
 				required: true,
@@ -121,7 +132,7 @@ function addEntry()
 		else
 		{
 			var m = new Backbone.Model(data);
-			m.id = data.name;
+			m.set('id', data.name);
 			monthly.add(m);
 		}
 	} 
@@ -149,6 +160,9 @@ function addEntry()
 			one_time.add(m);
 		}
 	}
+	
+	$('#input_name').val('');
+	$('#input_amount').val('');
 	
 	hideEntryDialog();
 	refreshEntries(); 
@@ -292,8 +306,11 @@ function hideEntryDialog()
 
 function showEntryDialog()
 {
-	validator.resetForm();
+	console.log("reset form.");
 	getEntryDialog().show();
+	validator.resetForm();
+	$('#input_name').focus();
+	$('#input_name').select();
 }
 
 /*
