@@ -1,11 +1,11 @@
 body{
-	font-family: 'PT Sans Narrow', sans-serif;
+	font-family: 'Gentium Book Basic', sans-serif;
 	font-weight:400;
+	color:#555;
 }
 
 .fieldset{
-	border: solid;
-	background-color: #DDDDDD;
+	border: 1px dashed #00c481;
 }
 
 td{
@@ -19,8 +19,6 @@ th{
 }
 
 tr.entries_first{
-	background-color: #2383c0;
-	color: white;
 	font-weight: 700;
 	height:20px;
 }
@@ -30,15 +28,12 @@ tr.entries_first td{
 }
 
 tr.entries:hover {
-	background-color: #C77405;
 }
 
 tr.entries {
-	background-color: #FDFFB2;
 }
 
 .entries_second{
-	background-color: #EEEEEE;
 	width: 100%;
 }
 
@@ -48,7 +43,6 @@ tr.entries {
 	margin:5px 0 0px 0;
 	padding:0;
 	float:left;
-	color:#91cff6;
 }
 
 .month{
@@ -67,4 +61,68 @@ label.preMonthMeta{
 
 .error{
 	background: #DE959C;
+}
+
+.fullWidth{
+	width:100%;
+}
+
+.red, .expense{
+	color:#fa2b31;
+}
+
+.orange{
+	color:#ffbf1f;
+}
+
+.yellow{
+	color:#fff146;
+}
+
+.blue{
+	color:#169bd2;
+}
+
+.green, .income{
+	color:#00c481;
+}
+
+.redbg{
+	background:#fa2b31;
+}
+
+.orangebg{
+	background:#ffbf1f;
+}
+
+.yellowbg{
+	background:#fff146;
+}
+
+.bluebg{
+	background:#169bd2;
+}
+
+.greenbg{
+	background:#00c481;
+}
+
+.Heading{
+	font-size:20px;
+	font-weight:700;
+}
+
+input[type="text"]{
+	border:1px solid #dddddd;
+}
+
+#sidebar{
+	width:20%;
+	float:left;
+	position:fixed;
+}
+
+.content{
+	width:80%;
+	float:right;
 }

@@ -515,7 +515,7 @@ function getEntriesHtml()
 			}
 			
 			var arr = _.values(obj);
-			arr.reverse();
+			//arr.reverse();
 			
 			var flattened = _.flatten(arr);
 			monthData.entries = flattened;

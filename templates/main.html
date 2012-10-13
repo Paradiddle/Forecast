@@ -6,7 +6,7 @@
 		<noscript>Your browser does not have Javascript enabled.</noscript>
 		<link href="css/style.css" rel="stylesheet">
 		<link href="css/jquery-ui.css" rel="stylesheet">
-		<link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Gentium+Book+Basic:400,700' rel='stylesheet' type='text/css'>
 		<script src="js/jquery.js"></script>
 		<script src="js/jquery-ui-1.9.0.js"></script>
 		<script src="js/jquery-validate.js"></script>
@@ -15,26 +15,32 @@
 		<script src="js/helper.js"></script>        
 	</head>
 
-	<body>		
-		<div style="float: right;">
-			{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
-			<br />
-			<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />
-		</div>
+	<body>	
+		<div class="fullWidth">
+			<div style="float: right;">
+				{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
+				<br />
+				<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />
+			</div>
+			{% if username %}
+				<div style="float: right;">
+					<button onclick="saveData();" class="button">Save</button>
+				</div>
+			{% endif %}
+			<div style="clear:both"></div>
+		</div>	
 		
 		{% if username %}
 		
-		<div style="float: right;">
-			<button onclick="saveData();" class="button">Save</button>
-		</div>
+		
 		<!-- Entry data input form -->
 		
 		<div id="dialog_form" style="display=none; position=absolute; z-index:5">
 			<form onsubmit="return false;" id="dform" name="dialog_form">
-				<table class="fieldset">
+				<table class="fieldset" bgcolor="white">
 					<tr>
 						<td colspan="2">
-							<label style="font-size: large; font-weight: bold;" id="dialog_status">Add Monthly Entry</label>
+							<label class="Heading blue" id="dialog_status">Add Monthly Entry</label>
 						</td>
 					</tr>
 					<tr>
@@ -88,10 +94,10 @@
 					</tr>
 					<tr>
 						<td>
-							<button class="button" style="width: 100%;" onclick="addEntry();" id="addentry">Add Entry</button>
+							<button class="button fullWidth" onclick="addEntry();" id="addentry">Add Entry</button>
 						</td>
 						<td>
-							<button class="button" style="width: 100%;" onclick="hideEntryDialog();">Close</button>
+							<button class="button fullWidth" onclick="hideEntryDialog();">Close</button>
 						</td>
 					</tr>
 				</table>
@@ -99,14 +105,7 @@
 		</div>
 		
 		<div style="display: block;">
-			<h2 style="vertical-align: middle">
-				Monthly Entries<button class="button" onclick="showEntryDialogUnderMonthly(this)">ADD</button>
-			</h2>
-			<div id="monthly_entries">{{ data }}</div>
-			<h2>
-				Entries<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">ADD</button>
-			</h2>
-			<div>
+			<div id="sidebar">
 				<table border="1">
 					<tr>
 						<td><label>From</label></td>
@@ -123,16 +122,25 @@
 							<label>Columns</label>
 						</td>
 						<td>
-							<select id="num_cols" style="width: 100%"></select>
+							<select id="num_cols" class="fullWidth"></select>
 						</td>
 					</tr>
 					<tr>
 						<td></td>
 						<td colspan="2">
-							<button class="button" style="width: 100%" onclick="refreshEntries()">Refresh</button>
+							<button class="button fullWidth" onclick="refreshEntries()">Refresh</button>
 						</td>
 					</tr>
 				</table>
+				<h2 style="vertical-align: middle">
+					Monthly Entries<button class="button" onclick="showEntryDialogUnderMonthly(this)">ADD</button>
+				</h2>
+				<div id="monthly_entries">{{ data }}</div>
+				<h2>
+					Entries<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">ADD</button>
+				</h2>
+			</div>
+			<div class="content">				
 				<div id="entries"></div>
 			</div>
 		</div>
@@ -141,15 +149,12 @@
 	
 		<script type="text/template" class="template">
 			<table cellspacing = "0" cellpadding="5">
-				<tr style="background-color: #FCEFA1;">
+				<tr>
 					<th width="33%">
 						Name
 					</th>
 					<th width="33%">
-						Expense
-					</th>
-					<th width="33%">
-						Income
+						Amount
 					</th>
 				</tr>
 				<% _.each(data, function(entry, key, list) { %>
@@ -157,11 +162,8 @@
 					<td>
 						<%- entry.get('name') %>
 					</td>
-					<td>
-						<%- entry.get('expense') %>
-					</td>
-					<td>
-						<%- entry.get('income') %>
+					<td class="<%-entry.get('type')=='Expense'?'expense':'income'%>">
+						<%-entry.get('type')=='Expense'?'-':'+'%><%- entry.get('amount') %>
 					</td>
 				</tr>
 				<% }); %>
@@ -169,24 +171,27 @@
 		</script>
 		
 		<script type="text/template" class="entries">
-			<table width="100%" cellspacing="0" cellpadding="0" style="padding-top: 10px;">
+			<table width="100%" cellspacing="0" cellpadding="10" style="padding-top: 10px;">
 				<tr>
 					<% _.each(data.rowData, function(row, key, list) { %>
 						
 						<!-- first row month data, starting balance and entries -->				
 						<% _.each(row, function(month, key, list) { %>
-							<td id=<%- month.month + month.year %> width="<%-100 / data.numCols%>%" style="background-color: #FDFFB2;" valign="top">
+							<td id=<%- month.month + month.year %> width="<%-100 / data.numCols%>%" valign="top">
 								<table width="100%" cellspacing="0" cellpadding="0">
-									<tr class="entries_first">
+									<tr class="entriecs_first blue">
+										<!-- YEAR MONTH -->
 										<td colspan="2">
 											<div class="year"><%-  month.year  %></div> <div class="month"><%-  month.month %></div>
 										</td>
+										<!-- ADD BUTTON -->
 										<td align="right">
 											<% var buttonid = month.year + "-" + month.month; %>
 											<button style="float:right" class="button" id='<%-buttonid%>' onclick='showEntryDialogUnderYearMonth(<%-month.monthid%>);'>ADD</button>
 										</td>
 									</tr>
-									<tr style="background-color: #DBDE90;">
+									<!-- STARTING BALANCE ROW -->
+									<tr class="ui-widget-header">
 										<td style="width: 33%">
 											<label class="preMonthMeta">Starting Balance: </label>
 										</td>
@@ -203,8 +208,9 @@
 											
 										</td>
 									</tr>
+									<!-- NAME EXPENSE INCOME -->
 									<% if (month.entries.length > 0) { %>
-									<tr style="background-color: #FCEFA1;">
+									<tr>
 										<th width="33%">
 											Name
 										</th>
@@ -216,15 +222,16 @@
 										</th>
 									</tr>
 										<% _.each(month.entries, function(entry, key, list) { %>
+									<!-- ACTUAL ENTRIES -->
 									<tr class="entries">
-										<td>
+										<td class="<%-entry.get('type')=='Expense'?'expense':'income'%>">
 											<%- entry.get('name') %>
 										</td>
 										<td>
-											<%- entry.get('expense') %>
+											<span class="expense"><%- entry.get('expense') %></span>
 										</td>
 										<td>
-											<%- entry.get('income') %>
+											<span class="income"><%- entry.get('income') %></span>
 										</td>
 									</tr>							
 										<% }); %>
@@ -238,8 +245,9 @@
 						<!-- second row month data, end of month info -->
 						<% _.each(row, function(month, key, list) { %>
 							<td style="padding-bottom: 10px;" width="<%-100 / data.numCols%>%" valign="top">
-								<table style="background-color: #DBDE90;" width="100%" cellspacing="0" cellpadding="0">
-									<tr style="background-color: #FCEFA1;">
+								<table width="100%" cellspacing="0" cellpadding="0">
+									<!-- TOTAL -->
+									<tr class="">
 										<td width="33%">
 											<label class="preMonthMeta">Total</label>
 										</td>
@@ -250,6 +258,7 @@
 											<%- month.total_income %>
 										</td>
 									</tr>
+									<!-- ENDING BALANCE -->
 									<tr>
 										<td width="33%">
 											<label class="preMonthMeta">Ending Balance:</label>
@@ -258,6 +267,7 @@
 											<label><%- month.end_balance%></label>
 										</td>
 									</tr>
+									<!-- DISCREPANCY -->
 									<tr>
 										<td width="33%">
 											<label class="preMonthMeta">Discrepancy: </label>
