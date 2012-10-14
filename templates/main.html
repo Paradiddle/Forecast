@@ -181,10 +181,12 @@
 							<td id=<%- month.month + month.year %> width="<%-100 / data.numCols%>%" valign="top">
 								<div class="tables">
 								<table width="100%" cellspacing="0" cellpadding="0" >
-									<tr class="entriecs_first blue">
+									<tr class="entries_first blue">
 										<!-- YEAR MONTH -->
 										<td colspan="2">
-											<div class="year"><%-  month.year  %></div> <div class="month"><%-  month.month %></div>
+											<% var newYear = month.year.substr(2,3); %>
+											<% var newMonth = month.month.substr(0,3); %>
+											<div class="year"><%- newMonth + ' \'' + newYear  %></div>
 										</td>
 										<!-- ADD BUTTON -->
 										<td align="right">

@@ -42,7 +42,7 @@ tr.entries {
 }
 
 .year{
-	font-size:40px;
+	font-size:30px;
 	line-height:15px;
 	margin:5px 0 20px 0;
 	padding:0;
@@ -59,7 +59,7 @@ tr.entries {
 
 .button{
 	font-size:11px!important;
-	background:#00405c;
+	background:#00623b;
 	padding:2px 5px;
 	color:white;
 	border:0;
@@ -95,7 +95,7 @@ label.preMonthMeta{
 }
 
 .blue{
-	color:#20769c;
+	color:#3bb772;
 }
 
 .green, .income{

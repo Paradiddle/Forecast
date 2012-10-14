@@ -3,7 +3,7 @@ import wsgiref.handlers
 import os
 import urllib
 import string
-import json
+import simplejson as json
 import logging
 
 from google.appengine.ext.webapp import template
