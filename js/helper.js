@@ -207,6 +207,59 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
  * Data helper functions
  */
 
+function deleteMonthly(year, month, name)
+{
+	var mod = {
+		'type': 'delete'
+	};
+	putMonthlyModification(year, month, name, mod);
+}
+
+function adjustMonthly(year, month, name, amount)
+{
+	var mod = {
+		'type': 'adjust',
+		'amount': amount
+	};
+	putMonthlyModification(year, month, name, mod);
+}
+
+function putMonthlyModification(year, month, name, mod)
+{
+	var meta = monthsMeta.get(year + ":" + month);
+	var modifications = meta.get('modifications');
+	if(typeof modifications == "undefined")
+	{
+		modifications = {};
+		meta.set('modifications', modifications);
+	}
+	modifications[name] = mod;
+}
+
+function applyMonthlyModifications(monthlyarr, mods)
+{
+	if(typeof mods == "undefined" || Object.keys(mods).length == 0)
+		return monthlyarr;
+	var ret = [];
+	for(var i = 0; i < monthlyarr.length; i++)
+	{
+		var monthly = monthlyarr[i];
+		var mod = mods[monthly.get('name')];
+		if(typeof mod != "undefined")
+		{
+			if(mod.type == "delete")
+				continue;
+			if(mod.type == "adjust")
+			{
+				monthly = monthly.clone().set('amount', mod.amount);
+				expandExpenseProperty(monthly);
+			}
+		}
+		ret.push(monthly);
+	}
+	return ret;
+}
+
 function getNextMonthMeta(yearIndex, monthIndex)
 {
 	var year = parseInt(years[yearIndex]);
@@ -273,43 +326,21 @@ function addEntry()
 
 	if (data.monthly)
 	{
-		var existing = monthly.get(data.name);
-		if (existing)
-		{
-			var prev_amount = existing.get('amount');
-			if (prev_amount == data.amount)
-				return false;
-			var update = confirm("There is already a monthly entry with the name " + data.name
-					+ ". Would you like to update the default amount from " + prev_amount + " to " + data.amount);
-			if (update)
-			{
-				existing.set('amount', data.amount);
-				expandExpenseProperty(existing);
-			}
-		}
-		else
+		if(!existing)
 		{
 			var m = new Backbone.Model(data);
 			m.set('id', data.name);
 			monthly.add(m);
 		}
+		else
+			return false;
 	} 
 	else
 	{
 		var existing = one_time.get(data.year + ":" + data.month + ":" + data.name);
 		if (existing)
 		{
-			var prev_amount = existing.get('amount');
-			if (prev_amount == data.amount)
-				return false;
-			var update = confirm("There is already a one time entry with the name " + data.name + " for the month "
-					+ data.month + " of " + data.year + ". Would you like to update that entry's amount from "
-					+ prev_amount + " to " + data.amount);
-			if (update)
-			{
-				existing.set('amount', data.amount);
-				expandExpenseProperty(existing);
-			}
+			return false;
 		} 
 		else
 		{
@@ -381,7 +412,8 @@ function calculateAllMonthData()
 			}
 			var entries = one_time.where({'year': yearString, 'month': monthString});
 			meta.set('entries', entries);
-			entries = entries.concat(monthly.toArray());
+			var monthlies = applyMonthlyModifications(monthly.toArray(), meta.get('modifications'));
+			entries = entries.concat(monthlies);
 			
 			var total_expenses = 0;
 			var total_income = 0;
@@ -440,7 +472,6 @@ function getEntriesHtml()
 	var templateData = {};
 	templateData.rowData = [];
 	templateData.numCols = NUM_COLS[getNumCols()];
-	var previousEstimate = undefined;
 	
 	var rowMonthsData = [];
 	var curIndex = 0;
@@ -465,7 +496,9 @@ function getEntriesHtml()
 			
 			monthData.total_expenses = monthMeta.get('total_expenses');
 			monthData.total_income = monthMeta.get('total_income');
-			monthData.entries = groupAndSortEntries(monthMeta.get('entries').concat(monthly.toArray()));
+			monthData.entries = groupAndSortEntries(monthMeta.get('entries'));
+			monthData.entries = monthData.entries.concat(applyMonthlyModifications(monthly.toArray(), monthMeta.get('modifications')));
+			console.log(monthData.entries);
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.end_balance = monthMeta.get('est_end_balance');
