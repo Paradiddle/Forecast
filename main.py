@@ -41,7 +41,7 @@ class Login(webapp.RequestHandler):
         if users.get_current_user():
             url = users.create_logout_url(self.request.uri)
             url_linktext = 'Logout'
-            message_pretext = 'You are logged in as \'%s\'.' % (username)
+            message_pretext = 'Welcome, %s!' % (username)
             message_posttext = ''
         else:
             url = users.create_login_url(self.request.uri)

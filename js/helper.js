@@ -567,7 +567,7 @@ function refreshEntries()
 {
 	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
 	$('#entries').html(getEntriesHtml());	
-	$("button").button();
+	//$("button").button();
 	$('.start_balance_input').hide();
 }
 

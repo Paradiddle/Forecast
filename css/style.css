@@ -1,11 +1,15 @@
 body{
-	font-family: 'Gentium Book Basic', sans-serif;
-	font-weight:400;
+	font-family: 'Open Sans Condensed', sans-serif;
+	font-weight:300;
 	color:#555;
+	padding:0;
+	margin:0;
 }
 
 .fieldset{
-	border: 1px dashed #00c481;
+	box-sizing:border-box;
+	box-shadow: 0px 0px 10px #555;
+	padding:10px;
 }
 
 td{
@@ -40,19 +44,30 @@ tr.entries {
 .year{
 	font-size:40px;
 	line-height:15px;
-	margin:5px 0 0px 0;
+	margin:5px 0 20px 0;
 	padding:0;
 	float:left;
+	font-weight:700;
 }
 
 .month{
 	font-size:20px;
 	float:left;
 	margin-left:15px;
+	font-weight:700;
 }
 
 .button{
-	font-size:12px!important;
+	font-size:11px!important;
+	background:#00405c;
+	padding:2px 5px;
+	color:white;
+	border:0;
+	letter-spacing:2px;
+	text-transform:uppercase;
+	cursor:pointer;
+	top:-3px;
+	position:relative;
 }
 
 label.preMonthMeta{
@@ -68,7 +83,7 @@ label.preMonthMeta{
 }
 
 .red, .expense{
-	color:#fa2b31;
+	color:#b32317;
 }
 
 .orange{
@@ -80,11 +95,11 @@ label.preMonthMeta{
 }
 
 .blue{
-	color:#169bd2;
+	color:#20769c;
 }
 
 .green, .income{
-	color:#00c481;
+	color:#005e20;
 }
 
 .redbg{
@@ -100,7 +115,7 @@ label.preMonthMeta{
 }
 
 .bluebg{
-	background:#169bd2;
+	background:#20769c;
 }
 
 .greenbg{
@@ -112,17 +127,55 @@ label.preMonthMeta{
 	font-weight:700;
 }
 
+.Header{
+	position:fixed;
+	height:100px;
+	background:white;
+	margin:0;
+	z-index:999;
+	border-bottom:2px solid #00405c;
+}
+
 input[type="text"]{
 	border:1px solid #dddddd;
+	width:50px;
+	font-size:14px;
+	font-family: 'Open Sans Condensed', sans-serif;
 }
 
 #sidebar{
-	width:20%;
+	width:18%;
 	float:left;
 	position:fixed;
+	top:110px;
+	padding:1%;
 }
 
 .content{
 	width:80%;
 	float:right;
+	margin-top:100px;
+}
+
+.tables{
+	background:white;
+	box-shadow: 0 0 5px #555;
+	margin-right:20px;
+	margin-bottom:10px;
+	padding:10px;
+	position:relative;
+}
+
+.bottom{
+	margin-top:-10px;
+}
+
+.whiteCover{
+	top:-10px;
+	left:0px;
+	background:white;
+	height:10px;
+	width:100%;
+	position:absolute;
+	
 }
