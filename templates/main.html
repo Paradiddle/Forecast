@@ -12,7 +12,9 @@
 		<script src="js/jquery-validate.js"></script>
 		<script src="js/underscore.js"></script>
 		<script src="js/backbone.js"></script>
-		<script src="js/helper.js"></script>        
+		<script src="js/helper.js"></script> 
+		<script src="js/mousewheel.js"></script>  
+		<script src="js/scroll.js"></script>         
 	</head>
 
 	<body>	
@@ -24,35 +26,7 @@
 				<br />
 				<!--<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />-->
 			</div>
-			{% if username %}
-				<div style="float: right;">
-					<button onclick="saveData();" class="button">Save</button>
-				</div>
-			{% endif %}
-			<div style="float:right;margin-right:20%;">
-				<table>
-					<tr>
-						<td><label>From</label></td>
-						<td><select id="from_month"></select></td>
-						<td><select id="from_year"></select></td>
-						<td>
-							<label>Columns</label>
-						</td>
-						<td>
-							<select id="num_cols" class="fullWidth"></select>
-						</td>
-					</tr>
-					<tr>
-						<td><label>To</label></td>
-						<td><select id="to_month"></select></td>
-						<td><select id="to_year"></select></td>
-						<td></td>
-						<td colspan="2">
-							<button class="button fullWidth" onclick="refreshEntries()">Refresh</button>
-						</td>
-					</tr>
-				</table>
-			</div>
+				
 			<div style="clear:both"></div>
 		</div>	
 		
@@ -132,6 +106,43 @@
 		
 		<div style="display: block;">
 			<div id="sidebar">
+				<div style="float: right;">
+					<button onclick="saveData();" class="button">Save</button>
+				</div>
+				<table bgcolor="#efefef" width="100%">
+					<tr>
+						<td colspan="3">
+							<h2 style="margin:0;">Sort</h2>
+						</td>
+					</tr>
+					<tr>
+						<td><label>From</label></td>
+						<td><select id="from_month"></select></td>
+						<td><select id="from_year"></select></td>
+						
+					</tr>
+					<tr>
+						<td><label>To</label></td>
+						<td><select id="to_month"></select></td>
+						<td><select id="to_year"></select></td>
+						
+					</tr>
+					<tr>
+						<td>
+							<label>Columns</label>
+						</td>
+						<td>
+							<select id="num_cols" class="fullWidth"></select>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2">
+							<button class="button fullWidth" onclick="refreshEntries()">Refresh</button>
+						</td>
+					</tr>
+				</table>
+
 				<h2>
 					Entries <button class="button" onclick="showEntryDialogUnderEntryHeader(this)">ADD</button>
 				</h2>
@@ -172,14 +183,14 @@
 		</script>
 		
 		<script type="text/template" class="entries">
-			<table width="100%" cellspacing="0" cellpadding="0" style="padding-top: 10px;" >
+			<table width="100%" cellspacing="16" cellpadding="0" bgcolor="#efefef"style="padding-top: 10px;" class="tableentries" >
 				<tr>
 					<% _.each(data.rowData, function(row, key, list) { %>
 						
 						<!-- first row month data, starting balance and entries -->				
 						<% _.each(row, function(month, key, list) { %>
-							<td id=<%- month.month + month.year %> width="<%-100 / data.numCols%>%" valign="top">
-								<div class="tables">
+							<td id=<%- month.month + month.year %> width="<%-100 / data.numCols%>%" valign="top"class="tables">
+								
 								<table width="100%" cellspacing="0" cellpadding="0" >
 									<tr class="entries_first blue">
 										<!-- YEAR MONTH -->
@@ -202,8 +213,8 @@
 										<td style="width: 33%">
 											<form onsubmit="updateStartingBalance(<%-month.monthid%>); return false;" style="margin: 0px;">
 												<% var sbid = month.year + month.month; %>
-												<% var sb = month.start_balance? month.start_balance: "NaN"; %>
-												$<label id="start_balance_label<%-sbid%>" class="start_balance_label" onclick="showInputForStartingBalance(<%-month.monthid%>);"><%-sb%></label>
+												<% var sb = month.start_balance? month.start_balance: "--"; %>
+												<%-sb=='--'?'':'$'%><label id="start_balance_label<%-sbid%>" class="start_balance_label" onclick="showInputForStartingBalance(<%-month.monthid%>);"><%-sb%></label>
 												<input id="start_balance_input<%-sbid%>" class="start_balance_input" type="text" />
 												<br>
 											</form>
@@ -232,16 +243,16 @@
 											<%- entry.get('name') %>
 										</td>
 										<td>
-											<span class="expense">$<%- entry.get('expense') %></span>
+											<span class="expense"><%-entry.get('type')=='Expense'?'$':''%><%- entry.get('expense') %></span>
 										</td>
 										<td>
-											<span class="income">$<%- entry.get('income') %></span>
+											<span class="income"><%-entry.get('type')=='Expense'?'':'$'%><%- entry.get('income') %></span>
 										</td>
 									</tr>							
 										<% }); %>
 									<% } %>
 								</table>
-								</div>
+								
 							</td>
 						<% }); %>
 						</tr>
@@ -249,9 +260,8 @@
 						
 						<!-- second row month data, end of month info -->
 						<% _.each(row, function(month, key, list) { %>
-							<td style="padding-bottom: 10px;" width="<%-100 / data.numCols%>%" valign="top">
-								<div class="tables bottom">
-									<div class="whiteCover"></div>
+							<td style="padding-bottom: 10px;" width="<%-100 / data.numCols%>%" valign="top" class="tables bottom">
+									<div class="shadow"><div class="whitecover"></div></div>
 								<table width="100%" cellspacing="0" cellpadding="0" >
 									<!-- TOTAL -->
 									<tr class="">
@@ -271,7 +281,8 @@
 											<label class="preMonthMeta">Ending Balance:</label>
 										</td>
 										<td width="33%">
-											<label>$<%- month.end_balance%></label>
+											<% var eb = month.end_balance? month.end_balance: ""; %>
+											<label><%-eb==''?'':'$' %><%- eb%></label>
 										</td>
 									</tr>
 									<!-- DISCREPANCY -->
@@ -284,7 +295,6 @@
 										</td>
 									</tr>
 								</table>
-								</div>
 							</td>
 						<% }); %>
 						

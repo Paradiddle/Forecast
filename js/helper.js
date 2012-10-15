@@ -74,6 +74,14 @@ $(document).ready(function()
 	_.templateSettings.variable = "data";
 	templateMonthly = _.template($("script.template").html());
 	templateEntries = _.template($("script.entries").html());
+	
+	$('#sidebar').mCustomScrollbar({
+		scrollInertia:0,
+		scrollButtons:{
+			enable:true
+		}
+	});
+
 });
 
 /*

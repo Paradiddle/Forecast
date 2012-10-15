@@ -37,6 +37,10 @@ tr.entries:hover {
 tr.entries {
 }
 
+.tableentries{
+	border-left:1px solid #555;
+}
+
 .entries_second{
 	width: 100%;
 }
@@ -47,13 +51,6 @@ tr.entries {
 	margin:5px 0 20px 0;
 	padding:0;
 	float:left;
-	font-weight:700;
-}
-
-.month{
-	font-size:20px;
-	float:left;
-	margin-left:15px;
 	font-weight:700;
 }
 
@@ -69,6 +66,11 @@ tr.entries {
 	top:-3px;
 	position:relative;
 }
+
+.button:hover{
+	background: #63b16f;
+}
+
 
 label.preMonthMeta{
 	font-weight: bold;
@@ -95,7 +97,7 @@ label.preMonthMeta{
 }
 
 .blue{
-	color:#3bb772;
+	color:#378844;
 }
 
 .green, .income{
@@ -133,7 +135,8 @@ label.preMonthMeta{
 	background:white;
 	margin:0;
 	z-index:999;
-	border-bottom:2px solid #00405c;
+	border-bottom:1px solid #555;
+	box-shadow: 0 0px 5px #555;
 }
 
 input[type="text"]{
@@ -144,11 +147,10 @@ input[type="text"]{
 }
 
 #sidebar{
-	width:18%;
+	width:20%;
 	float:left;
 	position:fixed;
 	top:110px;
-	padding:1%;
 }
 
 .content{
@@ -157,25 +159,111 @@ input[type="text"]{
 	margin-top:100px;
 }
 
-.tables{
+td.tables{
 	background:white;
-	box-shadow: 0 0 5px #555;
+	box-shadow: 0 0 8px #555;
 	margin-right:20px;
 	margin-bottom:10px;
 	padding:10px;
 	position:relative;
 }
 
-.bottom{
+td.bottom{
 	margin-top:-10px;
 }
 
-.whiteCover{
-	top:-10px;
+td.bottom div.shadow{
+	top:-16px;
 	left:0px;
 	background:white;
-	height:10px;
+	height:16px;
 	width:100%;
 	position:absolute;
-	
+	box-shadow: 0 0 8px #555;
 }
+
+.whitecover{
+	top:-5px;
+	left:0px;
+	border-top:10px solid white;
+	border-bottom:10px solid white;
+	background:#eee;
+	height:6px;
+	width:100%;
+	position:absolute;
+}
+
+
+/* basic scrollbar styling */
+/* vertical scrollbar */
+.mCSB_container{
+	width:auto;
+	margin-right:30px;
+	overflow:hidden;
+}
+.mCSB_container.mCS_no_scrollbar{
+	margin-right:0;
+}
+.mCustomScrollBox .mCSB_scrollTools{
+	width:36px;
+	height:100%;
+	top:0;
+	right:0;
+}
+.mCSB_scrollTools .mCSB_draggerContainer{
+	height:100%;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+}
+.mCSB_scrollTools .mCSB_buttonUp+.mCSB_draggerContainer{
+	padding-bottom:40px;
+}
+.mCSB_scrollTools .mCSB_draggerRail{
+	width:12px;
+	height:100%;
+	*height:90%;
+	margin:0 auto;
+}
+.mCSB_scrollTools .mCSB_dragger{
+	cursor:pointer;
+	width:100%;
+	height:30px;
+}
+.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{
+	width:12px;
+	height:100%;
+	*height:85%;
+	margin:0 auto;
+	*margin-left:1px;
+	-webkit-border-radius:16px;
+	-moz-border-radius:16px;
+	border-radius:16px;
+	-webkit-box-shadow: #000 0px 2px 0px;
+	-moz-box-shadow: #000 0px 3px 0px;
+	box-shadow: #000 0px 3px 0px;
+	text-align:center;
+}
+.mCSB_scrollTools .mCSB_buttonUp,
+.mCSB_scrollTools .mCSB_buttonDown{
+	height:20px;
+	overflow:hidden;
+	margin:0 auto;
+	cursor:pointer;
+}
+.mCSB_scrollTools .mCSB_buttonDown{
+	bottom:0;
+	margin-top:-40px;
+}
+
+/* default scrollbar colors and backgrounds */
+
+.mCSB_scrollTools .mCSB_draggerRail{
+	background: blue;
+	border-left:1px solid #aaa;
+	border-right:1px solid #aaa;
+}
+.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{
+	background: red;
+}
+
