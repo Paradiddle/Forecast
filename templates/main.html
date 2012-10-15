@@ -227,7 +227,7 @@
 									</tr>
 										<% _.each(month.entries, function(entry, key, list) { %>
 									<!-- ACTUAL ENTRIES -->
-									<tr class="entries">
+									<tr id="<%-month.year + "-" + month.month + "-" + entry.cid%>" class="entries" onclick="showEntryDialogUnderEntry(<%-month.year%>, '<%-month.month%>', '<%-entry.get('name')%>', '<%-entry.cid%>', <%-entry.get('monthly')? 'true': 'false'%>)">
 										<td class="<%-entry.get('type')=='Expense'?'expense':'income'%>">
 											<%- entry.get('name') %>
 										</td>

@@ -181,6 +181,21 @@ function showEntryDialogUnderYearMonth(year, month)
 	updateEntryDialog(status, false, $moveTo, true, year, month, true);
 }
 
+function showEntryDialogUnderEntry(year, month, name, cid, monthly)
+{
+	var key = year + ":" + month + ":" + name + ":" + monthly;
+	if (selected == key)
+	{
+		selected = "";
+		hideEntryDialog();
+		return;
+	}
+	selected = key;
+	var status = 'Modify ' + monthly? 'Monthly': 'One Time' + ' Entry ' + name;
+	var $moveTo = $('#' + year + "-" + month + "-" + cid);
+	updateEntryDialog(status, false, $moveTo, true, year, month, true);
+}
+
 function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, yearSelection, monthSelection, topLeft)
 {
 	$('#dialog_status').html(statusText);
@@ -498,7 +513,6 @@ function getEntriesHtml()
 			monthData.total_income = monthMeta.get('total_income');
 			monthData.entries = groupAndSortEntries(monthMeta.get('entries'));
 			monthData.entries = monthData.entries.concat(applyMonthlyModifications(monthly.toArray(), monthMeta.get('modifications')));
-			console.log(monthData.entries);
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.end_balance = monthMeta.get('est_end_balance');
