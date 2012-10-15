@@ -106,15 +106,12 @@
 		
 		<div style="display: block;">
 			<div id="sidebar">
-				<div style="float: right;">
-					<button onclick="saveData();" class="button">Save</button>
-				</div>
-				<table bgcolor="#efefef" width="100%">
-					<tr>
-						<td colspan="3">
-							<h2 style="margin:0;">Sort</h2>
-						</td>
-					</tr>
+				<button onclick="saveData();" class="bluebutton">Save</button><br/>
+				<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">+ UNIQUE ENTRY</button><br/>
+				<button class="button" onclick="showEntryDialogUnderMonthly(this)">+ MONTHLY ENTRY</button><br/>
+				<div style="background:#efefef; padding:4px 0 2px 0;width:100%;"><button class="button" onclick="toggleSort()">Filter</button></div>
+				<div class="sort">
+					<table width="100%" bgcolor="#efefef">
 					<tr>
 						<td><label>From</label></td>
 						<td><select id="from_month"></select></td>
@@ -142,13 +139,8 @@
 						</td>
 					</tr>
 				</table>
-
-				<h2>
-					Entries <button class="button" onclick="showEntryDialogUnderEntryHeader(this)">ADD</button>
-				</h2>
-				<h2 style="vertical-align: middle">
-					Monthly Entries <button class="button" onclick="showEntryDialogUnderMonthly(this)">ADD</button>
-				</h2>
+				</div>
+				<h2 style="margin:5px 0;">Monthly Entries<button class="button" style="float:right; margin-top:13px;"onclick="showEntryDialogUnderMonthly(this)">ADD</button></h2>
 				<div id="monthly_entries">{{ data }}</div>
 				
 			</div>

@@ -67,6 +67,23 @@ tr.entries {
 	position:relative;
 }
 
+.bluebutton{
+	background:#20769c;
+	font-size:11px!important;
+	padding:2px 5px;
+	color:white;
+	border:0;
+	letter-spacing:2px;
+	text-transform:uppercase;
+	cursor:pointer;
+	top:-3px;
+	position:relative;
+}
+
+.bluebutton:hover{
+	background:#38b1e7;
+}
+
 .button:hover{
 	background: #63b16f;
 }
@@ -267,3 +284,6 @@ td.bottom div.shadow{
 	background: red;
 }
 
+.sort{
+	width:100%;
+}

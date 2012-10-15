@@ -60,7 +60,7 @@ $(document).ready(function()
 	// From and to months set to current month
 	$(idDropdownFromYear).val(d.getFullYear());
 	$(idDropdownFromMonth).val(months[d.getMonth()]);
-	$(idDropdownToMonth).val(months[d.getMonth()]);
+	$(idDropdownToMonth).val(months[(d.getMonth()-1) % 12]);
 	$(idDropdownToYear).val(d.getFullYear() + 1);
 	
 	// Retrieve user data from server
@@ -75,12 +75,16 @@ $(document).ready(function()
 	templateMonthly = _.template($("script.template").html());
 	templateEntries = _.template($("script.entries").html());
 	
+	//Setup scrollbar for sidebar
 	$('#sidebar').mCustomScrollbar({
 		scrollInertia:0,
 		scrollButtons:{
 			enable:true
 		}
 	});
+	
+	//Hide the sort div
+	$('.sort').hide();
 
 });
 
@@ -682,6 +686,11 @@ function getNumCols()
 function getSelectedIndex(id)
 {
 	return $(id).prop('selectedIndex');
+}
+
+function toggleSort()
+{
+	$('.sort').slideToggle();
 }
 
 /*
