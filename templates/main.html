@@ -48,7 +48,7 @@
 							<label for="input_name">Entry Name</label>								
 						</td>
 						<td width="50%">
-							<input type="text" class="in required" id="input_name" name="input_name">
+							<input style="width: 100%;" type="text" class="in required" id="input_name" name="input_name">
 						</td>
 					</tr>
 					<tr>
@@ -56,7 +56,7 @@
 							<label for="input_amount">Entry Amount</label>
 						</td>
 						<td>
-							<input type="text" class="in required" id="input_amount" name="input_amount">
+							<input style="width: 100%;" type="text" class="in required" id="input_amount" name="input_amount">
 						</td>
 					</tr>
 					<tr>
@@ -107,7 +107,7 @@
 		<div style="display: block;">
 			<div id="sidebar">
 				<button onclick="saveData();" class="bluebutton">Save</button><br/>
-				<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">+ UNIQUE ENTRY</button><br/>
+				<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">+ ONE TIME ENTRY</button><br/>
 				<button class="button" onclick="showEntryDialogUnderMonthly(this)">+ MONTHLY ENTRY</button><br/>
 				<div style="background:#efefef; padding:4px 0 2px 0;width:100%;"><button class="button" onclick="toggleSort()">Filter</button></div>
 				<div class="sort">
@@ -140,7 +140,7 @@
 					</tr>
 				</table>
 				</div>
-				<h2 style="margin:5px 0;">Monthly Entries<button class="button" style="float:right; margin-top:13px;"onclick="showEntryDialogUnderMonthly(this)">ADD</button></h2>
+				<h2 style="margin:5px 0;">Monthly Entries</h2>
 				<div id="monthly_entries">{{ data }}</div>
 				
 			</div>

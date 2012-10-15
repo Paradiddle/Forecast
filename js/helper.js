@@ -113,7 +113,7 @@ var months = [ "January", "February", "March", "April", "May", "June", "July", "
 var years = [];
 
 // TODO Static options for 
-var NUM_COLS = [ 3, 4, 5, 6];
+var NUM_COLS = [ 2, 3, 4 ];
 
 /*
  * Backbone Collections
