@@ -35,8 +35,8 @@
 		
 		<!-- Entry data input form -->
 		
-		<div id="dialog_form" style="display=none; position=absolute; z-index:5">
-			<form onsubmit="return false;" id="dform" name="dialog_form">
+		<div id="add_dialog_div" style="display=none; position=absolute; z-index:5">
+			<form onsubmit="return false;" id="add_dialog_form">
 				<table class="fieldset" bgcolor="white">
 					<tr>
 						<td colspan="2">
@@ -98,6 +98,51 @@
 						</td>
 						<td>
 							<button class="button fullWidth" onclick="hideEntryDialog();">Close</button>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		
+		<div id="edit_entry_div" style="display=none; position=absolute; z-index:5">
+			<form onsubmit="return false;" id="edit_entry_form">
+				<table class="fieldset" bgcolor="white">
+					<tr>
+						<td colspan="2">
+							<label class="Heading blue" id="dialog_status">Edit Entry</label>
+						</td>
+					</tr>
+					<tr>
+						<td width="50%">
+							<label for="edit_input_name" disabled="disabled">Entry Name</label>								
+						</td>
+						<td width="50%">
+							<input style="width: 100%;" type="text" class="in required" id="edit_input_name" name="edit_input_name">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="edit_input_amount">Entry Amount</label>
+						</td>
+						<td>
+							<input style="width: 100%;" type="text" class="in required" id="edit_input_amount" name="edit_input_amount">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="edit_entry_type">Type</label>
+						</td>
+						<td>
+							<input type="radio" id="edit_entry_income" name="edit_entry_type" title="Income"> Income<br>
+							<input type="radio" id="edit_entry_expense" name="edit_entry_type" title="Expense" checked="checked"> Expense
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button class="button fullWidth" onclick="saveEntry();" id="saveentry">Save</button>
+						</td>
+						<td>
+							<button class="button fullWidth" onclick="deleteEntry();">Delete</button>
 						</td>
 					</tr>
 				</table>
@@ -230,7 +275,7 @@
 									</tr>
 										<% _.each(month.entries, function(entry, key, list) { %>
 									<!-- ACTUAL ENTRIES -->
-									<tr id="<%-month.year + "-" + month.month + "-" + entry.cid%>" class="entries" onclick="showEntryDialogUnderEntry(<%-month.year%>, '<%-month.month%>', '<%-entry.get('name')%>', '<%-entry.cid%>', <%-entry.get('monthly')? 'true': 'false'%>)">
+									<tr id="<%-month.year + "-" + month.month + "-" + entry.cid%>" class="entries" onclick="showEditEntryDialogUnderEntry(<%-month.year%>, '<%-month.month%>', '<%-entry.get('type')%>', '<%-entry.get('name')%>', <%-entry.get('amount')%>, '<%-entry.cid%>', <%-entry.get('monthly')? 'true': 'false'%>)">
 										<td class="<%-entry.get('type')=='Expense'?'expense':'income'%>">
 											<%- entry.get('name') %>
 										</td>

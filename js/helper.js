@@ -22,7 +22,7 @@ $(document).ready(function()
 	});
 	
 	// Validation rules setup and execution
-	validator = $('#dform').validate({
+	validator = $('#add_dialog_form').validate({
 		rules: {
 			input_name: {
 				required: true,
@@ -39,6 +39,21 @@ $(document).ready(function()
 		},
 		onkeyup: false
 	});
+	
+	edit_validator = $('#edit_entry_form').validate({
+		rules: {
+			edit_input_amount: {
+				required: true,
+				numeric: true
+			}
+		},
+		messages: {
+			edit_input_name: "",
+			edit_input_amount: ""
+		},
+		onkeyup: false
+	});
+	
 	
 	// Year/month selector population
 	var d = new Date();
@@ -69,6 +84,10 @@ $(document).ready(function()
 	// Setup the entry dialog
 	hideEntryDialog();
 	getEntryDialog().css('position', 'absolute');
+	
+	getEditEntryDialog().hide();
+	getEditEntryDialog().css('position', 'absolute');
+	
 
 	// Setup the template functions
 	_.templateSettings.variable = "data";
@@ -99,6 +118,7 @@ var idDropdownFromYear = '#from_year';
 
 var idDropdownNumCols = '#num_cols';
 var validator;
+var edit_validator;
 
 // Template function for the monthly entries
 var templateMonthly;
@@ -153,6 +173,7 @@ function onReceiveJsonEntries(jsonData)
 
 // Used to remember which type of entry dialog was showing last
 var selected = "";
+var edit_selected = "";
 
 function showEntryDialogUnderMonthly(el)
 {
@@ -193,19 +214,40 @@ function showEntryDialogUnderYearMonth(year, month)
 	updateEntryDialog(status, false, $moveTo, true, year, month, true);
 }
 
-function showEntryDialogUnderEntry(year, month, name, cid, monthly)
+function showEditEntryDialogUnderEntry(year, month, type, name, amount, cid, monthly)
 {
+	var $dialog = $('#edit_entry_div');
 	var key = year + ":" + month + ":" + name + ":" + monthly;
-	if (selected == key)
+	if (edit_selected == key)
 	{
-		selected = "";
-		hideEntryDialog();
+		edit_selected = "";
+		$dialog.hide();
 		return;
 	}
-	selected = key;
-	var status = 'Modify ' + monthly? 'Monthly': 'One Time' + ' Entry ' + name;
+	$dialog.show();
+	$('#edit_input_name').prop('disabled', 'disabled');
+	$('#edit_input_name').val(name);
+	$('#edit_input_amount').val(amount);
+	$('#edit_input_amount').focus();
+	$('#edit_input_amount').select();
+	if(type == "Income")
+		$('#edit_entry_income').prop('checked', 'checked');
+	else
+		$('#edit_entry_expense').prop('checked', 'checked');
+	
+	var data = {
+		year: year,
+		month: month,
+		name: name,
+		amount: amount,
+		cid: cid,
+		monthly: monthly
+	};
+	$dialog.data('meta', data);
+	
+	edit_selected = key;
 	var $moveTo = $('#' + year + "-" + month + "-" + cid);
-	updateEntryDialog(status, false, $moveTo, true, year, month, true);
+	offsetElementFrom($dialog, $moveTo, true);
 }
 
 function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthOption, yearSelection, monthSelection, topLeft)
@@ -233,6 +275,49 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 /*
  * Data helper functions
  */
+
+function saveEntry()
+{
+	if(!edit_validator.form())
+	{
+		console.log("Form not validated.");
+		return false;
+	}
+	var meta = getEditEntryDialog().data('meta');
+	var new_amount = parseInt($('#edit_input_amount').val());
+	var type = $('[name=edit_entry_type]:checked').attr('title');
+	if(meta.monthly)
+	{
+		var m = monthly.get(meta.name);
+		m.set('amount', new_amount);
+		m.set('type', type);
+		expandExpenseProperty(m);
+	}
+	else
+	{
+		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
+		m.set('amount', new_amount);
+		m.set('type', type);
+		expandExpenseProperty(m);
+	}
+	getEditEntryDialog().hide();
+	refreshEntries();
+}
+
+function deleteEntry()
+{
+	var meta = getEditEntryDialog().data('meta');
+	if(meta.monthly)
+	{
+		monthly.remove(monthly.get(meta.name));
+	}
+	else
+	{
+		one_time.remove(one_time.get(meta.year + ":" + meta.month + ":" + meta.name));
+	}
+	getEditEntryDialog().hide();
+	refreshEntries();
+}
 
 function deleteMonthly(year, month, name)
 {
@@ -416,9 +501,15 @@ function expandExpenseProperties()
 function expandExpenseProperty(value)
 {
 	if (value.get('type') == "Income")
+	{
 		value.set('income', value.get('amount'));
+		value.unset('expense');
+	}
 	else
+	{
 		value.set('expense', value.get('amount'));
+		value.unset('income');
+	}
 }
 
 function calculateAllMonthData()
@@ -523,8 +614,7 @@ function getEntriesHtml()
 			
 			monthData.total_expenses = monthMeta.get('total_expenses');
 			monthData.total_income = monthMeta.get('total_income');
-			monthData.entries = groupAndSortEntries(monthMeta.get('entries'));
-			monthData.entries = monthData.entries.concat(applyMonthlyModifications(monthly.toArray(), monthMeta.get('modifications')));
+			monthData.entries = groupAndSortEntries(monthMeta.get('entries').concat(applyMonthlyModifications(monthly.toArray(), monthMeta.get('modifications'))));
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.end_balance = monthMeta.get('est_end_balance');
@@ -604,7 +694,19 @@ function showInputForStartingBalance(year, month)
 
 function getEntryDialog()
 {
-	return $('#dialog_form');
+	return $('#add_dialog_div');
+}
+
+function getEditEntryDialog()
+{
+	return $('#edit_entry_div');
+}
+
+function hideEditEntryDialog()
+{
+	edit_selected = "";
+	getEditEntryDialog().data('meta', undefined);
+	getEditEntryDialog().hide();
 }
 
 function hideEntryDialog()
@@ -626,7 +728,6 @@ function refreshEntries()
 {
 	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
 	$('#entries').html(getEntriesHtml());	
-	//$("button").button();
 	$('.start_balance_input').hide();
 }
 
