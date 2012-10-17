@@ -31,8 +31,7 @@ $(document).ready(function()
 			this.data.total_income = this.meta.get('total_income');
 			this.data.entries = getEntriesArrayForYearMonth(this.year, this.month);
 			this.data.end_balance = this.meta.get('est_end_balance');
-			this.data.monthid = this.year + ", '" + this.month + "'";
-			
+			this.data.meta = this.meta;
 			var currentStartBalance = this.meta.get('start_balance');
 			if(currentStartBalance != undefined)
 				this.data.start_balance = currentStartBalance;
@@ -49,11 +48,11 @@ $(document).ready(function()
 		},
 		editEntry: function(event) {
 			var entryName = ($(event.target).parents(".entry_data")).attr('name');
-			editEntry(this.data.entries[entryName]);
+			editEntry(this.data.entries[entryName], this.year, this.month);
 		},
 		deleteEntry: function(event) {
 			var entryName = ($(event.target).parents(".entry_data")).attr('name');
-			deleteEntry(this.data.entries[entryName]);
+			deleteEntry(this.data.entries[entryName], this.year, this.month);
 		},
 		updateStartBalance: function(event) {
 			var $input = $(event.target).find('#startBalanceInput');
@@ -306,7 +305,7 @@ function showEditEntryDialogUnderEntry(e)
 	$('#edit_input_amount').val(e.amount);
 	$('#edit_input_amount').focus();
 	$('#edit_input_amount').select();
-	if(e.type == "Income")
+	if(e.amount > 0)
 		$('#edit_entry_income').prop('checked', 'checked');
 	else
 		$('#edit_entry_expense').prop('checked', 'checked');
@@ -355,28 +354,24 @@ function saveEntry()
 	}
 	var meta = getEditEntryDialog().data('meta');
 	var new_amount = parseInt($('#edit_input_amount').val());
-	var type = $('[name=edit_entry_type]:checked').attr('title');
 	if(meta.monthly)
 	{
 		var m = monthly.get(meta.name);
 		m.set('amount', new_amount);
-		m.set('type', type);
-		expandExpenseProperty(m);
 	}
 	else
 	{
 		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
 		m.set('amount', new_amount);
-		m.set('type', type);
-		expandExpenseProperty(m);
 	}
 	getEditEntryDialog().hide();
 	refreshEntries();
 }
 
-function editEntry(meta)
+function editEntry(model, year, month)
 {
-	if(meta.monthly)
+	var monthly = model.get('monthly');
+	if(monthly)
 	{
 		var justmonth = confirm("Would you like to modify just this month?");
 		var allmonths = false;
@@ -386,9 +381,7 @@ function editEntry(meta)
 			if(allmonths)
 			{
 				var newVal = prompt("New value?");
-				var m = monthly.get(meta.name);
-				m.set('amount', newVal);
-				expandExpenseProperty(m);
+				model.set('amount', newVal);
 			}
 			else
 			{
@@ -398,58 +391,39 @@ function editEntry(meta)
 		else
 		{
 			var newVal = prompt("New value?");
-			adjustMonthly(meta.year, meta.month, meta.name, newVal);
+			adjustMonthly(year, month, model.get('name'), newVal);
 		}
 	}
 	else
 	{
 		var newVal = prompt("New value?");
-		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
 		m.set('amount', newVal);
-		expandExpenseProperty(m);
 	}
 	refreshEntries();
 }
 
-function deleteEntry(meta)
+function deleteEntry(model, year, month)
 {
-	if(meta.monthly)
+	if(model.get('monthly'))
 	{
 		var justmonth = confirm("Would you like to delete just this month?");
 		if(justmonth)
 		{
-			deleteMonthly(meta.year, meta.month, meta.name);
+			deleteMonthly(year, month, model.get('name'));
 		}
 		else
 		{
 			var all = confirm("Would you like to delete all instances of this monthly entry?");
 			if(all)
 			{
-				monthly.remove(monthly.get(meta.name));
+				monthly.remove(model);
 			}
 		}
 	}
 	else
 	{
-		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
-		one_time.remove(m);
+		one_time.remove(model);
 	}
-	//getEditEntryDialog().hide();
-	refreshEntries();
-}
-
-function deleteAllEntry()
-{
-	var meta = getEditEntryDialog().data('meta');
-	if(meta.monthly)
-	{
-		monthly.remove(monthly.get(meta.name));
-	}
-	else
-	{
-		one_time.remove(one_time.get(meta.year + ":" + meta.month + ":" + meta.name));
-	}
-	getEditEntryDialog().hide();
 	refreshEntries();
 }
 
@@ -482,6 +456,26 @@ function putMonthlyModification(year, month, name, mod)
 	modifications[name] = mod;
 }
 
+function getModifiedAmount(model, year, month)
+{
+	var meta = monthsMeta.get(year + ':' + month);
+	var mods = meta.get('modifications');
+	if(typeof mods != "undefined")
+	{
+		var mod = mods[model.get('name')];
+		if(typeof mod != "undefined")
+		{
+			if(mod.type == "delete")
+				return undefined;
+			else if(mod.type == "adjust")
+			{
+				return parseInt(mod.amount);
+			}
+		}
+	}
+	return parseInt(model.get('amount'));
+}
+
 function applyMonthlyModifications(monthlyarr, mods)
 {
 	if(typeof mods == "undefined" || Object.keys(mods).length == 0)
@@ -498,7 +492,6 @@ function applyMonthlyModifications(monthlyarr, mods)
 			if(mod.type == "adjust")
 			{
 				m = m.clone().set('amount', mod.amount);
-				expandExpenseProperty(m);
 			}
 		}
 		ret.push(m);
@@ -539,20 +532,19 @@ function addEntry()
 		console.log("Form not validated.");
 		return false;
 	}
-	
+	var type = $('[name=entry_type]:checked').attr('title');
 	var data = {
 		name : $('[name=input_name]').val(),
 		amount : $('[name=input_amount]').val(),
-		monthly : $('[name=monthly]:checked').val(),
+		monthly : $('[name=monthly]:checked').val() == "True",
 		month : $('[name=selectorMonth]').val(),
-		year : $('[name=selectorYear]').val(),
-		type : $('[name=entry_type]:checked').attr('title')
+		year : $('[name=selectorYear]').val()
 	};
 
-	if (data.type == "Income")
-		data.income = data.amount;
-	else
-		data.expense = data.amount;
+	if (type == "Expense")
+		data.amount = -Math.abs(data.amount);
+	if (type == "Income")
+		data.amount = Math.abs(data.amount);
 
 	if (data.monthly)
 	{
@@ -603,31 +595,6 @@ function parseData(data)
 	monthly = new Backbone.Collection(data['monthly']);
 	one_time = new Backbone.Collection(data['one_time']);
 	monthsMeta = new Backbone.Collection(data['months']);
-
-	monthly.each(expandExpenseProperties());
-	one_time.each(expandExpenseProperties());
-}
-
-function expandExpenseProperties()
-{
-	return function(value, index)
-	{
-		expandExpenseProperty(value);
-	};
-}
-
-function expandExpenseProperty(value)
-{
-	if (value.get('type') == "Income")
-	{
-		value.set('income', value.get('amount'));
-		value.unset('expense');
-	}
-	else
-	{
-		value.set('expense', value.get('amount'));
-		value.unset('income');
-	}
 }
 
 function calculateAllMonthData()
@@ -646,21 +613,20 @@ function calculateAllMonthData()
 				meta.set('id', id);
 				monthsMeta.add(meta);
 			}
-			var entries = one_time.where({'year': yearString, 'month': monthString});
-			meta.set('entries', entries);
-			var monthlies = applyMonthlyModifications(monthly.toArray(), meta.get('modifications'));
-			entries = entries.concat(monthlies);
 			
+			var entries = getEntriesArrayForYearMonth(yearString, monthString);
 			var total_expenses = 0;
 			var total_income = 0;
 			for(var e = 0; e < entries.length; e++)
 			{
 				var entry = entries[e];
-				var amount = parseInt(entry.get('amount'));
-				if(entry.get('type') == "Income")
+				var amount = getModifiedAmount(entry, yearString, monthString);
+				if(typeof amount == "undefined")
+					continue;
+				if(amount > 0)
 					total_income += amount;
 				else
-					total_expenses += amount;
+					total_expenses -= amount;
 			}
 			var diff = total_income - total_expenses;
 			var start_balance = meta.get('start_balance');
@@ -699,20 +665,8 @@ function calculateAllMonthData()
 
 function getEntriesArrayForYearMonth(year, month)
 {
-	var meta = monthsMeta.get(year + ":" + month);
-	var ot = meta.get('entries');
-	var monthlies = applyMonthlyModifications(monthly.toArray(), meta.get('modifications'));
-	var ordered = groupAndSortEntries(monthlies.concat(ot));
-	var ret = [];
-	for(var i = 0; i < ordered.length; i++)
-	{
-		var obj = ordered[i].toJSON();
-		obj.cid = ordered[i].cid;
-		obj.month = month;
-		obj.year = year;
-		ret.push(obj);
-	}
-	return ret;
+	var one_times = one_time.where({'year': year, 'month': month});
+	return one_times.concat(monthly.toArray());
 }
 
 var entries_json = [];
@@ -827,8 +781,7 @@ function updateYearMonthIterator()
 function groupAndSortEntries(entryArr)
 {
 	// Group by expense and income
-	var groups = _.groupBy(entryArr, function(value) {return value.get('type');});
-	
+	var groups = _.groupBy(entryArr, function(value) {return value.get('amount') < 0;});
 	// Sort both expenses and income by amount
 	for(var key in groups)
 	{
@@ -839,10 +792,10 @@ function groupAndSortEntries(entryArr)
 	
 	// Populate our new list of entries in the order of Income followed by Expenses
 	var arr = [];
-	if(groups['Income'] != undefined)
-		arr = arr.concat(groups['Income']);
-	if(groups['Expense'] != undefined)
-		arr = arr.concat(groups['Expense']);
+	if(groups['false'] != undefined)
+		arr = arr.concat(groups['false']);
+	if(groups['true'] != undefined)
+		arr = arr.concat(groups['true']);
 	return arr;
 }
 

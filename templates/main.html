@@ -217,8 +217,8 @@
 					<td>
 						<%- entry.get('name') %>
 					</td>
-					<td class="<%-entry.get('type')=='Expense'?'expense':'income'%>">
-						<%-entry.get('type')=='Expense'?'-':'+'%><%- entry.get('amount') %>
+					<td class="<%-entry.get('amount') < 0?'expense':'income'%>">
+						<%-formatDollars(entry.get('amount'), '', true) %>
 					</td>
 				</tr>
 				<% }); %>
@@ -288,16 +288,18 @@
 				</tr>
 				
 					<% _.each(data.entries, function(entry, key, list) { %>
+					<% var amount = getModifiedAmount(entry, data.year, data.month); %>
+					<% if(typeof amount == "undefined") return; %>
 				<!-- ACTUAL ENTRIES -->
 				<tr name="<%=key%>" class="entry_data editable_entry">
-					<td class="<%-data.type =='Expense'?'expense':'income'%>">
-						<%- entry.name %>
+					<td class="<%-amount < 0?'expense':'income'%>">
+						<%- entry.get('name') %>
 					</td>
 					<td>
-						<span class="expense"><%-entry.type=='Expense'?'$':''%><%- entry.expense %></span>
+						<span class="expense"><%-amount < 0? formatDollars(Math.abs(amount), ''): ''%></span>
 					</td>
 					<td>
-						<span class="income"><%-entry.type =='Expense'?'':'$'%><%- entry.income %></span>
+						<span class="income"><%-amount > 0? formatDollars(amount, ''): ''%></span>
 					</td>
 					<td style="float: right;">
 						<button class="show_on_hover smallButton" id="editButton">Edit</button>
