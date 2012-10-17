@@ -165,14 +165,14 @@
 					<table width="100%" bgcolor="#efefef">
 					<tr>
 						<td><label>From</label></td>
-						<td><select id="from_month"></select></td>
-						<td><select id="from_year"></select></td>
+						<td><select class="dirtyfilter" id="from_month"></select></td>
+						<td><select class="dirtyfilter" id="from_year"></select></td>
 						
 					</tr>
 					<tr>
 						<td><label>To</label></td>
-						<td><select id="to_month"></select></td>
-						<td><select id="to_year"></select></td>
+						<td><select class="dirtyfilter" id="to_month"></select></td>
+						<td><select class="dirtyfilter" id="to_year"></select></td>
 						
 					</tr>
 					<tr>
@@ -180,7 +180,7 @@
 							<label>Columns</label>
 						</td>
 						<td>
-							<select id="num_cols" class="fullWidth"></select>
+							<select id="num_cols" class="dirtyfilter fullWidth"></select>
 						</td>
 					</tr>
 					<tr>
@@ -225,131 +225,125 @@
 			</table>
 		</script>
 		
-		<script type="text/template" id="template-entry">
-			
-		</script>
-		
 		<script type="text/template" class="entries">
 			<table width="100%" height="100%" cellspacing="16" cellpadding="0" bgcolor="#efefef"style="padding-top: 10px;" class="tableentries" >
+				<% _.each(data.rowData, function(row, key, list) { %>
+					
 				<tr>
-					<% _.each(data.rowData, function(row, key, list) { %>
+					<% _.each(row, function(month, key, list) { %>
 						
-						<!-- first row month data, starting balance and entries -->				
-						<% _.each(row, function(month, key, list) { %>
-							<td id=<%- month.month + month.year %> style='width: <%-100 / data.numCols%>%; height: 100%;' valign="top"class="tables">
-								
-								<table style="width: 100%; height: 100%;" cellspacing="0" cellpadding="0" >
-									<tr class="entries_first blue">
-										<!-- YEAR MONTH -->
-										<td colspan="2">
-											<% var newYear = month.year.substr(2,3); %>
-											<% var newMonth = month.month.substr(0,3); %>
-											<div class="year"><%- newMonth + ' \'' + newYear  %></div>
-										</td>
-										<td></td>
-										<!-- ADD BUTTON -->
-										<td align="right">
-											<% var buttonid = month.year + "-" + month.month; %>
-											<button style="float:right" class="button" id='<%-buttonid%>' onclick='showEntryDialogUnderYearMonth(<%-month.monthid%>);'>ADD</button>
-										</td>
-									</tr>
-									<!-- STARTING BALANCE ROW -->
-									<tr class="">
-										<td style="width: 25%">
-											<label class="preMonthMeta">Starting Balance: </label>
-										</td>
-										<td style="width: 25%">
-											<form onsubmit="updateStartingBalance(<%-month.monthid%>); return false;" style="margin: 0px;">
-												<% var sbid = month.year + month.month; %>
-												<% var sb = month.start_balance? month.start_balance: "--"; %>
-												<%-sb=='--'?'':'$'%><label id="start_balance_label<%-sbid%>" class="start_balance_label" onclick="showInputForStartingBalance(<%-month.monthid%>);"><%-sb%></label>
-												<input id="start_balance_input<%-sbid%>" class="start_balance_input" type="text" />
-												<br>
-											</form>
-										</td>
-										<td style="width: 25%">
-											
-										</td>
-										<td style="width: 25%"></td>
-									</tr>
-									<!-- NAME EXPENSE INCOME -->
-									<% if (month.entries.length > 0) { %>
-									<tr>
-										<th width="25%">
-											Name
-										</th>
-										<th width="25%">
-											Expense
-										</th>
-										<th width="25%">
-											Income
-										</th>
-									</tr>
-										<% _.each(month.entries, function(entry, key, list) { %>
-									<!-- ACTUAL ENTRIES -->
-									<% var idd = month.year + "-" + month.month + "-" + entry.cid; %>
-									<tr id="<%-idd%>" class="entry_data editable_entry">
-										<td class="<%-data.type =='Expense'?'expense':'income'%>">
-											<%- entry.name %>
-										</td>
-										<td>
-											<span class="expense"><%-entry.type=='Expense'?'$':''%><%- entry.expense %></span>
-										</td>
-										<td>
-											<span class="income"><%-entry.type =='Expense'?'':'$'%><%- entry.income %></span>
-										</td>
-										<td style="float: right;">
-											<button class="show_on_hover smallButton" onclick="editEntry(<%=entry.uid%>);">Edit</button>
-											<button class="show_on_hover smallButton" onclick="deleteEntry(<%=entry.uid%>);">Delete</button>
-										</td>
-									</tr>
-										<% }); %>
-									<% } %>
-									
-									<!-- SPACING ROW TO KEEP END OF MONTH LINED UP HORIZONTALLY -->
-									<tr style="height: 100%;"></tr>
-									
-									<!-- TOTAL -->
-									<tr class="" valign="bottom">
-										<td>
-											<label class="preMonthMeta">Total</label>
-										</td>
-										<td>
-											$<%- month.total_expenses %>
-										</td>
-										<td>
-											$<%- month.total_income %>
-										</td>
-									</tr>
-									<!-- ENDING BALANCE -->
-									<tr>
-										<td>
-											<label class="preMonthMeta">Ending Balance:</label>
-										</td>
-										<td>
-											<% var eb = month.end_balance? month.end_balance: ""; %>
-											<label><%-eb==''?'':'$' %><%- eb%></label>
-										</td>
-									</tr>
-									<!-- DISCREPANCY -->
-									<tr>
-										<td>
-											<label class="preMonthMeta">Discrepancy: </label>
-										</td>
-										<td>
-											<label><%- month.discrepancy? (month.discrepancy > 0? "+": "") + month.discrepancy: "0" %></label>
-										</td>
-									</tr>
-								</table>
-								
-							</td>
-						<% }); %>
-						</tr>
-						<tr>
+					<td style='width: <%=data.entryWidth%>%;' class='monthModule tables <%=month.year%> <%=month.month%>'></td>
+					
 					<% }); %>
-				</tr>	
+				</tr>
+				
+				<% }); %>
 			</table>
-		</script>	
+		</script>
+		
+		<script type="text/template" id="templateMonthModule">
+			<table style="width: 100%; height: 100%;" cellspacing="0" cellpadding="0" >
+				<tr class="entries_first blue">
+					<!-- YEAR MONTH -->
+					<td colspan="2">
+						<div class="year"><%- data.shortMonth + ' \'' + data.shortYear  %></div>
+					</td>
+					<td></td>
+					<!-- ADD BUTTON -->
+					<td align="right">
+						<button style="float:right" class="button" id='addButton'>ADD</button>
+					</td>
+				</tr>
+				
+				<!-- STARTING BALANCE ROW -->
+				<tr class="">
+					<td style="width: 25%">
+						<label class="preMonthMeta">Starting Balance: </label>
+					</td>
+					<td style="width: 25%">
+						<form id="startBalanceForm" style="margin: 0px;">
+							<% var sb = data.start_balance; %>
+							<label id="startBalanceLabel" class="start_balance_label"><%=formatDollars(sb, '--')%></label>
+							<input id="startBalanceInput" class="start_balance_input" type="text" />
+						</form>
+					</td>
+					<td style="width: 25%">
+						
+					</td>
+					<td style="width: 25%"></td>
+				</tr>
+				
+				<!-- NAME EXPENSE INCOME -->
+				<% if (data.entries.length > 0) { %>
+				<tr>
+					<th width="25%">
+						Name
+					</th>
+					<th width="25%">
+						Expense
+					</th>
+					<th width="25%">
+						Income
+					</th>
+				</tr>
+				
+					<% _.each(data.entries, function(entry, key, list) { %>
+				<!-- ACTUAL ENTRIES -->
+				<tr name="<%=key%>" class="entry_data editable_entry">
+					<td class="<%-data.type =='Expense'?'expense':'income'%>">
+						<%- entry.name %>
+					</td>
+					<td>
+						<span class="expense"><%-entry.type=='Expense'?'$':''%><%- entry.expense %></span>
+					</td>
+					<td>
+						<span class="income"><%-entry.type =='Expense'?'':'$'%><%- entry.income %></span>
+					</td>
+					<td style="float: right;">
+						<button class="show_on_hover smallButton" id="editButton">Edit</button>
+						<button class="show_on_hover smallButton" id="deleteButton">Delete</button>
+					</td>
+				</tr>
+					<% }); %>
+				<% } %>
+				
+				<!-- SPACER ROW TO KEEP END OF MONTH LINED UP HORIZONTALLY -->
+				<tr style="height: 100%;"></tr>
+				
+				<!-- TOTAL -->
+				<tr class="" valign="bottom">
+					<td>
+						<label class="preMonthMeta">Total</label>
+					</td>
+					<td>
+						<%=formatDollars(data.total_expenses, '')%>
+					</td>
+					<td>
+						<%=formatDollars(data.total_income, '') %>
+					</td>
+				</tr>
+				
+				<!-- ENDING BALANCE -->
+				<tr>
+					<td>
+						<label class="preMonthMeta">Ending Balance:</label>
+					</td>
+					<td>
+						<label><%=formatDollars(data.end_balance, '')%></label>
+					</td>
+				</tr>
+				
+				<!-- DISCREPANCY -->
+				<tr>
+					<td>
+						<label class="preMonthMeta">Discrepancy: </label>
+					</td>
+					<td>
+						<label><%=formatDollars(data.discrepancy, '$0')%></label>
+					</td>
+				</tr>
+			</table>
+		</script>
 		{% endif %}
 	</body>
 </html>

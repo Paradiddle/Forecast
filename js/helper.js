@@ -12,29 +12,159 @@ $(document).ready(function()
 	initTemplates();
 	initialElementSetup();
 	
-	EntryView = Backbone.View.extend({
-		template: _.template($("#template-entry").html()),
-		initialize: function(param) {
-			this.data = param.data;
+	MonthModule = Backbone.View.extend({
+		template: _.template($("#templateMonthModule").html()),
+		initialize: function(params, year, month, meta) {
+			this.year = year;
+			this.month = month;
+			this.meta = meta;
+			this.data = {
+				year: year,
+				month: month,
+				shortYear: year.substr(2, 3),
+				shortMonth: month.substr(0, 3)
+			};
+			this.calculate();
+		},
+		calculate: function() {
+			this.data.total_expenses = this.meta.get('total_expenses');
+			this.data.total_income = this.meta.get('total_income');
+			this.data.entries = getEntriesArrayForYearMonth(this.year, this.month);
+			this.data.end_balance = this.meta.get('est_end_balance');
+			this.data.monthid = this.year + ", '" + this.month + "'";
+			
+			var currentStartBalance = this.meta.get('start_balance');
+			if(currentStartBalance != undefined)
+				this.data.start_balance = currentStartBalance;
+			else
+				this.data.start_balance = this.meta.get('est_start_balance');
+			this.data.discrepancy = this.meta.get('discrepancy');
+		},
+		events: {
+			"click #addButton": "addMonthOneTime",
+			"click #startBalanceLabel": "showStartBalanceInput",
+			"submit #startBalanceForm": "updateStartBalance",
+			"click #editButton": "editEntry",
+			"click #deleteButton": "deleteEntry"
+		},
+		editEntry: function(event) {
+			var entryName = ($(event.target).parents(".entry_data")).attr('name');
+			editEntry(this.data.entries[entryName]);
+		},
+		deleteEntry: function(event) {
+			var entryName = ($(event.target).parents(".entry_data")).attr('name');
+			deleteEntry(this.data.entries[entryName]);
+		},
+		updateStartBalance: function(event) {
+			var $input = $(event.target).find('#startBalanceInput');
+			var val = $input.val();
+			if(val[0] == '$')
+				val = val.substr(1, val.length);
+			var new_start_bal = parseInt(val);
+			
+			var m = monthsMeta.get(this.year + ":" + this.month);
+			if(m == undefined)
+			{
+				m = new Backbone.Model();
+				m.set('id', this.year + ":" + this.month);
+				monthsMeta.add(m);
+			}
+			m.set('start_balance', new_start_bal);
+			refreshEntries();
+			return false;
+		},
+		showStartBalanceInput: function(event) {
+			var $label = $(event.target);
+			var $input = $label.siblings('#startBalanceInput');
+			$('.start_balance_input').hide();
+			$('.start_balance_label').show();
+			$input.show();
+			$input.val($label.html().replace('$', ''));
+			$input.focus();
+			$input.select();
+			$label.hide();
+		},
+		addMonthOneTime: function(event) {
+			showEntryDialogUnderYearMonth($(event.target), this.year, this.month);
 		},
 		render: function() {
-			console.log("render");
-			
 			var html = this.template(this.data);
 			
-			this.$el.html(html);
+			$(this.el).html(html);
 			return this;
 		}
+	});
+	
+	$('.dirtyfilter').on("change", function() {
+		dirtyFilter = true;
 	});
 	
 	retrieveParseRefreshEntries();
 });
 
-var EntryView;
+var MonthModule;
+
+
+/*
+ * Global variables
+ */
+
+var dirtyFilter = true;
+
+var idDropdownToMonth = '#to_month';
+var idDropdownToYear = '#to_year';
+var idDropdownFromMonth = '#from_month';
+var idDropdownFromYear = '#from_year';
+
+var idDropdownNumCols = '#num_cols';
+var validator;
+var edit_validator;
+
+// Template function for the monthly entries
+var templateMonthly;
+
+// Template function for the month display section.
+var templateEntries;
+
+var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+
+// Populated statically now
+// TODO populate based on saved values
+var years = [];
+
+// TODO Static options for 
+var NUM_COLS = [ 2, 3, 4 ];
+
+/*
+ * Backbone Collections
+ */
+
+// Collection representing all the monthly entries, one Model per monthly entry
+var monthly;
+
+// Collection representing all the one_time entries, one Model per entry
+var one_time;
+
+// Collection of metadata associated with each month, one Model per month
+var monthsMeta;
+
 
 /*
  * Initialization
  */
+
+function formatDollars(num, undefinedFallback, showpositive)
+{
+	if(typeof showpositive == "undefined")
+		showpositive = false;
+	if(typeof num == "undefined")
+		return undefinedFallback;
+	if(num < 0)
+		return "-$" + Math.abs(num);
+	if(showpositive)
+		return "+$" + num;
+	return "$" + num;
+}
 
 function initialElementSetup()
 {
@@ -90,47 +220,6 @@ function populateSelectElements()
 }
 
 /*
- * Global variables
- */
-
-var idDropdownToMonth = '#to_month';
-var idDropdownToYear = '#to_year';
-var idDropdownFromMonth = '#from_month';
-var idDropdownFromYear = '#from_year';
-
-var idDropdownNumCols = '#num_cols';
-var validator;
-var edit_validator;
-
-// Template function for the monthly entries
-var templateMonthly;
-
-// Template function for the month display section.
-var templateEntries;
-
-var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-
-// Populated statically now
-// TODO populate based on saved values
-var years = [];
-
-// TODO Static options for 
-var NUM_COLS = [ 2, 3, 4 ];
-
-/*
- * Backbone Collections
- */
-
-// Collection representing all the monthly entries, one Model per monthly entry
-var monthly;
-
-// Collection representing all the one_time entries, one Model per entry
-var one_time;
-
-// Collection of metadata associated with each month, one Model per month
-var monthsMeta;
-
-/*
  * Client-server communications 
  */
 
@@ -182,7 +271,7 @@ function showEntryDialogUnderEntryHeader(el)
 	updateEntryDialog('Add Entry', false, $(el), false, false);
 }
 
-function showEntryDialogUnderYearMonth(year, month)
+function showEntryDialogUnderYearMonth($button, year, month)
 {
 	var key = year + ":" + month;
 	if (selected == key)
@@ -193,13 +282,11 @@ function showEntryDialogUnderYearMonth(year, month)
 	}
 	selected = key;
 	var status = 'Add Entry for ' + month + " " + year;
-	var $moveTo = $('#' + year + "-" + month);
-	updateEntryDialog(status, false, $moveTo, true, year, month, true);
+	updateEntryDialog(status, false, $button, true, year, month, true);
 }
 
 function showEditEntryDialogUnderEntry(e)
 {
-	console.log('edit pressed.');
 	var $dialog = $('#edit_entry_div');
 	var key = e.year + ":" + e.month + ":" + e.name + ":" + e.monthly;
 	if (edit_selected == key)
@@ -242,7 +329,6 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 		$('#checkbox_monthly').removeAttr("checked");
 	
 	changeDateSelector();
-	showEntryDialog();
 	
 	if(yearSelection !== undefined)
 		$('#selectorYear').val(yearSelection);
@@ -253,6 +339,7 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 	$('.month_option').toggle(!hideMonthOption);
 
 	offsetElementFrom(getEntryDialog(), $moveTo, topLeft);
+	showEntryDialog();
 }
 
 /*
@@ -287,10 +374,8 @@ function saveEntry()
 	refreshEntries();
 }
 
-function editEntry(uid)
+function editEntry(meta)
 {
-	var meta = entries_json[uid];
-	console.log(meta);
 	if(meta.monthly)
 	{
 		var justmonth = confirm("Would you like to modify just this month?");
@@ -319,7 +404,6 @@ function editEntry(uid)
 	else
 	{
 		var newVal = prompt("New value?");
-		console.log(one_time);
 		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
 		m.set('amount', newVal);
 		expandExpenseProperty(m);
@@ -327,9 +411,8 @@ function editEntry(uid)
 	refreshEntries();
 }
 
-function deleteEntry(uid)
+function deleteEntry(meta)
 {
-	var meta = entries_json[uid];
 	if(meta.monthly)
 	{
 		var justmonth = confirm("Would you like to delete just this month?");
@@ -349,7 +432,6 @@ function deleteEntry(uid)
 	else
 	{
 		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
-		console.log(m);
 		one_time.remove(m);
 	}
 	//getEditEntryDialog().hide();
@@ -448,22 +530,6 @@ function getPreviousMonthMeta(yearIndex, monthIndex)
 		year--;
 	}
 	return "" + year + ":" + months[monthIndex];
-}
-
-function updateStartingBalance(year, month)
-{
-	var $input = $('#start_balance_input' + year + month);
-	var new_start_bal = parseInt($input.val());
-	
-	var m = monthsMeta.get(year + ":" + month);
-	if(m == undefined)
-	{
-		m = new Backbone.Model();
-		m.set('id', year + ":" + month);
-		monthsMeta.add(m);
-	}
-	m.set('start_balance', new_start_bal);
-	refreshEntries();
 }
 
 function addEntry()
@@ -598,16 +664,23 @@ function calculateAllMonthData()
 			}
 			var diff = total_income - total_expenses;
 			var start_balance = meta.get('start_balance');
+			var prevMonthMeta = monthsMeta.get(getPreviousMonthMeta(y, m));
+			var prevEstEndBalance = undefined;
+			if(prevMonthMeta != undefined)
+				prevEstEndBalance = prevMonthMeta.get('est_end_balance');
 			if(start_balance != undefined)
 			{
 				meta.set('est_end_balance', start_balance + diff);
+				if(prevMonthMeta != undefined && prevEstEndBalance != undefined)
+				{
+					var disc = start_balance - prevEstEndBalance;
+					prevMonthMeta.set('discrepancy', disc);
+				}
 			}
 			else
 			{
-				var prevMonthMeta = monthsMeta.get(getPreviousMonthMeta(y, m));
 				if(prevMonthMeta != undefined)
 				{
-					var prevEstEndBalance = prevMonthMeta.get('est_end_balance');
 					if(prevEstEndBalance != undefined)
 					{
 						meta.set('est_start_balance', prevEstEndBalance);
@@ -652,21 +725,78 @@ function getEntriesHtml()
 		alert("Not a valid to and from filter.");
 		return;
 	}
-	calculateAllMonthData();
 
+	var templateData = {};
+	templateData.rowData = [];
+	var numCols = NUM_COLS[getNumCols()];
+	templateData.entryWidth = 100 / numCols;
+	
+	var rowMonthsData = [];
+	var curIndex = 0;
+	
+	for(var j = 0; j < yearMonthIteratorData.length; j++)
+	{
+		var month = yearMonthIteratorData[j];
+		
+		monthData = {};
+		monthData.month = month.month;
+		monthData.year = month.year;
+		
+		curIndex++;
+		rowMonthsData.push(monthData);
+		if(curIndex == numCols)
+		{
+			curIndex = 0;
+			templateData.rowData.push(rowMonthsData);
+			rowMonthsData = [];
+		}
+	}
+	if(rowMonthsData.length > 0)
+		templateData.rowData.push(rowMonthsData);
+	
+	return templateEntries(templateData);
+}
+
+var monthModuleViews = {};
+
+function fillMonths()
+{
+	for(var j = 0; j < yearMonthIteratorData.length; j++)
+	{
+		var month = yearMonthIteratorData[j];
+		var key = month.year + ":" + month.month;
+		var module = monthModuleViews[key];
+		var $stuff = $('.' + month.month).filter('.' + month.year);
+		if(typeof module == "undefined")
+		{
+			var meta = monthsMeta.get(month.year + ":" + month.month);
+			module = new MonthModule({
+				el: $stuff
+			}, month.year, month.month, meta);
+			monthModuleViews[key] = module;
+		}
+		if(dirtyFilter)
+		{
+			module.el = $stuff;
+			module.$el = $stuff;
+			module.delegateEvents();
+		}
+		module.calculate();
+		module.render();
+	}
+}
+
+var yearMonthIteratorData;
+
+function updateYearMonthIterator()
+{
+	yearMonthIteratorData = [];
+	
 	var toMonth = getSelectedIndex(idDropdownToMonth);
 	var fromMonth = getSelectedIndex(idDropdownFromMonth);
 	var toYear = getSelectedIndex(idDropdownToYear);
 	var fromYear = getSelectedIndex(idDropdownFromYear);
-
-	var templateData = {};
-	templateData.rowData = [];
-	templateData.numCols = NUM_COLS[getNumCols()];
 	
-	var rowMonthsData = [];
-	var curIndex = 0;
-	var uniqueId = 0;
-	entries_json = [];
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
 	{
@@ -682,55 +812,16 @@ function getEntriesHtml()
 		{
 			var currentMonthStr = months[currentMonthNum];
 			var currentYearStr = years[currentYearNum];
-			var monthMeta = monthsMeta.get(currentYearStr + ":" + currentMonthStr);
-			
-			monthData = {};
-			
-			monthData.total_expenses = monthMeta.get('total_expenses');
-			monthData.total_income = monthMeta.get('total_income');
-			monthData.entries = getEntriesArrayForYearMonth(currentYearStr, currentMonthStr);
-			for(var i = 0; i < monthData.entries.length; i++)
-			{
-				var ee = monthData.entries[i];
-				ee.uid = uniqueId;
-				entries_json.push(ee);
-				uniqueId++;
-			}
-			
-			monthData.month = currentMonthStr;
-			monthData.year = currentYearStr;
-			monthData.end_balance = monthMeta.get('est_end_balance');
-			
-			monthData.monthid = currentYearStr + ", '" + currentMonthStr + "'";
-			
-			var currentStartBalance = monthMeta.get('start_balance');
-			if(currentStartBalance != undefined)
-				monthData.start_balance = currentStartBalance;
-			else
-				monthData.start_balance = monthMeta.get('est_start_balance');
-			
-			var nextMonthMeta = monthsMeta.get(getNextMonthMeta(currentYearNum, currentMonthNum));
-			if(nextMonthMeta != undefined)
-			{
-				var nextMonthStartBalance = nextMonthMeta.get('start_balance');
-				if(nextMonthStartBalance != undefined)
-					monthData.discrepancy = parseInt(nextMonthStartBalance) - monthData.end_balance;
-			}
-			
-			curIndex++;
-			rowMonthsData.push(monthData);
-			if(curIndex == templateData.numCols)
-			{
-				curIndex = 0;
-				templateData.rowData.push(rowMonthsData);
-				rowMonthsData = [];
-			}
+			var obj = {
+				month: currentMonthStr,
+				year: currentYearStr,
+				month_num: currentMonthNum,
+				year_num: currentYearNum,
+				meta: monthsMeta.get(currentYearStr + ":" + currentMonthStr)
+			};
+			yearMonthIteratorData.push(obj);
 		}
 	}
-	if(rowMonthsData.length > 0)
-		templateData.rowData.push(rowMonthsData);
-	
-	return templateEntries(templateData);
 }
 
 function groupAndSortEntries(entryArr)
@@ -758,21 +849,6 @@ function groupAndSortEntries(entryArr)
 /*
  * JQuery helper functions
  */
-
-function showInputForStartingBalance(year, month)
-{
-	var $input = $('#start_balance_input' + year + month);
-	var $label = $('#start_balance_label' + year + month);
-	var $button = $('#start_balance_button' + year + month);
-	$('.start_balance_input').hide();
-	$('.start_balance_label').show();
-	$input.show();
-	$button.show();
-	$input.val($label.html());
-	$input.focus();
-	$input.select();
-	$label.hide();
-}
 
 function getEntryDialog()
 {
@@ -807,8 +883,18 @@ function showEntryDialog()
 
 function refreshEntries()
 {
+	calculateAllMonthData();
+	if(dirtyFilter)
+	{
+		updateYearMonthIterator();
+		$('#entries').html(getEntriesHtml());
+	}
+
+	fillMonths();
+	
+	dirtyFilter = false;
+	
 	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
-	$('#entries').html(getEntriesHtml());	
 	$('.start_balance_input').hide();
 	$('.show_on_hover').hide();
 	$('.editable_entry').hover(

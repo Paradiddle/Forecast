@@ -284,3 +284,8 @@ td.bottom div.shadow{
 .smallButton{
 	font-size: 9px;
 }
+
+.monthModule{
+	height: 100%;
+	vertical-align: top;
+}
