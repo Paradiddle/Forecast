@@ -1,61 +1,73 @@
 $(document).ready(function()
 {
-	/*
-	 * Custom JQuery Validation Validators
-	 */
-	jQuery.validator.addMethod("alphanumeric", function(value, element) {
-        return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
-	});
-	jQuery.validator.addMethod("numeric", function(value, element) {
-        return this.optional(element) || /^[0-9]+$/.test(value);
-	});
-	jQuery.validator.addMethod("existing_name", function(value, element) {
-		var is_monthly = $('[name=monthly]:checked').val();
-		var month = $('[name=selectorMonth]').val();
-		var year = $('[name=selectorYear]').val();
-		var monthly_exists = monthly.get(value);
-		var one_time_exists = one_time.get(year + ":" + month + ":" + value);
-		var lst = one_time.filter(nameFilter(value));
-		if(is_monthly)
-			return !(monthly_exists || lst.length > 0);
-		return !monthly_exists && !one_time_exists;
+	jQuery.fn.outerHTML = function(s) {
+		return (s)
+		? this.before(s).remove()
+		: jQuery("<p>").append(this.eq(0).clone()).html();
+	};
+	
+	addCustomValidators();
+	initializeValidation();
+	
+	initTemplates();
+	initialElementSetup();
+	
+	EntryView = Backbone.View.extend({
+		template: _.template($("#template-entry").html()),
+		initialize: function(param) {
+			this.data = param.data;
+		},
+		render: function() {
+			console.log("render");
+			
+			var html = this.template(this.data);
+			
+			this.$el.html(html);
+			return this;
+		}
 	});
 	
-	// Validation rules setup and execution
-	validator = $('#add_dialog_form').validate({
-		rules: {
-			input_name: {
-				required: true,
-				existing_name: true
-			},
-			input_amount: {
-				required: true,
-				numeric: true
-			}
-		},
-		messages: {
-			input_name: "",
-			input_amount: ""
-		},
-		onkeyup: false
+	retrieveParseRefreshEntries();
+});
+
+var EntryView;
+
+/*
+ * Initialization
+ */
+
+function initialElementSetup()
+{
+	populateSelectElements();
+	
+	// Setup the popup dialogs
+	hideEntryDialog();
+	getEntryDialog().css('position', 'absolute');
+	
+	getEditEntryDialog().hide();
+	getEditEntryDialog().css('position', 'absolute');
+	
+	//Setup scrollbar for sidebar
+	$('#sidebar').mCustomScrollbar({
+		scrollInertia:0,
+		scrollButtons:{
+			enable:true
+		}
 	});
 	
-	edit_validator = $('#edit_entry_form').validate({
-		rules: {
-			edit_input_amount: {
-				required: true,
-				numeric: true
-			}
-		},
-		messages: {
-			edit_input_name: "",
-			edit_input_amount: ""
-		},
-		onkeyup: false
-	});
-	
-	
-	// Year/month selector population
+	//Hide the sort div
+	$('.sort').hide();
+}
+function initTemplates()
+{
+	// Setup the template functions
+	_.templateSettings.variable = "data";
+	templateMonthly = _.template($("script.template").html());
+	templateEntries = _.template($("script.entries").html());
+}
+
+function populateSelectElements()
+{
 	var d = new Date();
 	for(var i = d.getFullYear() - 1; i <= d.getFullYear() + 2; i++)
 	{
@@ -68,44 +80,14 @@ $(document).ready(function()
 	populateSelector($(idDropdownFromYear), years);
 	populateSelector($('#selectorYear'), years);
 	populateSelector($(idDropdownNumCols), NUM_COLS);
-	
-	// Setting default selections for year/month selectors
-	
+
 	// From year set to current year, to year set to next year
 	// From and to months set to current month
 	$(idDropdownFromYear).val(d.getFullYear());
 	$(idDropdownFromMonth).val(months[d.getMonth()]);
 	$(idDropdownToMonth).val(months[(d.getMonth()-1) % 12]);
-	$(idDropdownToYear).val(d.getFullYear() + 1);
-	
-	// Retrieve user data from server
-	retrieveEntries();
-
-	// Setup the entry dialog
-	hideEntryDialog();
-	getEntryDialog().css('position', 'absolute');
-	
-	getEditEntryDialog().hide();
-	getEditEntryDialog().css('position', 'absolute');
-	
-
-	// Setup the template functions
-	_.templateSettings.variable = "data";
-	templateMonthly = _.template($("script.template").html());
-	templateEntries = _.template($("script.entries").html());
-	
-	//Setup scrollbar for sidebar
-	$('#sidebar').mCustomScrollbar({
-		scrollInertia:0,
-		scrollButtons:{
-			enable:true
-		}
-	});
-	
-	//Hide the sort div
-	$('.sort').hide();
-
-});
+	$(idDropdownToYear).val(d.getFullYear() + 1);	
+}
 
 /*
  * Global variables
@@ -152,8 +134,8 @@ var monthsMeta;
  * Client-server communications 
  */
 
- // Retrieves the entries from the server in JSON format
-function retrieveEntries()
+ // Retrieves the entries from the server in JSON format, then parses the data and updates the entire display
+function retrieveParseRefreshEntries()
 {
 	var data = {
 		year: $('#idYearSelector').val()
@@ -181,6 +163,7 @@ function showEntryDialogUnderMonthly(el)
 	{
 		selected = "";
 		hideEntryDialog();
+		populateSelectElements();
 		return;
 	}
 	selected = "monthly";
@@ -214,10 +197,11 @@ function showEntryDialogUnderYearMonth(year, month)
 	updateEntryDialog(status, false, $moveTo, true, year, month, true);
 }
 
-function showEditEntryDialogUnderEntry(year, month, type, name, amount, cid, monthly)
+function showEditEntryDialogUnderEntry(e)
 {
+	console.log('edit pressed.');
 	var $dialog = $('#edit_entry_div');
-	var key = year + ":" + month + ":" + name + ":" + monthly;
+	var key = e.year + ":" + e.month + ":" + e.name + ":" + e.monthly;
 	if (edit_selected == key)
 	{
 		edit_selected = "";
@@ -225,28 +209,27 @@ function showEditEntryDialogUnderEntry(year, month, type, name, amount, cid, mon
 		return;
 	}
 	$dialog.show();
+	if(e.monthly)
+		$('#edit_entry_delete_all').show();
+	else
+		$('#edit_entry_delete_all').hide();
+	
 	$('#edit_input_name').prop('disabled', 'disabled');
-	$('#edit_input_name').val(name);
-	$('#edit_input_amount').val(amount);
+	$('#edit_input_name').val(e.name);
+	$('#edit_input_amount').val(e.amount);
 	$('#edit_input_amount').focus();
 	$('#edit_input_amount').select();
-	if(type == "Income")
+	if(e.type == "Income")
 		$('#edit_entry_income').prop('checked', 'checked');
 	else
 		$('#edit_entry_expense').prop('checked', 'checked');
 	
-	var data = {
-		year: year,
-		month: month,
-		name: name,
-		amount: amount,
-		cid: cid,
-		monthly: monthly
-	};
-	$dialog.data('meta', data);
+	$dialog.data('meta', e);
 	
 	edit_selected = key;
-	var $moveTo = $('#' + year + "-" + month + "-" + cid);
+	var stuff = '#' + e.year + "-" + e.month + "-" + e.cid;
+	var $moveTo = $(stuff);
+	
 	offsetElementFrom($dialog, $moveTo, true);
 }
 
@@ -304,7 +287,76 @@ function saveEntry()
 	refreshEntries();
 }
 
-function deleteEntry()
+function editEntry(uid)
+{
+	var meta = entries_json[uid];
+	console.log(meta);
+	if(meta.monthly)
+	{
+		var justmonth = confirm("Would you like to modify just this month?");
+		var allmonths = false;
+		if(!justmonth)
+		{
+			allmonths = confirm("Would you like to modify all months except previously modified months?");
+			if(allmonths)
+			{
+				var newVal = prompt("New value?");
+				var m = monthly.get(meta.name);
+				m.set('amount', newVal);
+				expandExpenseProperty(m);
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			var newVal = prompt("New value?");
+			adjustMonthly(meta.year, meta.month, meta.name, newVal);
+		}
+	}
+	else
+	{
+		var newVal = prompt("New value?");
+		console.log(one_time);
+		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
+		m.set('amount', newVal);
+		expandExpenseProperty(m);
+	}
+	refreshEntries();
+}
+
+function deleteEntry(uid)
+{
+	var meta = entries_json[uid];
+	if(meta.monthly)
+	{
+		var justmonth = confirm("Would you like to delete just this month?");
+		if(justmonth)
+		{
+			deleteMonthly(meta.year, meta.month, meta.name);
+		}
+		else
+		{
+			var all = confirm("Would you like to delete all instances of this monthly entry?");
+			if(all)
+			{
+				monthly.remove(monthly.get(meta.name));
+			}
+		}
+	}
+	else
+	{
+		var m = one_time.get(meta.year + ":" + meta.month + ":" + meta.name);
+		console.log(m);
+		one_time.remove(m);
+	}
+	//getEditEntryDialog().hide();
+	refreshEntries();
+}
+
+function deleteAllEntry()
 {
 	var meta = getEditEntryDialog().data('meta');
 	if(meta.monthly)
@@ -355,19 +407,19 @@ function applyMonthlyModifications(monthlyarr, mods)
 	var ret = [];
 	for(var i = 0; i < monthlyarr.length; i++)
 	{
-		var monthly = monthlyarr[i];
-		var mod = mods[monthly.get('name')];
+		var m = monthlyarr[i];
+		var mod = mods[m.get('name')];
 		if(typeof mod != "undefined")
 		{
 			if(mod.type == "delete")
 				continue;
 			if(mod.type == "adjust")
 			{
-				monthly = monthly.clone().set('amount', mod.amount);
-				expandExpenseProperty(monthly);
+				m = m.clone().set('amount', mod.amount);
+				expandExpenseProperty(m);
 			}
 		}
-		ret.push(monthly);
+		ret.push(m);
 	}
 	return ret;
 }
@@ -457,7 +509,7 @@ function addEntry()
 		else
 		{
 			var m = new Backbone.Model(data);
-			m.id = (data.year + ":" + data.month + ":" + data.name);
+			m.set('id', data.year + ":" + data.month + ":" + data.name);
 			one_time.add(m);
 		}
 	}
@@ -572,6 +624,26 @@ function calculateAllMonthData()
 	}
 }
 
+function getEntriesArrayForYearMonth(year, month)
+{
+	var meta = monthsMeta.get(year + ":" + month);
+	var ot = meta.get('entries');
+	var monthlies = applyMonthlyModifications(monthly.toArray(), meta.get('modifications'));
+	var ordered = groupAndSortEntries(monthlies.concat(ot));
+	var ret = [];
+	for(var i = 0; i < ordered.length; i++)
+	{
+		var obj = ordered[i].toJSON();
+		obj.cid = ordered[i].cid;
+		obj.month = month;
+		obj.year = year;
+		ret.push(obj);
+	}
+	return ret;
+}
+
+var entries_json = [];
+
 function getEntriesHtml()
 {
 	var valid = validateFilter();
@@ -593,6 +665,8 @@ function getEntriesHtml()
 	
 	var rowMonthsData = [];
 	var curIndex = 0;
+	var uniqueId = 0;
+	entries_json = [];
 	// Iterate through each year from the starting year to the ending year
 	for ( var currentYearNum = fromYear; currentYearNum <= toYear; currentYearNum++)
 	{
@@ -614,13 +688,21 @@ function getEntriesHtml()
 			
 			monthData.total_expenses = monthMeta.get('total_expenses');
 			monthData.total_income = monthMeta.get('total_income');
-			monthData.entries = groupAndSortEntries(monthMeta.get('entries').concat(applyMonthlyModifications(monthly.toArray(), monthMeta.get('modifications'))));
+			monthData.entries = getEntriesArrayForYearMonth(currentYearStr, currentMonthStr);
+			for(var i = 0; i < monthData.entries.length; i++)
+			{
+				var ee = monthData.entries[i];
+				ee.uid = uniqueId;
+				entries_json.push(ee);
+				uniqueId++;
+			}
+			
 			monthData.month = currentMonthStr;
 			monthData.year = currentYearStr;
 			monthData.end_balance = monthMeta.get('est_end_balance');
 			
 			monthData.monthid = currentYearStr + ", '" + currentMonthStr + "'";
-
+			
 			var currentStartBalance = monthMeta.get('start_balance');
 			if(currentStartBalance != undefined)
 				monthData.start_balance = currentStartBalance;
@@ -717,7 +799,6 @@ function hideEntryDialog()
 
 function showEntryDialog()
 {
-	console.log("reset form.");
 	getEntryDialog().show();
 	validator.resetForm();
 	$('#input_name').focus();
@@ -729,6 +810,15 @@ function refreshEntries()
 	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
 	$('#entries').html(getEntriesHtml());	
 	$('.start_balance_input').hide();
+	$('.show_on_hover').hide();
+	$('.editable_entry').hover(
+		function() {
+			$(this).find('.show_on_hover').show();
+		},
+		function() {
+			$(this).find('.show_on_hover').hide();
+		}
+	);
 }
 
 function offsetElementFrom($toMove, $toOffsetFrom, topLeft)
@@ -750,6 +840,7 @@ function offsetElementFrom($toMove, $toOffsetFrom, topLeft)
 function populateSelector(selector, options)
 {
 	var $sel = $(selector);
+	$sel.html('');
 	for ( var i = 0; i < options.length; i++)
 	{
 		$sel.append("<option value='" + options[i] + "'>" + options[i] + "</option>");
@@ -820,4 +911,61 @@ function yearMonthNameFilter(year, month, name)
 	{
 		return obj.get('year') == year && obj.get('month') == month && obj.get('name') == name;
 	};
+}
+
+// Custom JQuery Validators
+function addCustomValidators()
+{
+	jQuery.validator.addMethod("alphanumeric", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
+	});
+	jQuery.validator.addMethod("numeric", function(value, element) {
+        return this.optional(element) || /^[0-9]+$/.test(value);
+	});
+	jQuery.validator.addMethod("existing_name", function(value, element) {
+		var is_monthly = $('[name=monthly]:checked').val();
+		var month = $('[name=selectorMonth]').val();
+		var year = $('[name=selectorYear]').val();
+		var monthly_exists = monthly.get(value);
+		var one_time_exists = one_time.get(year + ":" + month + ":" + value);
+		var lst = one_time.filter(nameFilter(value));
+		if(is_monthly)
+			return !(monthly_exists || lst.length > 0);
+		return !monthly_exists && !one_time_exists;
+	});
+}
+
+function initializeValidation()
+{
+	validator = $('#add_dialog_form').validate({
+		rules: {
+			input_name: {
+				required: true,
+				existing_name: true
+			},
+			input_amount: {
+				required: true,
+				numeric: true
+			}
+		},
+		messages: {
+			input_name: "",
+			input_amount: ""
+		},
+		onkeyup: false
+	});
+	
+	edit_validator = $('#edit_entry_form').validate({
+		rules: {
+			edit_input_amount: {
+				required: true,
+				numeric: true
+			}
+		},
+		messages: {
+			edit_input_name: "",
+			edit_input_amount: ""
+		},
+		onkeyup: false
+	});
 }

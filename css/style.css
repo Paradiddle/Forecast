@@ -31,12 +31,6 @@ tr.entries_first td{
 	padding:0;
 }
 
-tr.entries:hover {
-}
-
-tr.entries {
-}
-
 .tableentries{
 	border-left:1px solid #555;
 }
@@ -55,7 +49,6 @@ tr.entries {
 }
 
 .button{
-	font-size:11px!important;
 	background:#00623b;
 	padding:2px 5px;
 	color:white;
@@ -286,4 +279,8 @@ td.bottom div.shadow{
 
 .sort{
 	width:100%;
+}
+
+.smallButton{
+	font-size: 9px;
 }
