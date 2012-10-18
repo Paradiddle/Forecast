@@ -1,0 +1,20 @@
+<table cellspacing = "0" style="font-size:14px;"cellpadding="2">
+	<tr>
+		<th width="33%">
+			Name
+		</th>
+		<th width="33%">
+			Amount
+		</th>
+	</tr>
+	<% _.each(data, function(entry, key, list) { %>
+	<tr class="entries">
+		<td>
+			<%- entry.get('name') %>
+		</td>
+		<td class="<%-entry.get('amount') < 0?'expense':'income'%>">
+			<%-formatDollars(entry.get('amount'), '', true) %>
+		</td>
+	</tr>
+	<% }); %>
+</table>

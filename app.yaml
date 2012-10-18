@@ -10,6 +10,9 @@ handlers:
 - url: /js
   static_dir: js
   
+- url: /underscore_templates
+  static_dir: underscore_templates
+  
 - url: /images
   static_dir: images
   

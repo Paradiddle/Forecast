@@ -1,5 +1,6 @@
 $(document).ready(function()
 {
+	_.templateSettings.variable = "data";
 	jQuery.fn.outerHTML = function(s) {
 		return (s)
 		? this.before(s).remove()
@@ -9,11 +10,9 @@ $(document).ready(function()
 	addCustomValidators();
 	initializeValidation();
 	
-	initTemplates();
 	initialElementSetup();
 	
 	MonthModule = Backbone.View.extend({
-		template: _.template($("#templateMonthModule").html()),
 		initialize: function(params, year, month, meta) {
 			this.year = year;
 			this.month = month;
@@ -87,7 +86,7 @@ $(document).ready(function()
 			showEntryDialogUnderYearMonth($(event.target), this.year, this.month);
 		},
 		render: function() {
-			var html = this.template(this.data);
+			var html = render('month_module', this.data);
 			
 			$(this.el).html(html);
 			return this;
@@ -100,6 +99,31 @@ $(document).ready(function()
 	
 	retrieveParseRefreshEntries();
 });
+
+function render(tmpl_name, tmpl_data) {
+    if ( !render.tmpl_cache ) { 
+        render.tmpl_cache = {};
+    }
+
+    if ( ! render.tmpl_cache[tmpl_name] ) {
+        var tmpl_dir = '/underscore_templates';
+        var tmpl_url = tmpl_dir + '/' + tmpl_name + '.html';
+
+        var tmpl_string;
+        $.ajax({
+            url: tmpl_url,
+            method: 'GET',
+            async: false,
+            success: function(data) {
+                tmpl_string = data;
+            }
+        });
+
+        render.tmpl_cache[tmpl_name] = _.template(tmpl_string);
+    }
+
+    return render.tmpl_cache[tmpl_name](tmpl_data);
+}
 
 var MonthModule;
 
@@ -186,13 +210,6 @@ function initialElementSetup()
 	
 	//Hide the sort div
 	$('.sort').hide();
-}
-function initTemplates()
-{
-	// Setup the template functions
-	_.templateSettings.variable = "data";
-	templateMonthly = _.template($("script.template").html());
-	templateEntries = _.template($("script.entries").html());
 }
 
 function populateSelectElements()
@@ -708,7 +725,7 @@ function getEntriesHtml()
 	if(rowMonthsData.length > 0)
 		templateData.rowData.push(rowMonthsData);
 	
-	return templateEntries(templateData);
+	return render('entries_table', templateData);
 }
 
 var monthModuleViews = {};
@@ -847,7 +864,7 @@ function refreshEntries()
 	
 	dirtyFilter = false;
 	
-	$('#monthly_entries').html(templateMonthly(monthly.toArray()));
+	$('#monthly_entries').html(render('monthly_entries', monthly.toArray()));
 	$('.start_balance_input').hide();
 	$('.show_on_hover').hide();
 	$('.editable_entry').hover(
