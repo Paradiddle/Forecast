@@ -3,7 +3,7 @@ function initialElementSetup()
 	populateSelectElements();
 	
 	// Setup the popup dialogs
-	hideEntryDialog();
+	getEntryDialog().hide();
 	getEntryDialog().css('position', 'absolute');
 	
 	getEditEntryDialog().hide();
@@ -191,7 +191,7 @@ function getSelectedIndex(id)
 
 function toggleSort()
 {
-	$('.sort').slideToggle();
+	$('.sort').slideToggle('fast');
 }
 
 function offsetElementFrom($toMove, $toOffsetFrom, topLeft)
