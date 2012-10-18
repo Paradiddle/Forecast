@@ -89,6 +89,9 @@ tr.entries_first td{
 	background: #63b16f;
 }
 
+.editing{
+	background-color: #FFF146;
+}
 
 label.preMonthMeta{
 	font-weight: 600;
@@ -313,6 +316,6 @@ td.bottom div.shadow{
 	background-image: url('/images/delete.png');
 }
 
-.entry_data:hover{
+.row_hover:hover{
 	background-color: #EEEEEE;
 }

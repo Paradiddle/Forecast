@@ -9,6 +9,9 @@ handlers:
  
 - url: /js
   static_dir: js
+ 
+- url: /libjs
+  static_dir: libjs
   
 - url: /underscore_templates
   static_dir: underscore_templates

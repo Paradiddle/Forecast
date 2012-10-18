@@ -33,7 +33,9 @@ class User(db.Model):
     userid = db.StringProperty()
     num_monthly = db.IntegerProperty(default=0)
     num_one_time = db.IntegerProperty(default=0)
-    obj = JsonProperty()
+    months = JsonProperty()
+    one_time = JsonProperty()
+    monthly = JsonProperty()
     
 class Login(webapp.RequestHandler):
     def get(self):
@@ -69,7 +71,11 @@ class Entries(webapp.RequestHandler):
         already_entered = User.get_by_key_name(user.user_id())
         self.response.headers.add_header('content-type', 'applications/json', charset='utf-8')
         if already_entered:
-            self.response.out.write(json.dumps(already_entered.obj))
+            obj = {}
+            obj['monthly'] = already_entered.monthly
+            obj['one_time'] = already_entered.one_time
+            obj['months'] = already_entered.months
+            self.response.out.write(json.dumps(obj))
         else:
             self.response.out.write(json.dumps("{'monthly': {}, 'one_time': {}, 'months': {}}"))
             
@@ -91,10 +97,14 @@ class Entries(webapp.RequestHandler):
         if not u:
             u = User(key_name=user.user_id())
             u.userid = user.user_id()
-            u.obj = data
+            u.months = data['months']
+            u.monthly = data['monthly']
+            u.one_time = data['one_time']
             self.response.out.write("Save file successfully created.");
         else:
-            u.obj = data
+            u.months = data['months']
+            u.monthly = data['monthly']
+            u.one_time = data['one_time']
             self.response.out.write("Save file successfully updated.");
             diff_one_time = num_one_time - u.num_one_time
             diff_monthly = num_monthly - u.num_monthly

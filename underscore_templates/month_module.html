@@ -50,7 +50,7 @@
 		<% var amount = getModifiedAmount(entry, data.year, data.month); %>
 		<% if(typeof amount == "undefined") return; %>
 	<!-- ACTUAL ENTRIES -->
-	<tr name="<%=key%>" class="entry_data editable_entry">
+	<tr name="<%=key%>" class="entry_data editable_entry row_hover">
 		<td class="<%-amount < 0?'expense':'income'%>">
 			<%- entry.get('name') %>
 		</td>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 	<head>
 		<title>Budget Forecaster</title>
 		
@@ -7,17 +8,26 @@
 		<link href="css/jquery-ui.css" rel="stylesheet">
 		<link href='http://fonts.googleapis.com/css?family=Gentium+Book+Basic' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
-		<script src="js/jquery.js"></script>
-		<script src="js/jquery-ui-1.9.0.js"></script>
-		<script src="js/jquery-validate.js"></script>
-		<script src="js/underscore.js"></script>
-		<script src="js/backbone.js"></script>
-		<script src="js/helper.js"></script> 
-		<script src="js/mousewheel.js"></script>  
-		<script src="js/scroll.js"></script>         
+		<script src="libjs/jquery.js"></script>
+		<script src="libjs/jquery-ui-1.9.0.js"></script>
+		<script src="libjs/jquery-validate.js"></script>
+		<script src="libjs/underscore.js"></script>
+		<script src="libjs/backbone.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/data_functions.js"></script>
+		<script src="js/dialog_add_entry.js"></script>
+		<script src="js/dialog_edit_entry.js"></script>
+		<script src="js/jquery_helpers.js"></script>
+		<script src="js/client_server_functions.js"></script>
+		<script src="js/data_views.js"></script>
+		<script src="libjs/mousewheel.js"></script>  
+		<script src="libjs/scroll.js"></script>  
 	</head>
 
-	<body onunload="saveData();">	
+	<body>
+		
+		<!-- HEADER -->
+		
 		<div class="fullWidth Header">
 			<img src="images/logo.jpg" style="float:left; border:0; margin-top:10px;"/>
 			
@@ -32,8 +42,7 @@
 		
 		{% if username %}
 		
-		
-		<!-- Entry data input form -->
+		<!-- ADD ENTRIES DIALOG -->
 		
 		<div id="add_dialog_div" style="display=none; position=absolute; z-index:5">
 			<form onsubmit="return false;" id="add_dialog_form">
@@ -94,7 +103,7 @@
 					</tr>
 					<tr>
 						<td>
-							<button class="button fullWidth" onclick="addEntry();" id="addentry">Add Entry</button>
+							<button class="button fullWidth" onclick="click_AddEntry();" id="addentry">Add Entry</button>
 						</td>
 						<td>
 							<button class="button fullWidth" onclick="hideEntryDialog();">Close</button>
@@ -104,23 +113,29 @@
 			</form>
 		</div>
 		
-		<div id="edit_entry_div" style="display=none; position=absolute; z-index:5">
+		<!-- EDIT ENTRIES DIALOG -->
+		
+		<div id="edit_entry_div" style="display=none; position=absolute; z-index:5;">
 			<form onsubmit="return false;" id="edit_entry_form">
 				<table class="fieldset" bgcolor="white">
 					<tr>
 						<td colspan="2">
-							<label class="Heading blue" id="dialog_status">Edit Entry</label>
+							<label class="Heading blue" id="edit_dialog_status">Edit Entry</label>
 						</td>
 					</tr>
 					<tr>
-						<td width="50%">
+						<td width="50%"></td>
+						<td width="50%"></td>
+					</tr>
+					<tr class="edit">
+						<td>
 							<label for="edit_input_name" disabled="disabled">Entry Name</label>								
 						</td>
-						<td width="50%">
+						<td>
 							<input style="width: 100%;" type="text" class="in required" id="edit_input_name" name="edit_input_name">
 						</td>
 					</tr>
-					<tr>
+					<tr class="edit">
 						<td>
 							<label for="edit_input_amount">Entry Amount</label>
 						</td>
@@ -128,33 +143,41 @@
 							<input style="width: 100%;" type="text" class="in required" id="edit_input_amount" name="edit_input_amount">
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<label for="edit_entry_type">Type</label>
+					<tr class="edit">
+						<td style="vertical-align: top;">
+							<label for="edit_entry_type">Type:</label>
 						</td>
 						<td>
-							<input type="radio" id="edit_entry_income" name="edit_entry_type" title="Income"> Income<br>
-							<input type="radio" id="edit_entry_expense" name="edit_entry_type" title="Expense" checked="checked"> Expense
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Action
+							<input type="radio" id="edit_entry_income" value="Income" name="edit_entry_type"> Income<br>
+							<input type="radio" id="edit_entry_expense" value="Expense" name="edit_entry_type"> Expense
 						</td>
 					</tr>
-					<tr>
+					<tr class="edit">
 						<td colspan="2">
-							<select style="width: 100%;" id="edit_entry_select"></select>
+							<div style="border: solid; border-width: 1px;"></div>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2">
-							<button class="button fullWidth" onclick="editEntry();">Apply</button>
+						<td style="vertical-align: top;">
+							<label for="edit_entry_type">Entry Scope:</label>
+						</td>
+						<td class="edit_action">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button class="button fullWidth edit" onclick="applyEdit();">Apply</button>
+							<button class="button fullWidth delete" onclick="applyDelete();">Delete</button>
+						</td>
+						<td>
+							<button class="button fullWidth" onclick="hideEditEntryDialog();">Close</button>
 						</td>
 					</tr>
 				</table>
 			</form>
 		</div>
+		
+		<!-- SIDE BAR -->
 		
 		<div style="display: block;">
 			<div id="sidebar">
@@ -200,6 +223,7 @@
 				<div id="entries"></div>
 			</div>
 		</div>
+		
 		{% endif %}
 	</body>
 </html>
