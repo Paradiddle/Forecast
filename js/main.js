@@ -16,6 +16,12 @@ $(document).ready(function()
 		dirtyFilter = true;
 		updateMonthFilterIndexes();
 	});
+
+	$('body').delegate('.editable_entry', "hover",
+		function(event) {
+			$(this).find('.show_on_hover').toggle(event.type === 'mouseenter');
+		}
+	);
 	
 	retrieveParseRefreshEntries();
 });

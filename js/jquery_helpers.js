@@ -152,15 +152,6 @@ function renderMonthlyEntries()
 
 function postRenderMonthModules()
 {
-	$('.editable_entry').hover(
-		function() {
-			$(this).find('.show_on_hover').show();
-		},
-		function() {
-			$(this).find('.show_on_hover').hide();
-		}
-	);
-	
 	// Hide start balance inputs
 	$('.start_balance_input').hide();
 	
