@@ -28,7 +28,7 @@ $(document).ready(function()
 		calculate: function() {
 			this.data.total_expenses = this.meta.get('total_expenses');
 			this.data.total_income = this.meta.get('total_income');
-			this.data.entries = getEntriesArrayForYearMonth(this.year, this.month);
+			this.data.entries = sortByIncomeThenAmount(getEntriesArrayForYearMonth(this.year, this.month));
 			this.data.end_balance = this.meta.get('est_end_balance');
 			this.data.meta = this.meta;
 			var currentStartBalance = this.meta.get('start_balance');
@@ -99,6 +99,27 @@ $(document).ready(function()
 	
 	retrieveParseRefreshEntries();
 });
+
+function sortByIncomeThenAmount(models)
+{
+	// Group by expense and income
+	var groups = _.groupBy(models, function(value) {return value.get('amount') < 0;});
+	// Sort both expenses and income by amount
+	for(var key in groups)
+	{
+		groups[key] = _.sortBy(groups[key], function(value) {
+			return -Math.abs(value.get('amount'));
+		});
+	}
+	
+	// Populate our new list of entries in the order of Income followed by Expenses
+	var arr = [];
+	if(groups['false'] != undefined)
+		arr = arr.concat(groups['false']);
+	if(groups['true'] != undefined)
+		arr = arr.concat(groups['true']);
+	return arr;
+}
 
 function render(tmpl_name, tmpl_data) {
     if ( !render.tmpl_cache ) { 
@@ -715,7 +736,7 @@ function getEntriesHtml()
 		
 		curIndex++;
 		rowMonthsData.push(monthData);
-		if(curIndex == numCols)
+		if(curIndex == numCols || month.month == "December")
 		{
 			curIndex = 0;
 			templateData.rowData.push(rowMonthsData);
@@ -793,27 +814,6 @@ function updateYearMonthIterator()
 			yearMonthIteratorData.push(obj);
 		}
 	}
-}
-
-function groupAndSortEntries(entryArr)
-{
-	// Group by expense and income
-	var groups = _.groupBy(entryArr, function(value) {return value.get('amount') < 0;});
-	// Sort both expenses and income by amount
-	for(var key in groups)
-	{
-		groups[key] = _.sortBy(groups[key], function(value) {
-			return -value.get('amount');
-		});
-	}
-	
-	// Populate our new list of entries in the order of Income followed by Expenses
-	var arr = [];
-	if(groups['false'] != undefined)
-		arr = arr.concat(groups['false']);
-	if(groups['true'] != undefined)
-		arr = arr.concat(groups['true']);
-	return arr;
 }
 
 /*

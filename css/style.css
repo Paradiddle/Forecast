@@ -289,9 +289,30 @@ td.bottom div.shadow{
 
 .smallButton{
 	font-size: 9px;
+	background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    height: 16px;
+    padding-left: 16px;
+    vertical-align: middle;
+    display: inline;
+    float: left;
 }
 
 .monthModule{
 	height: 100%;
 	vertical-align: top;
+}
+
+.editButton{
+	background-image: url('/images/edit.png');
+}
+
+.deleteButton{
+	background-image: url('/images/delete.png');
+}
+
+.entry_data:hover{
+	background-color: #EEEEEE;
 }

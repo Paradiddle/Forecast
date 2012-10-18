@@ -13,10 +13,11 @@
 	
 	<!-- STARTING BALANCE ROW -->
 	<tr class="">
-		<td style="width: 25%">
+		<% var w = 25 + '%' %>
+		<td style="width: <%=w%>">
 			<label class="preMonthMeta">Starting Balance: </label>
 		</td>
-		<td style="width: 25%">
+		<td style="width: <%=w%>">
 			<span class="serif">
 				<form id="startBalanceForm" style="margin: 0px;">
 					<% var sb = data.start_balance; %>
@@ -25,22 +26,22 @@
 				</form>
 			</span>
 		</td>
-		<td style="width: 25%">
+		<td style="width: <%=w%>">
 			
 		</td>
-		<td style="width: 25%"></td>
+		<td style="width: 110px;"></td>
 	</tr>
 	
 	<!-- NAME EXPENSE INCOME -->
 	<% if (data.entries.length > 0) { %>
 	<tr>
-		<th width="25%">
+		<th>
 			Name
 		</th>
-		<th width="25%">
+		<th>
 			Expense
 		</th>
-		<th width="25%">
+		<th>
 			Income
 		</th>
 	</tr>
@@ -60,8 +61,8 @@
 			<span class="income serif"><%-amount > 0? formatDollars(amount, ''): ''%></span>
 		</td>
 		<td style="float: right;">
-			<button class="show_on_hover smallButton" id="editButton">Edit</button>
-			<button class="show_on_hover smallButton" id="deleteButton">Delete</button>
+			<input type="button" class="show_on_hover smallButton editButton" id="editButton">
+			<input type="button" class="show_on_hover smallButton deleteButton" id="deleteButton">
 		</td>
 	</tr>
 		<% }); %>
