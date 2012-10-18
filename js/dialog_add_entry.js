@@ -76,12 +76,12 @@ function clearAddEntryNameAndAmount()
 function hideEntryDialog()
 {
 	selected = "";
-	getEntryDialog().hide();
+	getEntryDialog().fadeOut('fast');
 }
 
 function showEntryDialog()
 {
-	getEntryDialog().show();
+	getEntryDialog().fadeIn('fast');
 	hideEditEntryDialog();
 	validator.resetForm();
 	$('#input_name').focus();

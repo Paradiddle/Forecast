@@ -11,14 +11,14 @@ function hideEditEntryDialog()
 	getEditEntryDialog().data('model', undefined);
 	getEditEntryDialog().data('year', undefined);
 	getEditEntryDialog().data('month', undefined);
-	getEditEntryDialog().hide();
+	getEditEntryDialog().fadeOut('fast');
 	$('.entry_data').removeClass('editing');
 	$('.entry_data').addClass('row_hover');
 }
 
 function showEditEntryDialog()
 {
-	getEditEntryDialog().show();
+	getEditEntryDialog().fadeIn('fast');
 	hideEntryDialog();
 }
 
