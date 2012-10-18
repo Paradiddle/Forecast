@@ -17,11 +17,13 @@
 			<label class="preMonthMeta">Starting Balance: </label>
 		</td>
 		<td style="width: 25%">
-			<form id="startBalanceForm" style="margin: 0px;">
-				<% var sb = data.start_balance; %>
-				<label id="startBalanceLabel" class="start_balance_label"><%=formatDollars(sb, '--')%></label>
-				<input id="startBalanceInput" class="start_balance_input" type="text" />
-			</form>
+			<span class="serif">
+				<form id="startBalanceForm" style="margin: 0px;">
+					<% var sb = data.start_balance; %>
+					<label id="startBalanceLabel" class="start_balance_label"><%=formatDollars(sb, '--')%></label>
+					<input id="startBalanceInput" class="start_balance_input" type="text" />
+				</form>
+			</span>
 		</td>
 		<td style="width: 25%">
 			
@@ -52,10 +54,10 @@
 			<%- entry.get('name') %>
 		</td>
 		<td>
-			<span class="expense"><%-amount < 0? formatDollars(Math.abs(amount), ''): ''%></span>
+			<span class="expense serif"><%-amount < 0? formatDollars(Math.abs(amount), ''): ''%></span>
 		</td>
 		<td>
-			<span class="income"><%-amount > 0? formatDollars(amount, ''): ''%></span>
+			<span class="income serif"><%-amount > 0? formatDollars(amount, ''): ''%></span>
 		</td>
 		<td style="float: right;">
 			<button class="show_on_hover smallButton" id="editButton">Edit</button>
@@ -66,18 +68,23 @@
 	<% } %>
 	
 	<!-- SPACER ROW TO KEEP END OF MONTH LINED UP HORIZONTALLY -->
-	<tr style="height: 100%;"></tr>
+	<tr style="height: 100%;"><td></td></tr>
 	
 	<!-- TOTAL -->
+	<tr>
+		<td colspan="4">
+			<div class="whitecover"></div>
+		</td>
+	</tr>
 	<tr class="" valign="bottom">
 		<td>
 			<label class="preMonthMeta">Total</label>
 		</td>
 		<td>
-			<%=formatDollars(data.total_expenses, '')%>
+			<span class="serif"><%=formatDollars(data.total_expenses, '')%></span>
 		</td>
 		<td>
-			<%=formatDollars(data.total_income, '') %>
+			<span class="serif"><%=formatDollars(data.total_income, '') %></span>
 		</td>
 	</tr>
 	
@@ -87,7 +94,7 @@
 			<label class="preMonthMeta">Ending Balance:</label>
 		</td>
 		<td>
-			<label><%=formatDollars(data.end_balance, '')%></label>
+			<span class="serif"><label><%=formatDollars(data.end_balance, '')%></label></span>
 		</td>
 	</tr>
 	
@@ -97,7 +104,7 @@
 			<label class="preMonthMeta">Discrepancy: </label>
 		</td>
 		<td>
-			<label><%=formatDollars(data.discrepancy, '$0')%></label>
+			<span class="serif"><label><%=formatDollars(data.discrepancy, '$0')%></label></span>
 		</td>
 	</tr>
 </table>

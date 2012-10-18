@@ -13,7 +13,7 @@
 			<%- entry.get('name') %>
 		</td>
 		<td class="<%-entry.get('amount') < 0?'expense':'income'%>">
-			<%-formatDollars(entry.get('amount'), '', true) %>
+			<span class="serif"><%-formatDollars(entry.get('amount'), '', true) %></span>
 		</td>
 	</tr>
 	<% }); %>
