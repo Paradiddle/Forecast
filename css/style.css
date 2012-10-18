@@ -90,7 +90,7 @@ tr.entries_first td{
 }
 
 .editing{
-	background-color: #FFF146;
+	background-color: #FFF146 !important;
 }
 
 label.preMonthMeta{
@@ -206,7 +206,7 @@ td.bottom div.shadow{
 .whitecover{
 	top:-5px;
 	left:0px;
-	background:#eee;
+	background:#CCCCCC;
 	height:6px;
 	margin:5px 0;
 	width:100%;
@@ -315,4 +315,3 @@ td.bottom div.shadow{
 .deleteButton{
 	background-image: url('/images/delete.png');
 }
-
