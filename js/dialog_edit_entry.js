@@ -17,7 +17,6 @@ function hideEditEntryDialog(fade)
 	else
 		getEditEntryDialog().fadeOut('fast');
 	$('.entry_data').removeClass('editing');
-	$('.entry_data').addClass('row_hover');
 }
 
 function showEditEntryDialog(fade)
@@ -32,8 +31,6 @@ function showEditEntryDialog(fade)
 function showEditEntryDialogUnderEntry($button, model, year, month, is_delete)
 {
 	$('.entry_data').removeClass('editing');
-	$button.parents('.entry_data').removeClass('row_hover');
-	$button.parents('.entry_data').addClass('editing');
 	$('.edit').toggle(!is_delete);
 	$('.delete').toggle(is_delete);
 	var $status = $('#edit_dialog_status');
@@ -90,7 +87,8 @@ function showEditEntryDialogUnderEntry($button, model, year, month, is_delete)
 	$dialog.data('model', model);
 	$dialog.data('year', year);
 	$dialog.data('month', month);
-	
+
+	$button.parents('.entry_data').addClass('editing');
 	edit_selected = key;
 }
 
