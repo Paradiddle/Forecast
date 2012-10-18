@@ -5,21 +5,28 @@ function getEditEntryDialog()
 	return $('#edit_entry_div');
 }
 
-function hideEditEntryDialog()
+function hideEditEntryDialog(fade)
 {
 	edit_selected = "";
 	getEditEntryDialog().data('model', undefined);
 	getEditEntryDialog().data('year', undefined);
 	getEditEntryDialog().data('month', undefined);
-	getEditEntryDialog().fadeOut('fast');
+	
+	if(typeof fade == "undefined" || !fade)
+		getEditEntryDialog().hide();
+	else
+		getEditEntryDialog().fadeOut('fast');
 	$('.entry_data').removeClass('editing');
 	$('.entry_data').addClass('row_hover');
 }
 
-function showEditEntryDialog()
+function showEditEntryDialog(fade)
 {
-	getEditEntryDialog().fadeIn('fast');
-	hideEntryDialog();
+	if(typeof fade == "undefined" || !fade)
+		getEditEntryDialog().show();
+	else
+		getEditEntryDialog().fadeIn('fast');
+	hideEntryDialog(true);
 }
 
 function showEditEntryDialogUnderEntry($button, model, year, month, is_delete)
@@ -59,11 +66,13 @@ function showEditEntryDialogUnderEntry($button, model, year, month, is_delete)
 	if (edit_selected == key)
 	{
 		edit_selected = "";
-		hideEditEntryDialog();
+		hideEditEntryDialog(true);
 		return;
 	}
 	offsetElementFrom($dialog, $button, true);
-	showEditEntryDialog();
+	if(edit_selected != "")
+		hideEditEntryDialog(false);
+	showEditEntryDialog(true);
 	
 	if(!is_delete)
 	{

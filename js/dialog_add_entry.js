@@ -73,16 +73,22 @@ function clearAddEntryNameAndAmount()
 	$('#input_amount').val('');	
 }
 
-function hideEntryDialog()
+function hideEntryDialog(fade)
 {
 	selected = "";
-	getEntryDialog().fadeOut('fast');
+	if(typeof fade == "undefined" || !fade)
+		getEntryDialog().hide();
+	else
+		getEntryDialog().fadeOut('fast');
 }
 
-function showEntryDialog()
+function showEntryDialog(fade)
 {
-	getEntryDialog().fadeIn('fast');
-	hideEditEntryDialog();
+	if(typeof fade == "undefined" || !fade)
+		getEntryDialog().show();
+	else
+		getEntryDialog().fadeIn('fast');
+	hideEditEntryDialog(true);
 	validator.resetForm();
 	$('#input_name').focus();
 	$('#input_name').select();
@@ -93,10 +99,12 @@ function showEntryDialogUnderMonthly(el)
 	if (selected == "monthly")
 	{
 		selected = "";
-		hideEntryDialog();
+		hideEntryDialog(true);
 		populateSelectElements();
 		return;
 	}
+	if(selected != "")
+		hideEntryDialog();
 	selected = "monthly";
 	updateEntryDialog('Add Monthly Entry', true, $(el), true, false);
 }
@@ -106,9 +114,11 @@ function showEntryDialogUnderEntryHeader(el)
 	if (selected == "transactions")
 	{
 		selected = "";
-		hideEntryDialog();
+		hideEntryDialog(true);
 		return;
 	}
+	if(selected != "")
+		hideEntryDialog();
 	selected = "transactions";
 	updateEntryDialog('Add Entry', false, $(el), false, false);
 }
@@ -119,9 +129,11 @@ function showEntryDialogUnderYearMonth($button, year, month)
 	if (selected == key)
 	{
 		selected = "";
-		hideEntryDialog();
+		hideEntryDialog(true);
 		return;
 	}
+	if(selected != "")
+		hideEntryDialog();
 	selected = key;
 	var status = 'Add Entry for ' + month + " " + year;
 	updateEntryDialog(status, false, $button, true, year, month, true);
@@ -146,5 +158,5 @@ function updateEntryDialog(statusText, checkMonthlyCheckbox, $moveTo, hideMonthO
 	$('.month_option').toggle(!hideMonthOption);
 
 	offsetElementFrom(getEntryDialog(), $moveTo, topLeft);
-	showEntryDialog();
+	showEntryDialog(true);
 }
