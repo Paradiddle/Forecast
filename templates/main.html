@@ -181,9 +181,11 @@
 		
 		<div style="display: block;">
 			<div id="sidebar">
-				<button onclick="saveData();" class="bluebutton">Save</button><br/>
-				<button class="button" onclick="showEntryDialogUnderEntryHeader(this)">+ ONE TIME ENTRY</button><br/>
-				<button class="button" onclick="showEntryDialogUnderMonthly(this)">+ MONTHLY ENTRY</button><br/>
+				<label id="budget_name"></label>
+				<input type="button" value="return" onclick="switchBack();" id="budget_return">
+				<button onclick="saveData();" class="bluebutton modify_data">Save</button><br/>
+				<button class="button modify_data" onclick="showEntryDialogUnderEntryHeader(this)">+ ONE TIME ENTRY</button><br/>
+				<button class="button modify_data" onclick="showEntryDialogUnderMonthly(this)">+ MONTHLY ENTRY</button><br/>
 				<div style="background:#efefef; padding:4px 0 2px 0;width:100%;"><button class="button" onclick="toggleSort()">Filter</button></div>
 				<div class="sort">
 					<table width="100%" bgcolor="#efefef">
@@ -217,10 +219,26 @@
 				</div>
 				<h2 style="margin:5px 0;">Monthly Entries</h2>
 				<div id="monthly_entries">{{ data }}</div>
-				
 			</div>
-			<div class="content">				
+		</div>
+		<div class="content">
+			<div id="tabs">
+				<ul>
+					<li><a href="#entries">Entries</a></li>
+					<li><a href="#share">Share</a></li>
+				</ul>
+
 				<div id="entries"></div>
+				<div id="share">
+					<div>
+						<form onsubmit="addShare(); return false;">
+							<label>E-mail Address</label>
+							<input type="text" id="share_input" style="width: 300px;" />
+							<input type="button" class="button" name="click_share" onclick="addShare();" value="Share">
+						</form>
+						<div id="share_entries"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 		

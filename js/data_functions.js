@@ -129,8 +129,10 @@ function putMonthlyModification(year, month, name, mod)
 
 function onReceiveJsonEntries(jsonData)
 {
+	viewing_other = jsonData.viewing_other;
 	parseData(jsonData);
 	refreshEntries();
+	refreshSharedWith();
 }
 
 function getEntriesArrayForYearMonth(year, month)
@@ -144,6 +146,11 @@ function one_time_key(year, month, name)
 	return "" + year + ":" + month + ":" + name;
 }
 
+function deleteEmail(email)
+{
+	sharing_with.splice(sharing_with.indexOf(email), 1);
+}
+
 function months_meta_key(year, month)
 {
 	return year + ":" + month;
@@ -154,6 +161,8 @@ function parseData(data)
 	monthly = new Backbone.Collection(data['monthly']);
 	one_time = new Backbone.Collection(data['one_time']);
 	monthsMeta = new Backbone.Collection(data['months']);
+	sharing_with = data['sharing_with'];
+	shared = data['shared'];
 }
 
 function getOnlyRelevantPartsOfMonths()

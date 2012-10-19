@@ -10,8 +10,7 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: Score
-  ancestor: yes
+- kind: User
   properties:
-  - name: score
-    direction: desc
+  - name: sharing_with
+  - name: email

@@ -1,6 +1,7 @@
 $(document).ready(function()
 {
 	_.templateSettings.variable = "data";
+	$('#budget_return').hide();		
 	jQuery.fn.outerHTML = function(s) {
 		return (s)
 		? this.before(s).remove()
@@ -17,11 +18,13 @@ $(document).ready(function()
 		updateMonthFilterIndexes();
 	});
 
-	$('body').delegate('.editable_entry', "hover",
+	$('body').delegate('.show_on_hover', "hover",
 		function(event) {
-			$(this).find('.show_on_hover').toggle(event.type === 'mouseenter');
+			$(this).find('.to_show_on_hover').toggle(event.type === 'mouseenter' && typeof viewing_other == "undefined");
 		}
 	);
+	
+	$('#tabs').tabs();
 	
 	retrieveParseRefreshEntries();
 });
@@ -63,6 +66,12 @@ var one_time;
 // Collection of metadata associated with each month, one Model per month
 var monthsMeta;
 
+var sharing_with;
+
+var shared;
+
+var viewing_other = undefined;
+
 // View that represents an individual month for a given year
 var MonthModule;
 
@@ -79,8 +88,21 @@ function refreshEntries()
 	}
 
 	recalculateAndRenderMonthModules();
-	postRenderMonthModules();
 	renderMonthlyEntries();
 	
 	dirtyFilter = false;
+
+	$('.modify_data').toggle(viewing_other == undefined);
+	postRenderMonthModules();
+	if(typeof viewing_other == "undefined")
+	{
+		$('#budget_name').hide();	
+		$('#budget_return').hide();		
+	}
+	else
+	{
+		$('#budget_name').show();
+		$('#budget_name').html("Viewing budget for '" + viewing_other + "'");
+		$('#budget_return').show();
+	}
 }

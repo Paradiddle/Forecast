@@ -7,7 +7,7 @@
 		<td></td>
 		<!-- ADD BUTTON -->
 		<td align="right">
-			<button style="float:right" class="button" id='addButton'>ADD</button>
+			<button style="float:right" class="button modify_data" id='addButton'>ADD</button>
 		</td>
 	</tr>
 	
@@ -50,7 +50,7 @@
 		<% var amount = getModifiedAmount(entry, data.year, data.month); %>
 		<% if(typeof amount == "undefined") return; %>
 	<!-- ACTUAL ENTRIES -->
-	<tr name="<%=key%>" <%=key % 2 == 1? 'style="background-color: #F5F5F5;"': ''%>class="entry_data editable_entry">
+	<tr name="<%=key%>" class="entry_data editable_entry show_on_hover">
 		<td class="<%-amount < 0?'expense':'income'%>">
 			<%- entry.get('name') %>
 		</td>
@@ -61,8 +61,8 @@
 			<span class="income serif"><%-amount > 0? formatDollars(amount, ''): ''%></span>
 		</td>
 		<td style="float: right;">
-			<input type="button" class="show_on_hover smallButton editButton" id="editButton">
-			<input type="button" class="show_on_hover smallButton deleteButton" id="deleteButton">
+			<input type="button" class="modify_data to_show_on_hover smallButton editButton" id="editButton">
+			<input type="button" class="modify_data to_show_on_hover smallButton deleteButton" id="deleteButton">
 		</td>
 	</tr>
 		<% }); %>

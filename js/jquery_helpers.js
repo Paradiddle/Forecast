@@ -17,6 +17,8 @@ function initialElementSetup()
 		}
 	});
 	
+	$('.to_show_on_hover').hide();
+	
 	//Hide the sort div
 	$('.sort').hide();
 }
@@ -140,9 +142,43 @@ function initializeValidation()
 	});
 }
 
+function addShare()
+{
+	var email = $('#share_input').val();
+	$('#share_input').val('');
+	addShareServer(email);
+}
+
+function deleteShare(event)
+{
+	var email = $(event.target).parents('.share_row').attr('name');
+	removeShareServer(email);
+}
+
 function setEntriesHtml(html)
 {
 	$('#entries').html(html);	
+}
+
+function switchToShare(event)
+{
+	var email = $(event.target).parents('.share_row').attr('name');
+	retrieveParseRefreshEntries(email);
+	$('#tabs').tabs('select', 0);
+}
+
+function switchBack()
+{
+	retrieveParseRefreshEntries();
+}
+
+function refreshSharedWith()
+{
+	var data = {};
+	data.sharing_with = sharing_with;
+	data.shared = shared;
+	$('#share_entries').html(render_template('table_shares', data));
+	$('.to_show_on_hover').hide();
 }
 
 function renderMonthlyEntries()
@@ -156,7 +192,7 @@ function postRenderMonthModules()
 	$('.start_balance_input').hide();
 	
 	// Hide the buttons
-	$('.show_on_hover').hide();	
+	$('.to_show_on_hover').hide();
 }
 
 function changeDateSelector()

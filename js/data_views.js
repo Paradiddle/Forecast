@@ -1,5 +1,11 @@
+/*
+ * Month Module
+ */
+
 MonthModule = Backbone.View.extend({
-	initialize: function(params, year, month, meta) {
+	initialize: function(params) {
+	},
+	update: function(year, month, meta) {
 		this.year = year;
 		this.month = month;
 		this.meta = meta;
@@ -84,13 +90,13 @@ function recalculateAndRenderMonthModules()
 		var month = yearMonthIteratorData[j];
 		var key = month.year + ":" + month.month;
 		var module = monthModuleViews[key];
+		var meta = monthsMeta.get(month.year + ":" + month.month);
 		var $stuff = $('.' + month.month).filter('.' + month.year);
 		if(typeof module == "undefined")
 		{
-			var meta = monthsMeta.get(month.year + ":" + month.month);
 			module = new MonthModule({
 				el: $stuff
-			}, month.year, month.month, meta);
+			});
 			monthModuleViews[key] = module;
 		}
 		if(dirtyFilter)
@@ -99,7 +105,7 @@ function recalculateAndRenderMonthModules()
 			module.$el = $stuff;
 			module.delegateEvents();
 		}
-		module.calculate();
+		module.update(month.year, month.month, meta);
 		module.render();
 	}
 }

@@ -1,0 +1,31 @@
+<table style="padding-top: 40px;">
+	<th>
+		Sharing your budget with:
+	</th>
+	<% _.each(data.sharing_with, function(share, key, list) {  console.log(share);%>
+		<tr name="<%=share%>" class="share_row">
+			<td>
+				<%=share%>
+			</td>
+			<td style="width: 50px;">
+				<input style="float: right;" type="button" class="smallButton deleteButton" onclick="deleteShare(event);" id="deleteButton">
+			</td>
+		</tr>
+	<% }); %>
+	<tr style="height: 50px;">
+		
+	</tr>
+	<th>
+		Others sharing their budget with you:		
+	</th>
+	<% _.each(data.shared, function(share, key, list) { %>
+		<tr name="<%=share%>" class="share_row">
+			<td>
+				<%=share%>
+			</td>
+			<td style="width: 50px;">
+				<input style="float: right;" type="button" onclick="switchToShare(event);" value="Switch" id="deleteButton">
+			</td>
+		</tr>
+	<% }); %>
+</table>

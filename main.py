@@ -31,6 +31,8 @@ class JsonProperty(db.TextProperty):
 
 class User(db.Model):
     userid = db.StringProperty()
+    email = db.StringProperty()
+    sharing_with = db.StringListProperty(default=[])
     num_monthly = db.IntegerProperty(default=0)
     num_one_time = db.IntegerProperty(default=0)
     months = JsonProperty()
@@ -61,6 +63,55 @@ class Login(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'templates/main.html')
         self.response.out.write(template.render(path, template_values))
 
+class Share(webapp.RequestHandler):       
+    def post(self):
+        user = users.get_current_user()
+        
+        if not user:
+            self.response.out.write('Invalid user.')
+            return
+        
+        to_add = str(self.request.get('add'))
+        to_remove = str(self.request.get('remove'))
+
+        usr = User.get_by_key_name(user.user_id())
+        if usr:
+            if to_add:
+                if to_add not in usr.sharing_with:
+                    usr.sharing_with.append(to_add)
+                    usr.put()
+            if to_remove:
+                if to_remove in usr.sharing_with:
+                    usr.sharing_with.remove(to_remove)
+                    usr.put()
+                
+        self.response.headers.add_header('content-type', 'applications/json', charset='utf-8')
+        
+        obj = {};
+        obj['sharing_with'] = usr.sharing_with        
+        obj['shared'] = getSharedWith(user)
+        
+        self.response.out.write(json.dumps(obj))
+        
+def getSharedWith(user):
+    lst = []
+    sharing = db.GqlQuery("SELECT email FROM User WHERE sharing_with = :1", user.email())
+    for i in sharing:
+        lst.append(i.email)
+    return lst
+
+def getData(entity, user):
+    obj = {}
+    obj['monthly'] = entity.monthly
+    obj['one_time'] = entity.one_time
+    obj['months'] = entity.months
+    if entity.userid == user.user_id():
+        obj['sharing_with'] = entity.sharing_with
+    else:
+        obj['sharing_with'] = []
+    obj['shared'] = getSharedWith(user)
+    return obj
+
 class Entries(webapp.RequestHandler):        
     def get(self):
         user = users.get_current_user()
@@ -68,22 +119,40 @@ class Entries(webapp.RequestHandler):
             self.response.out.write("Invalid user.")
             return
         
-        already_entered = User.get_by_key_name(user.user_id())
         self.response.headers.add_header('content-type', 'applications/json', charset='utf-8')
+        
+        mask = self.request.get('viewing')
+        if mask:
+            viewing_other = db.GqlQuery("SELECT * FROM User WHERE email = :1", mask)
+            other = User.get_by_key_name(viewing_other[0].userid)
+            if other:
+                obj = getData(other, user)
+                obj['viewing_other'] = mask
+                self.response.out.write(json.dumps(obj))
+                return
+        
+        already_entered = User.get_by_key_name(user.user_id())
+        
+        
         if already_entered:
-            obj = {}
-            obj['monthly'] = already_entered.monthly
-            obj['one_time'] = already_entered.one_time
-            obj['months'] = already_entered.months
-            self.response.out.write(json.dumps(obj))
+            self.response.out.write(json.dumps(getData(already_entered, user)))
         else:
-            self.response.out.write(json.dumps("{'monthly': {}, 'one_time': {}, 'months': {}}"))
+            obj = User(key_name=user.user_id())
+            obj.userid = user.user_id()
+            obj.email = user.email()
+            obj.monthly = []
+            obj.one_time = []
+            obj.months = []
+            obj.sharing_with = []
+            obj.put()
+            self.response.out.write(json.dumps(getData(obj, user)))
             
     def post(self):
         user = users.get_current_user()
         if not user:
             self.response.out.write("Invalid user.")
             return
+                
         data = json.loads(self.request.body)
         
         num_one_time = 0
@@ -96,24 +165,21 @@ class Entries(webapp.RequestHandler):
         u = User.get_by_key_name(user.user_id())
         if not u:
             u = User(key_name=user.user_id())
+            u.email = user.email()
             u.userid = user.user_id()
-            u.months = data['months']
-            u.monthly = data['monthly']
-            u.one_time = data['one_time']
-            self.response.out.write("Save file successfully created.");
+           
+        u.months = data['months']
+        u.monthly = data['monthly']
+        u.one_time = data['one_time']
+        u.sharing_with = data['sharing_with']
+        diff_one_time = num_one_time - u.num_one_time
+        diff_monthly = num_monthly - u.num_monthly
+        if diff_one_time >= 0:
+            self.response.out.write("\n%d one time entries added." % diff_one_time)
         else:
-            u.months = data['months']
-            u.monthly = data['monthly']
-            u.one_time = data['one_time']
-            self.response.out.write("Save file successfully updated.");
-            diff_one_time = num_one_time - u.num_one_time
-            diff_monthly = num_monthly - u.num_monthly
-            if diff_one_time >= 0:
-                self.response.out.write("\n%d one time entries added." % diff_one_time)
-            else:
-                self.response.out.write("\n%d one time entries removed.") % abs(diff_one_time)
-            if diff_monthly >= 0:
-                self.response.out.write("\n%d monthly entries added" % diff_monthly)
+            self.response.out.write("\n%d one time entries removed.") % abs(diff_one_time)
+        if diff_monthly >= 0:
+            self.response.out.write("\n%d monthly entries added" % diff_monthly)
                 
         u.num_monthly = num_monthly
         u.num_one_time = num_one_time
@@ -122,7 +188,8 @@ class Entries(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
     ('/', Login),
-    ('/Entries', Entries)
+    ('/Entries', Entries),
+    ('/Share', Share)
 ], debug=True)
 
 def main():
