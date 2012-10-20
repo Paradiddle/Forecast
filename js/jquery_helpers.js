@@ -183,7 +183,7 @@ function refreshSharedWith()
 
 function renderMonthlyEntries()
 {
-	$('#monthly_entries').html(render_template('monthly_entries', monthly.toArray()));	
+	$('#monthly_entries').html(render_template('monthly_entries', sortByIncomeThenAmount(monthly.toArray())));	
 }
 
 function postRenderMonthModules()

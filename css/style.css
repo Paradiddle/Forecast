@@ -58,7 +58,7 @@ tr.entries_first td{
 
 .button{
 	background:#00623b;
-	padding:2px 5px;
+	padding:2px 10px;
 	color:white;
 	border:0;
 	letter-spacing:2px;
@@ -66,12 +66,17 @@ tr.entries_first td{
 	cursor:pointer;
 	top:-3px;
 	position:relative;
+	-moz-border-radius: 4px; 
+	-webkit-border-radius: 4px; 
+	-khtml-border-radius: 4px; 
+	border-radius: 4px;
+	font-size:12px!important;
 }
 
 .bluebutton{
 	background:#20769c;
 	font-size:11px!important;
-	padding:2px 5px;
+	padding:2px 10px;
 	color:white;
 	border:0;
 	letter-spacing:2px;
@@ -79,14 +84,23 @@ tr.entries_first td{
 	cursor:pointer;
 	top:-3px;
 	position:relative;
+	-moz-border-radius: 4px; 
+	-webkit-border-radius: 4px; 
+	-khtml-border-radius: 4px; 
+	border-radius: 4px;
+	font-size:12px!important;
 }
 
 .bluebutton:hover{
-	background:#38b1e7;
+	background:#0b4d6a;
 }
 
 .button:hover{
-	background: #63b16f;
+	background: #004228;
+}
+
+.button:active, .bluebutton:active{
+	background:black;
 }
 
 .editing{
@@ -286,6 +300,11 @@ td.bottom div.shadow{
 	background: red;
 }
 
+
+.ui-widget{
+	font-size:14px!important;
+}
+
 .sort{
 	width:100%;
 }
@@ -301,6 +320,10 @@ td.bottom div.shadow{
     vertical-align: middle;
     display: inline;
     float: left;
+}
+
+.blank{
+	display:none;
 }
 
 .monthModule{

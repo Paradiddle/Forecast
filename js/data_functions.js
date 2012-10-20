@@ -256,13 +256,13 @@ function calculateAllMonthData()
 {
 	for(var y = 0; y < years.length; y++)
 	{
+		var yearString = years[y];
 		for(var m = 0; m < months.length; m++)
 		{
-			var yearString = years[y];
 			var monthString = months[m];
 			var id = yearString + ":" + monthString;
 			var meta = monthsMeta.get(id);
-			if(meta == undefined)
+			if(typeof meta == 'undefined')
 			{
 				meta = new Backbone.Model();
 				meta.set('id', id);

@@ -4,32 +4,10 @@
 		<td colspan="2">
 			<div class="year"><%- data.shortMonth + ' \'' + data.shortYear  %></div>
 		</td>
-		<td></td>
 		<!-- ADD BUTTON -->
 		<td align="right">
 			<button style="float:right" class="button modify_data" id='addButton'>ADD</button>
 		</td>
-	</tr>
-	
-	<!-- STARTING BALANCE ROW -->
-	<tr class="">
-		<% var w = 25 + '%' %>
-		<td style="width: <%=w%>">
-			<label class="preMonthMeta">Starting Balance: </label>
-		</td>
-		<td style="width: <%=w%>">
-			<span class="serif">
-				<form id="startBalanceForm" style="margin: 0px;">
-					<% var sb = data.start_balance; %>
-					<label id="startBalanceLabel" class="start_balance_label"><%=formatDollars(sb, '--')%></label>
-					<input id="startBalanceInput" class="start_balance_input" type="text" />
-				</form>
-			</span>
-		</td>
-		<td style="width: <%=w%>">
-			
-		</td>
-		<td style="width: 110px;"></td>
 	</tr>
 	
 	<!-- NAME EXPENSE INCOME -->
@@ -39,13 +17,28 @@
 			Name
 		</th>
 		<th>
-			Expense
-		</th>
-		<th>
-			Income
+			Amount
 		</th>
 	</tr>
-	
+	<!-- STARTING BALANCE ROW -->
+	<tr>
+		<td style="width:60%">Balance</td>
+		<td style="width:30%">
+			<span class="serif">
+				<form id="startBalanceForm" style="margin: 0px;">
+					<% var sb = data.start_balance; %>
+					<label id="startBalanceLabel" class="start_balance_label"><%=formatDollars(sb, '--')%></label>
+					<input id="startBalanceInput" class="start_balance_input" type="text" />
+				</form>
+			</span>
+		</td>
+		<td style="width: 10%; min-width:40px;"></td>
+	</tr>
+	<tr>
+		<td colspan="4">
+			<div class="whitecover"></div>
+		</td>
+	</tr>
 		<% _.each(data.entries, function(entry, key, list) { %>
 		<% var amount = getModifiedAmount(entry, data.year, data.month); %>
 		<% if(typeof amount == "undefined") return; %>
@@ -55,10 +48,7 @@
 			<%- entry.get('name') %>
 		</td>
 		<td>
-			<span class="expense serif"><%-amount < 0? formatDollars(Math.abs(amount), ''): ''%></span>
-		</td>
-		<td>
-			<span class="income serif"><%-amount > 0? formatDollars(amount, ''): ''%></span>
+			<span class="<%-amount < 0?'expense':'income'%> serif"><%-amount < 0? formatDollars(Math.abs(amount), ''): ''%><%-amount > 0? formatDollars(amount, ''): ''%></span>
 		</td>
 		<td style="float: right;">
 			<input type="button" class="modify_data to_show_on_hover smallButton editButton" id="editButton">
@@ -73,7 +63,7 @@
 	
 	<!-- TOTAL -->
 	<tr>
-		<td colspan="4">
+		<td colspan="3">
 			<div class="whitecover"></div>
 		</td>
 	</tr>
@@ -97,15 +87,18 @@
 		<td>
 			<span class="serif"><label><%=formatDollars(data.end_balance, '')%></label></span>
 		</td>
+		<td></td>
 	</tr>
 	
 	<!-- DISCREPANCY -->
+	<% var blank = typeof data.discrepancy == 'undefined'?'blank':'discrepancy'%>
 	<tr>
 		<td>
-			<label class="preMonthMeta">Discrepancy: </label>
+			<label class="preMonthMeta <%=blank%>">Discrepancy: </label>
 		</td>
 		<td>
-			<span class="serif"><label><%=formatDollars(data.discrepancy, '$0')%></label></span>
+			<span class="serif <%=blank%>"><label><%=formatDollars(data.discrepancy, '$0')%></label></span>
 		</td>
+		<td></td>
 	</tr>
 </table>
