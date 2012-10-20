@@ -1,0 +1,23 @@
+<table cellspacing="10">
+	<% data.each(function(m, key, list) { %>
+		<th>
+			<%= m.get('name') %>
+		</th>
+		<% var mods = m.get('modifications'); %>
+		<% if(typeof mods != "undefined") { %>
+			<% _.each(mods, function(mod, key, list) { %>
+		<tr>
+			<td><%=mod.year + " " + mod.month%></td>
+			<td><%=mod.type%></td>
+			<td><%=mod.amount%></td>
+		</tr>		
+			<% }); %>
+		<% } else { %>
+		<tr>
+			<td>
+				No modifications
+			</td>
+		</tr>		
+		<% } %>
+	<% }); %>
+</table>

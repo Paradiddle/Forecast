@@ -109,3 +109,33 @@ function recalculateAndRenderMonthModules()
 		module.render();
 	}
 }
+
+/*
+ * Monthly Modifications View
+ */
+
+MonthlyModifications = Backbone.View.extend({
+	initialize: function(params) {
+	},
+	update: function(year, month, meta) {
+		this.year = year;
+		this.month = month;
+		this.meta = meta;
+		this.data = {
+			year: year,
+			month: month,
+			shortYear: year.substr(2, 3),
+			shortMonth: month.substr(0, 3)
+		};
+		this.calculate();
+	},
+	calculate: calculate_MonthModule,
+	events: {
+		"click #addButton": click_AddButton,
+		"click #startBalanceLabel": click_StartBalanceLabel,
+		"submit #startBalanceForm": submit_StartBalanceForm,
+		"click #editButton": click_EditEntry,
+		"click #deleteButton": click_DeleteEntry
+	},
+	render: render_MonthModule
+});

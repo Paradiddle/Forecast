@@ -75,6 +75,9 @@ var viewing_other = undefined;
 // View that represents an individual month for a given year
 var MonthModule;
 
+// View that represents all the monthly modifications
+var MonthlyModifications;
+
 var monthModuleViews = {};
 
 function refreshEntries()
@@ -89,6 +92,7 @@ function refreshEntries()
 
 	recalculateAndRenderMonthModules();
 	renderMonthlyEntries();
+	$('#mods').html(render_template('table_monthly_modifications', monthly));
 	
 	dirtyFilter = false;
 

@@ -117,7 +117,9 @@ function adjustMonthly(year, month, name, amount)
 
 function putMonthlyModification(year, month, name, mod)
 {
-	var model = monthly.get(name);	
+	mod.year = year;
+	mod.month = month;
+	var model = monthly.get(name);
 	var modifications = model.get('modifications');
 	if(typeof modifications == "undefined")
 	{
