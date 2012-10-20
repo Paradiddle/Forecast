@@ -18,7 +18,8 @@ function saveData()
 		'monthly': monthly.toJSON(),
 		'one_time': one_time.toJSON(),
 		'months': _.compact(getOnlyRelevantPartsOfMonths()),
-		'sharing_with': sharing_with
+		'sharing_with': sharing_with,
+		'modifications': modifications
 	};
 	$.post("/Entries", JSON.stringify(data), function(result) {refreshEntries();});	
 }

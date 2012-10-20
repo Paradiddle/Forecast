@@ -55,21 +55,13 @@ function formatDollars(num, undefinedFallback, showpositive)
 
 function getModifiedAmount(model, year, month)
 {
-	var mods = model.get('modifications');
-	if(typeof mods != "undefined")
+	var id = year + ":" + month + ":" + model.get('name');
+	var mod = modifications.get(id);
+	if(typeof mod == "undefined")
 	{
-		var mod = mods[year + ":" + month];
-		if(typeof mod != "undefined")
-		{
-			if(mod.type == "delete")
-				return undefined;
-			else if(mod.type == "adjust")
-			{
-				return parseInt(mod.amount);
-			}
-		}
+		return model.get('amount');
 	}
-	return parseInt(model.get('amount'));
+	return mod.get('amount');
 }
 
 function getNextMonthMeta(yearIndex, monthIndex)
@@ -100,31 +92,25 @@ function getPreviousMonthMeta(yearIndex, monthIndex)
 
 function deleteMonthly(year, month, name)
 {
-	var mod = {
-		'type': 'delete'
-	};
-	putMonthlyModification(year, month, name, mod);
+	putMonthlyModification(year, month, name, undefined);
 }
 
 function adjustMonthly(year, month, name, amount)
 {
-	var mod = {
-		'type': 'adjust',
-		'amount': amount
-	};
-	putMonthlyModification(year, month, name, mod);
+	putMonthlyModification(year, month, name, amount);
 }
 
-function putMonthlyModification(year, month, name, mod)
+function putMonthlyModification(year, month, name, amount)
 {
-	var model = monthly.get(name);	
-	var modifications = model.get('modifications');
-	if(typeof modifications == "undefined")
+	var id = year + ":" + month + ":" + name;
+	var modification = modifications.get(id);
+	if(typeof modification == "undefined")
 	{
-		modifications = {};
-		model.set('modifications', modifications);
+		modification = new Backbone.Model();
+		modification.set('id', id);
+		modifications.add(modification);
 	}
-	modifications[year + ":" + month] = mod;
+	modification.set('amount', amount);
 }
 
 function onReceiveJsonEntries(jsonData)
@@ -161,6 +147,7 @@ function parseData(data)
 	monthly = new Backbone.Collection(data['monthly']);
 	one_time = new Backbone.Collection(data['one_time']);
 	monthsMeta = new Backbone.Collection(data['months']);
+	modifications = new Backbone.Collection(data['modifications']);
 	sharing_with = data['sharing_with'];
 	shared = data['shared'];
 }

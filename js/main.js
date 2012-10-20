@@ -66,10 +66,17 @@ var one_time;
 // Collection of metadata associated with each month, one Model per month
 var monthsMeta;
 
+// Collection of monthly modifications
+var modifications;
+
+// Array of e-mails you're sharing your budget with
 var sharing_with;
 
+// Array of e-mails sharing their budget with you
 var shared;
 
+// A string that represents whether or not you are viewing someone else's budget.
+// undefined if you are viewing your own, set to email address of other account when viewing another.
 var viewing_other = undefined;
 
 // View that represents an individual month for a given year
