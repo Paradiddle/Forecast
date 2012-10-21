@@ -20,6 +20,7 @@
 			Amount
 		</th>
 	</tr>
+	<% } %>
 	<!-- STARTING BALANCE ROW -->
 	<tr>
 		<td style="width:60%">Balance</td>
@@ -34,6 +35,7 @@
 		</td>
 		<td style="width: 10%; min-width:40px;"></td>
 	</tr>
+	<% if (data.entries.length > 0) { %>
 	<tr>
 		<td colspan="4">
 			<div class="whitecover"></div>
@@ -60,25 +62,43 @@
 	
 	<!-- SPACER ROW TO KEEP END OF MONTH LINED UP HORIZONTALLY -->
 	<tr style="height: 100%;"><td></td></tr>
-	
-	<!-- TOTAL -->
+
+	<!-- BOTTOM DIVIDER OF ENTRIES -->
 	<tr>
 		<td colspan="3">
 			<div class="whitecover"></div>
 		</td>
 	</tr>
-	<tr class="" valign="bottom">
+	
+	<tr class="" valign="top">
 		<td>
-			<label class="preMonthMeta">Total</label>
+			<label class="preMonthMeta">Totals</label>
 		</td>
 		<td>
-			<span class="serif"><%=formatDollars(data.total_expenses, '')%></span>
-		</td>
-		<td>
-			<span class="serif"><%=formatDollars(data.total_income, '') %></span>
+			<span class="serif income"><%=formatDollars(data.total_income, '') %></span>
 		</td>
 	</tr>
-	
+	<tr>
+		<td>
+			
+		</td>
+		<td>
+			<span class="serif expense" style="text-decoration: underline;"><%=formatDollars(data.total_expenses, '')%></span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			
+		</td>
+		<td>
+			<% var difference = data.total_income + data.total_expenses; %>
+			<span class="serif <%= difference >= 0? 'income': 'expense'%>"><%=formatDollars(difference, '')%></span>
+		</td>
+	</tr>
+	<tr style="height: 15px;">
+		<td></td>
+		<td></td>
+	</tr>
 	<!-- ENDING BALANCE -->
 	<tr>
 		<td>
@@ -92,7 +112,7 @@
 	
 	<!-- DISCREPANCY -->
 	<% var blank = typeof data.discrepancy == 'undefined'?'blank':'discrepancy'%>
-	<tr>
+	<tr style="height: 18px;">
 		<td>
 			<label class="preMonthMeta <%=blank%>">Discrepancy: </label>
 		</td>

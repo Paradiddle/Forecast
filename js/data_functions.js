@@ -268,7 +268,7 @@ function calculateAllMonthData()
 				if(amount > 0)
 					total_income += amount;
 				else
-					total_expenses -= amount;
+					total_expenses += amount;
 			}
 			var diff = total_income - total_expenses;
 			var start_balance = meta.get('start_balance');
