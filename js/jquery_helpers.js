@@ -47,9 +47,6 @@ function click_DeleteMonthlyMod(target)
 	var year = $('#div_monthly_modifications').data('year');
 	var month = $('#div_monthly_modifications').data('month');
 	var entryName = ($(target).parents(".monthly_mod")).attr('name');
-	console.log("year: " + year);
-	console.log("month: " + month);
-	console.log("name: " + entryName);
 	var delmatches = modifications.where({'month':month, 'year':year, 'name':entryName});
 	if (delmatches.length == 1)
 		modifications.remove(delmatches[0]);
@@ -73,7 +70,7 @@ function updateStartBalanceLabel($form, val)
 
 function hideStartBalanceInput($form)
 {
-	var $input = $(event.target).find('#startBalanceInput');
+	var $input = $form.find('#startBalanceInput');
 	var $label = $form.find('#startBalanceLabel');
 	$input.hide();
 	$label.show();

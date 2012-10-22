@@ -27,7 +27,7 @@ $(document).ready(function()
 	$('#div_monthly_modifications').dialog({
 		autoOpen: false,
 		modal: true,
-		width: 350
+		width: 400
 	});
 	$('#tabs').tabs();
 	

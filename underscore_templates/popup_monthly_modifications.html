@@ -1,7 +1,8 @@
-<table>
+<table class="fullWidth">
 	<tr>
 		<td colspan="3">
-			<label style="font-weight: bold;">Monthly Modifications</label> <%= data.month %> <%= data.year %>
+			<% var msg = data.modifications.length > 0? 'Monthly Modifications': 'No Monthly Modifications for'; %> 
+			<label style="font-weight: bold;"><%=msg%></label> <%= data.month %> <%= data.year %>
 		</td>
 	</tr>
 	<% _.each(data.modifications, function(modification, id, list) { %>

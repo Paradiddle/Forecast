@@ -24,7 +24,7 @@ MonthModule = Backbone.View.extend({
 		"submit #startBalanceForm": submit_StartBalanceForm,
 		"click #editButton": click_EditEntry,
 		"click #deleteButton": click_DeleteEntry,
-		"click #editMonthlies": click_EditMonthlies,
+		"click #editMonthlies": click_EditMonthlies
 	},
 	render: render_MonthModule
 });
