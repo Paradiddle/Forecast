@@ -23,10 +23,16 @@ MonthModule = Backbone.View.extend({
 		"click #startBalanceLabel": click_StartBalanceLabel,
 		"submit #startBalanceForm": submit_StartBalanceForm,
 		"click #editButton": click_EditEntry,
-		"click #deleteButton": click_DeleteEntry
+		"click #deleteButton": click_DeleteEntry,
+		"click #editMonthlies": click_EditMonthlies,
 	},
 	render: render_MonthModule
 });
+
+function click_EditMonthlies()
+{
+	openEditMonthlyModifications(this.year, this.month);
+}
 
 function calculate_MonthModule()
 {

@@ -1,0 +1,25 @@
+<table>
+	<tr>
+		<td colspan="3">
+			<label style="font-weight: bold;">Monthly Modifications</label> <%= data.month %> <%= data.year %>
+		</td>
+	</tr>
+	<% _.each(data.modifications, function(modification, id, list) { %>
+	<tr name='<%=modification.get("name")%>' class="monthly_mod" >
+		<td width="40%">
+			<%= modification.get('name') %>
+		</td>
+		<td width="40%">
+			<% var amount = modification.get('amount'); %>
+			<% if(typeof amount != "undefined") { %>
+				<%= modification.get('amount') %>
+			<%} else {%>
+				Deleted
+			<% } %>
+		</td>
+		<td width="20%">
+			<input type="button" class="smallButton deleteButton" onclick="click_DeleteMonthlyMod(this);">
+		</td>
+	</tr>
+	<% }); %>
+</table>

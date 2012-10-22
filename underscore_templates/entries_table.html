@@ -3,8 +3,7 @@
 	<% var lastMonth = "January"; %>
 	<tr>
 		<% _.each(row, function(month, key, list) { %>
-			
-		<td style='width: <%=data.entryWidth%>%;' class='monthModule tables <%=month.year%> <%=month.month%>'></td>
+		<td class='monthModule tables <%=month.year%> <%=month.month%>'></td>
 		<% lastMonth = month.month; %>
 		<% }); %>
 	</tr>

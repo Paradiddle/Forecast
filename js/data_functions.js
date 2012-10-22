@@ -103,14 +103,17 @@ function adjustMonthly(year, month, name, amount)
 function putMonthlyModification(year, month, name, amount)
 {
 	var id = year + ":" + month + ":" + name;
-	var modification = modifications.get(id);
-	if(typeof modification == "undefined")
+	var mod = modifications.get(id);
+	if(typeof mod == "undefined")
 	{
-		modification = new Backbone.Model();
-		modification.set('id', id);
-		modifications.add(modification);
+		mod = new Backbone.Model();
+		mod.set('year', year);
+		mod.set('month', month);
+		mod.set('name', name);
+		mod.set('id', id);
+		modifications.add(mod);
 	}
-	modification.set('amount', amount);
+	mod.set('amount', amount);
 }
 
 function onReceiveJsonEntries(jsonData)
@@ -211,7 +214,6 @@ function getEntriesTableTemplateData()
 	var templateData = {};
 	templateData.rowData = [];
 	var numCols = NUM_COLS[getNumCols()];
-	templateData.entryWidth = 100 / numCols;
 	
 	var rowMonthsData = [];
 	var curIndex = 0;
