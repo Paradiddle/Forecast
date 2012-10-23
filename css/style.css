@@ -182,14 +182,14 @@ input[type="text"]{
 }
 
 #sidebar{
-	width:20%;
+	width:15%;
 	float:left;
 	position:fixed;
 	top:110px;
 }
 
 .content{
-	width:80%;
+	width:85%;
 	float:right;
 	margin-top:100px;
 }
@@ -337,4 +337,8 @@ td.bottom div.shadow{
 
 .deleteButton{
 	background-image: url('/images/delete.png');
+}
+
+.configureButton{
+	background-image: url('/images/configure.png');
 }

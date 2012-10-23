@@ -47,7 +47,7 @@
 		<% if(typeof amount == "undefined") return; %>
 	<!-- ACTUAL ENTRIES -->
 	<tr name="<%=key%>" class="entry_data editable_entry show_on_hover">
-		<td class="<%-amount < 0?'expense':'income'%>">
+		<td style="color: <%=entry.get('color')%>;">
 			<%- entry.get('name') %>
 		</td>
 		<td>

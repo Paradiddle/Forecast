@@ -339,6 +339,7 @@ function addEntry(name, amount, is_monthly, year, month)
 		delete data.month;
 		delete data.year;
 		model = new Backbone.Model(data);
+		model.set('color', '#000000');
 		model.set('id', key);
 		monthly.add(model);
 	} 

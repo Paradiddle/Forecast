@@ -1,0 +1,19 @@
+<form onsubmit="applyColorConfigurations(); return false;">
+	<table class="fullWidth">
+		<% data.each(function(model, id, list) { %>
+		<tr name='<%=model.get("name")%>' class="monthly_entry">
+			<td id="name_cell" width="33%" class="<%=model.get('name')%>">
+				<%= model.get('name') %>
+			</td>
+			<td width="33%">
+				<input class="color_input" value="<%=model.get('color')%>">
+			</td>
+		</tr>
+		<% }); %>
+		<tr>
+			<td colspan="2">
+				<input type="submit" id="apply_button" value="Apply Color Configurations" class="fullWidth button">
+			</td>
+		</tr>
+	</table>
+</form>

@@ -10,6 +10,7 @@
 		<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
 		<script src="libjs/jquery.js"></script>
 		<script src="libjs/jquery-ui-1.9.0.js"></script>
+		<script src="jscolor/jscolor.js"></script>
 		<script src="libjs/jquery-validate.js"></script>
 		<script src="libjs/underscore.js"></script>
 		<script src="libjs/backbone.js"></script>
@@ -21,11 +22,10 @@
 		<script src="js/client_server_functions.js"></script>
 		<script src="js/data_views.js"></script>
 		<script src="libjs/mousewheel.js"></script>  
-		<script src="libjs/scroll.js"></script>  
+		<script src="libjs/scroll.js"></script>
 	</head>
 
 	<body>
-		
 		<!-- HEADER -->
 		
 		<div class="fullWidth Header">
@@ -145,7 +145,7 @@
 					</tr>
 					<tr class="edit">
 						<td style="vertical-align: top;">
-							<label for="edit_entry_type">Type:</label>
+							<label>Type:</label>
 						</td>
 						<td>
 							<input type="radio" id="edit_entry_income" value="Income" name="edit_entry_type"> Income<br>
@@ -159,7 +159,7 @@
 					</tr>
 					<tr>
 						<td style="vertical-align: top;">
-							<label for="edit_entry_type">Entry Scope:</label>
+							<label>Entry Scope:</label>
 						</td>
 						<td class="edit_action">
 						</td>
@@ -178,7 +178,11 @@
 		</div>
 		
 		<!-- EDIT MONTHLY MODIFICATIONS -->
-		<div id="div_monthly_modifications">
+		<div id="div_monthly_modifications" title="Monthly Modifications">
+		</div>
+		
+		<!-- CONFIGURE MONTHLY ENTRIES -->
+		<div id="div_monthly_configuration" title="Color Configuration">
 		</div>
 		
 		<!-- SIDE BAR -->
@@ -221,7 +225,10 @@
 					</tr>
 				</table>
 				</div>
-				<h2 style="margin:5px 0;">Monthly Entries</h2>
+				<span style="vertical-align: middle;">
+					<h2 style="margin:5px; display: inline; float: left;">Monthly Entries</h2>
+					<input type="button" style="float: left; padding-top: 10px; vertical-align: middle;" onclick="showMonthlyConfigurationDialog();" class="smallButton configureButton">
+				</span>
 				<div id="monthly_entries">{{ data }}</div>
 			</div>
 		</div>
@@ -245,7 +252,6 @@
 				</div>
 			</div>
 		</div>
-		
 		{% endif %}
 	</body>
 </html>

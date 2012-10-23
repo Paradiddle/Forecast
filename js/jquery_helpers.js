@@ -35,23 +35,76 @@ function openEditMonthlyModifications(year, month)
 		model.get("name");
 	});
 	data.modifications = mods;
-	$('#div_monthly_modifications').html(render_template("popup_monthly_modifications", data));
-	$('#div_monthly_modifications').data('year', year);
-	$('#div_monthly_modifications').data('month', month);
-	$('#div_monthly_modifications').dialog("open");
+	if(data.modifications.length > 0)
+	{
+		getMonthlyModificationsDialog().attr('title', "Monthly Modifications for " + month + " of " + year);
+	}
+	else
+	{
+		getMonthlyModificationsDialog().attr('title', "No Monthly Modifications for " + month + " of " + year);
+	}
+	getMonthlyModificationsDialog().html(render_template("popup_monthly_modifications", data));
+	getMonthlyModificationsDialog().data('year', year);
+	getMonthlyModificationsDialog().data('month', month);
+	getMonthlyModificationsDialog().dialog("open");
 	$('.smallButton').blur();
 }
 
 function click_DeleteMonthlyMod(target)
 {
-	var year = $('#div_monthly_modifications').data('year');
-	var month = $('#div_monthly_modifications').data('month');
+	var year = getMonthlyModificationsDialog().data('year');
+	var month = getMonthlyModificationsDialog().data('month');
 	var entryName = ($(target).parents(".monthly_mod")).attr('name');
 	var delmatches = modifications.where({'month':month, 'year':year, 'name':entryName});
 	if (delmatches.length == 1)
 		modifications.remove(delmatches[0]);
 	refreshEntries();
 	openEditMonthlyModifications(year, month);
+}
+
+function getMonthlyModificationsDialog()
+{
+	return $('#div_monthly_modifications');
+}
+
+var colorPickers = {};
+
+function showMonthlyConfigurationDialog()
+{
+	getMonthlyConfigurationDialog().html(render_template('popup_monthly_configuration', monthly));
+	$('.color_input').each(function(index, val) {
+		var $el = $(val);
+		var $row = $el.parents('.monthly_entry');
+		var name = $row.attr('name');
+		var picker = colorPickers[name];
+		
+		if(typeof picker != "undefined")
+		{
+			delete colorPickers[name];
+		}
+		picker = new jscolor.color(val);
+		colorChange({'target':val});
+		colorPickers[name] = picker;
+	});
+	getMonthlyConfigurationDialog().dialog("open");
+	
+	for(var prop in colorPickers)
+	{
+		var pick = colorPickers[prop];
+		pick.hidePicker();
+	}
+	$('#apply_button').focus();
+}
+
+function colorChange(evt) {
+	var $picker = $(evt.target);
+	var $name = $picker.parents('.monthly_entry').find('#name_cell');
+	$name.css('color', $picker.css('background-color'));
+}
+
+function getMonthlyConfigurationDialog()
+{
+	return $('#div_monthly_configuration');
 }
 
 function getEditedStartBalance($form)
@@ -136,6 +189,47 @@ function addCustomValidators()
 			return !(monthly_exists || lst.length > 0);
 		return !monthly_exists && !one_time_exists;
 	});
+}
+
+function validateColorConfigurations()
+{
+	var $dialog = getMonthlyConfigurationDialog();
+	var allGood = true;
+	$dialog.find('.color_input').each(function (index, value)
+	{
+		var $val = $(value);
+		var name = $val.parents('.monthly_entry').attr('name');
+		var good = /^#[0-9A-F]{3,6}$/.test($val.val());
+		if (!good)
+		{
+			$val.addClass('error');
+			allGood = false;
+		}
+		else
+		{
+			$val.removeClass('error');
+			$val.find('.' + name).css('background-color', $val.val());
+			monthly.get(name).set('color', $val.val());
+		}
+	});
+	return allGood;
+}
+
+function changeColorConfig(el)
+{
+	var $el = $(el);
+	console.log($el);
+}
+
+function applyColorConfigurations()
+{
+	var validated = validateColorConfigurations();
+	if(validated)
+	{
+		getMonthlyConfigurationDialog().dialog("close");
+		refreshEntries();
+	}
+	
 }
 
 function initializeValidation()

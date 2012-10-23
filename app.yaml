@@ -9,6 +9,9 @@ handlers:
  
 - url: /js
   static_dir: js
+  
+- url: /jscolor
+  static_dir: jscolor
  
 - url: /libjs
   static_dir: libjs

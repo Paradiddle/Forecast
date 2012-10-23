@@ -23,12 +23,19 @@ $(document).ready(function()
 			$(this).find('.to_show_on_hover').toggle(event.type === 'mouseenter' && typeof viewing_other == "undefined");
 		}
 	);
+	$('body').delegate('.color_input', 'change', colorChange);
 	
-	$('#div_monthly_modifications').dialog({
+	getMonthlyModificationsDialog().dialog({
 		autoOpen: false,
 		modal: true,
 		width: 400
 	});
+	$('#div_monthly_configuration').dialog({
+		autoOpen: false,
+		modal: true,
+		width: 350
+	})
+	
 	$('#tabs').tabs();
 	
 	retrieveParseRefreshEntries();
