@@ -30,7 +30,7 @@ function openEditMonthlyModifications(year, month)
 	var mods = modifications.where({'month':month, 'year':year});
 	mods = _.sortBy(mods, function (model)
 	{
-		model.get("name");
+		return model.get("name");
 	});
 	data.modifications = mods;
 	if(data.modifications.length > 0)

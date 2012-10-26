@@ -17,10 +17,7 @@ $(document).ready(function()
 		dirtyFilter = true;
 		var valid = validateFilter();
 		if(valid)
-		{
-			console.log("updated");
 			updateMonthFilterIndexes();
-		}
 	});
 
 	$('body').delegate('.show_on_hover', "hover",

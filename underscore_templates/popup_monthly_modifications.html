@@ -1,9 +1,11 @@
 <table class="fullWidth">
 	<tr>
-		<td colspan="3">
-			<% var msg = data.modifications.length > 0? 'Monthly Modifications': 'No Monthly Modifications for'; %> 
-			<label style="font-weight: bold;"><%=msg%></label> <%= data.month %> <%= data.year %>
+		<td colspan="1">
+			<%= data.month %> <%= data.year %>
 		</td>
+	</tr>
+	<tr style="height: 15px;">
+		
 	</tr>
 	<% _.each(data.modifications, function(modification, id, list) { %>
 	<tr name='<%=modification.get("name")%>' class="monthly_mod" >
@@ -12,8 +14,9 @@
 		</td>
 		<td width="40%">
 			<% var amount = modification.get('amount'); %>
+			<% var model = monthly.get(modification.get('name')); %>
 			<% if(typeof amount != "undefined") { %>
-				<%= modification.get('amount') %>
+				<%= model.get('amount') %> to <%= getModifiedAmount(model, data.year, data.month) %>
 			<%} else {%>
 				Deleted
 			<% } %>
