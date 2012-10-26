@@ -15,7 +15,12 @@ $(document).ready(function()
 	
 	$('.dirtyfilter').on("change", function() {
 		dirtyFilter = true;
-		updateMonthFilterIndexes();
+		var valid = validateFilter();
+		if(valid)
+		{
+			console.log("updated");
+			updateMonthFilterIndexes();
+		}
 	});
 
 	$('body').delegate('.show_on_hover', "hover",
@@ -56,11 +61,9 @@ var idDropdownNumCols = '#num_cols';
 var validator;
 var edit_validator;
 
-// Template function for the monthly entries
-var templateMonthly;
+var loaded = false;
 
-// Template function for the month display section.
-var templateEntries;
+var curDate = new Date();
 
 // populated statically
 var years = [];
@@ -87,6 +90,9 @@ var sharing_with;
 // Array of e-mails sharing their budget with you
 var shared;
 
+// Object that holds settings
+var settings;
+
 // A string that represents whether or not you are viewing someone else's budget.
 // undefined if you are viewing your own, set to email address of other account when viewing another.
 var viewing_other = undefined;
@@ -98,6 +104,14 @@ var monthModuleViews = {};
 
 function refreshEntries()
 {
+	var valid = validateFilter();
+	if (!valid)
+	{
+		alert("Not a valid to and from filter.");
+		updateDropdownSelections();
+		return;
+	}
+	
 	calculateAllMonthData();
 	if(dirtyFilter)
 	{

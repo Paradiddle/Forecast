@@ -1,16 +1,9 @@
-var monthFilters = {};
-
-function getMonthFilterIndexes()
-{
-	return monthFilters;
-}
-
 function updateMonthFilterIndexes()
 {
-	monthFilters.toMonth = getSelectedIndex(idDropdownToMonth);
-	monthFilters.fromMonth = getSelectedIndex(idDropdownFromMonth);
-	monthFilters.toYear = getSelectedIndex(idDropdownToYear);
-	monthFilters.fromYear = getSelectedIndex(idDropdownFromYear);
+	settings.toMonth = getSelectedIndex(idDropdownToMonth);
+	settings.fromMonth = getSelectedIndex(idDropdownFromMonth);
+	settings.toYear = getSelectedIndex(idDropdownToYear);
+	settings.fromYear = getSelectedIndex(idDropdownFromYear);
 }
 
 function updateStartBalance(year, month, val)
@@ -43,6 +36,13 @@ function sortByIncomeThenAmount(models, year, month)
 	if(groups['true'] != undefined)
 		arr = arr.concat(groups['true']);
 	return arr;
+}
+
+function useDefined(var1, var2)
+{
+	if(typeof var1 == "undefined")
+		return var2;
+	return var1;
 }
 
 function formatDollars(num, undefinedFallback, showpositive)
@@ -123,10 +123,17 @@ function putMonthlyModification(year, month, name, amount)
 
 function onReceiveJsonEntries(jsonData)
 {
-	viewing_other = jsonData.viewing_other;
 	parseData(jsonData);
+	loadSettings();
+	loaded = true;
+	viewing_other = jsonData.viewing_other;
 	refreshEntries();
 	refreshSharedWith();
+}
+
+function loadSettings()
+{
+	populateSelectElements();
 }
 
 function getEntriesArrayForYearMonth(year, month)
@@ -158,6 +165,7 @@ function parseData(data)
 	modifications = new Backbone.Collection(data['modifications']);
 	sharing_with = data['sharing_with'];
 	shared = data['shared'];
+	settings = data['settings'];
 }
 
 function getOnlyRelevantPartsOfMonths()
@@ -177,19 +185,17 @@ var yearMonthIteratorData;
 function updateYearMonthIterator()
 {
 	yearMonthIteratorData = [];
-	
-	var filter = getMonthFilterIndexes();
-	
+		
 	// Iterate through each year from the starting year to the ending year
-	for ( var currentYearNum = filter.fromYear; currentYearNum <= filter.toYear; currentYearNum++)
+	for ( var currentYearNum = settings.fromYear; currentYearNum <= settings.toYear; currentYearNum++)
 	{
 		// If the current year is the first year of the selection then the starting 
 		// month will be the selected starting month, otherwise we start at January.
-		var startingMonthNum = (currentYearNum == filter.fromYear) ? filter.fromMonth : 0;
+		var startingMonthNum = (currentYearNum == settings.fromYear) ? settings.fromMonth : 0;
 
 		// If the current year is the last year of the selection then the ending
 		// month will be the selected ending month, otherwise we end at December.
-		var endingMonthNum = (currentYearNum == filter.toYear) ? filter.toMonth : 11;
+		var endingMonthNum = (currentYearNum == settings.toYear) ? settings.toMonth : 11;
 
 		for ( var currentMonthNum = startingMonthNum; currentMonthNum <= endingMonthNum; currentMonthNum++)
 		{
@@ -209,13 +215,6 @@ function updateYearMonthIterator()
 
 function getEntriesTableTemplateData()
 {
-	var valid = validateFilter();
-	if (!valid)
-	{
-		alert("Not a valid to and from filter.");
-		return;
-	}
-
 	var templateData = {};
 	templateData.rowData = [];
 	var numCols = NUM_COLS[getNumCols()];
@@ -314,8 +313,8 @@ function calculateAllMonthData()
 
 function validateFilter()
 {
-	var filter = getMonthFilterIndexes();
-	if (filter.fromYear <= filter.toYear && (filter.fromMonth <= filter.toMonth || filter.toYear > filter.fromYear))
+	if (getSelectedIndex(idDropdownFromYear) <= getSelectedIndex(idDropdownToYear) 
+			&& (getSelectedIndex(idDropdownFromMonth) <= getSelectedIndex(idDropdownToMonth) || getSelectedIndex(idDropdownToYear) > getSelectedIndex(idDropdownFromYear)))
 		return true;
 	return false;
 }

@@ -1,7 +1,5 @@
 function initialElementSetup()
-{
-	populateSelectElements();
-	
+{	
 	// Setup the popup dialogs
 	getEntryDialog().hide();
 	getEntryDialog().css('position', 'absolute');
@@ -148,8 +146,7 @@ function showStartBalanceInput($form)
 
 function populateSelectElements()
 {
-	var d = new Date();
-	for(var i = d.getFullYear() - 1; i <= d.getFullYear() + 2; i++)
+	for(var i = curDate.getFullYear() - 1; i <= curDate.getFullYear() + 2; i++)
 	{
 		years.push("" + i);
 	}
@@ -158,14 +155,19 @@ function populateSelectElements()
 	
 	populateSelector($(idDropdownNumCols), NUM_COLS);
 
-	// From year set to current year, to year set to next year
-	// From and to months set to current month
-	$(idDropdownFromYear).val(d.getFullYear());
-	$(idDropdownFromMonth).val(months[d.getMonth()]);
-	$(idDropdownToMonth).val(months[(d.getMonth()-1) % 12]);
-	$(idDropdownToYear).val(d.getFullYear() + 1);
+	updateDropdownSelections();
 	
 	updateMonthFilterIndexes();
+}
+
+function updateDropdownSelections()
+{
+	// From year set to current year, to year set to next year
+	// From and to months set to current month
+	$(idDropdownFromYear).val(useDefined(years[settings['fromYear']], curDate.getFullYear()));
+	$(idDropdownFromMonth).val(useDefined(months[settings['fromMonth']], months[curDate.getMonth()]));
+	$(idDropdownToMonth).val(useDefined(months[settings['toMonth']], months[(curDate.getMonth() - 1) % 12]));
+	$(idDropdownToYear).val(useDefined(years[settings['toYear']], curDate.getFullYear() + 1));
 }
 
 function populateMonthYearSelectElements($filter)
@@ -181,7 +183,6 @@ function populateMonthYearSelectElements($filter)
 		monthFilter = $filter.find(monthFilter);
 	}
 	
-	console.log('num years: ' + yearFilter.size());
 	yearFilter.each(yearFiller);
 	monthFilter.each(monthFiller);
 }

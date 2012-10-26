@@ -19,7 +19,8 @@ function saveData()
 		'one_time': one_time.toJSON(),
 		'months': _.compact(getOnlyRelevantPartsOfMonths()),
 		'sharing_with': sharing_with,
-		'modifications': modifications
+		'modifications': modifications,
+		'settings': settings
 	};
 	$.post("/Entries", JSON.stringify(data), function(result) {refreshEntries();});	
 }

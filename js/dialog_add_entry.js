@@ -100,7 +100,7 @@ function showEntryDialogUnderMonthly(el)
 	{
 		selected = "";
 		hideEntryDialog(true);
-		populateSelectElements();
+		populateSelectElements(getEntryDialog());
 		return;
 	}
 	if(selected != "")

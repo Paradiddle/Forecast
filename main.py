@@ -35,6 +35,7 @@ class User(db.Model):
     sharing_with = db.StringListProperty(default=[])
     num_monthly = db.IntegerProperty(default=0)
     num_one_time = db.IntegerProperty(default=0)
+    settings = JsonProperty()
     months = JsonProperty()
     one_time = JsonProperty()
     monthly = JsonProperty()
@@ -107,6 +108,7 @@ def getData(entity, user):
     obj['one_time'] = entity.one_time
     obj['months'] = entity.months
     obj['modifications'] = entity.modifications
+    obj['settings'] = entity.settings
     if entity.userid == user.user_id():
         obj['sharing_with'] = entity.sharing_with
     else:
@@ -147,6 +149,7 @@ class Entries(webapp.RequestHandler):
             obj.months = []
             obj.sharing_with = []
             obj.modifications = []
+            obj.settings = {}
             obj.put()
             self.response.out.write(json.dumps(getData(obj, user)))
             
@@ -176,6 +179,7 @@ class Entries(webapp.RequestHandler):
         u.modifications = data['modifications']
         u.one_time = data['one_time']
         u.sharing_with = data['sharing_with']
+        u.settings = data['settings']
         diff_one_time = num_one_time - u.num_one_time
         diff_monthly = num_monthly - u.num_monthly
         if diff_one_time >= 0:
