@@ -1,18 +1,41 @@
 <form onsubmit="applyColorConfigurations(); return false;">
 	<table class="fullWidth">
+		<th>
+			Name
+		</th>
+		<th>
+			Color
+		</th>
+		<th>
+			Track Balance
+		</th>
+		<th>
+			Start Amount
+		</th>
 		<% data.each(function(model, id, list) { %>
-		<tr name='<%=model.get("name")%>' class="monthly_entry">
-			<td id="name_cell" width="33%" class="<%=model.get('name')%>">
-				<%= model.get('name') %>
+		<tr name='<%=model.cid%>' class="monthly_entry">
+			<td class="<%=model.cid%>">
+				<div id="name_div"><%- model.get('name') %></div>
 			</td>
-			<td width="33%">
+			<td>
 				<input class="color_input" value="<%=model.get('color')%>">
+			</td>
+			<td>
+				<input type="checkbox" value="track">
+				<select class="month_select"></select>
+				<select class="year_select"></select>
+			</td>
+			<td>
+				<input class="fullWidth" type="text">
 			</td>
 		</tr>
 		<% }); %>
+		<tr style="height: 25px;">
+			
+		</tr>
 		<tr>
-			<td colspan="2">
-				<input type="submit" id="apply_button" value="Apply Color Configurations" class="fullWidth button">
+			<td colspan="1">
+				<input type="submit" id="apply_button" value="Apply" class="fullWidth button">
 			</td>
 		</tr>
 	</table>

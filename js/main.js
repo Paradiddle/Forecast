@@ -33,7 +33,7 @@ $(document).ready(function()
 	$('#div_monthly_configuration').dialog({
 		autoOpen: false,
 		modal: true,
-		width: 350
+		width: 800
 	})
 	
 	$('#tabs').tabs();

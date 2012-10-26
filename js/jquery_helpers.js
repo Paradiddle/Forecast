@@ -220,7 +220,7 @@ function validateColorConfigurations()
 	$dialog.find('.color_input').each(function (index, value)
 	{
 		var $val = $(value);
-		var name = $val.parents('.monthly_entry').attr('name');
+		var cid = $val.parents('.monthly_entry').attr('name');
 		var good = /^#[0-9A-F]{3,6}$/.test($val.val());
 		if (!good)
 		{
@@ -230,8 +230,8 @@ function validateColorConfigurations()
 		else
 		{
 			$val.removeClass('error');
-			$val.find('.' + name).css('background-color', $val.val());
-			monthly.get(name).set('color', $val.val());
+			$val.find('.' + cid).css('background-color', $val.val());
+			monthly.getByCid(cid).set('color', $val.val());
 		}
 	});
 	return allGood;

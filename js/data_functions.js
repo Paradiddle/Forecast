@@ -19,7 +19,7 @@ function updateStartBalance(year, month, val)
 	m.set('start_balance', val);
 }
 
-function sortByIncomeThenAmount(models)
+function sortByIncomeThenAmount(models, year, month)
 {
 	// Group by expense and income
 	var groups = _.groupBy(models, function(value) {return value.get('amount') < 0;});
@@ -27,7 +27,12 @@ function sortByIncomeThenAmount(models)
 	for(var key in groups)
 	{
 		groups[key] = _.sortBy(groups[key], function(value) {
-			return -Math.abs(value.get('amount'));
+			var amount;
+			if(typeof year == "undefined" || typeof month == "undefined")
+				amount = value.get('amount');
+			else
+				amount = getModifiedAmount(value, year, month);
+			return -Math.abs(amount);
 		});
 	}
 	
@@ -272,7 +277,7 @@ function calculateAllMonthData()
 				else
 					total_expenses += amount;
 			}
-			var diff = total_income - total_expenses;
+			var diff = total_income + total_expenses;
 			var start_balance = meta.get('start_balance');
 			var prevMonthMeta = monthsMeta.get(getPreviousMonthMeta(y, m));
 			var prevEstEndBalance = undefined;
