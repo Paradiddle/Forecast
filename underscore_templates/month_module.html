@@ -47,7 +47,8 @@
 		<% if(typeof amount == "undefined") return; %>
 	<!-- ACTUAL ENTRIES -->
 	<tr name="<%=key%>" class="entry_data editable_entry show_on_hover">
-		<td style="color: <%=entry.get('color')%>;">
+		<% var color = typeof entry.get('track') != "undefined"? '#999999': entry.get('color'); %>
+		<td style="color: <%=color%>;">
 			<%- entry.get('name') %>
 		</td>
 		<td>
@@ -122,4 +123,21 @@
 		</td>
 		<td></td>
 	</tr>
+	<% if(typeof data.tracked_balances != "undefined") { %>
+	<% _.each(data.tracked_balances, function(track, key, list) { %>
+	<tr>
+		<td>
+			<label class="preMonthMeta">Separate Balances:</label>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<%= key %>
+		</td>
+		<td class="serif">
+			<%= formatDollars(track, '$0') %>
+		</td>
+	</tr>
+	<% }); %>
+	<% } %>
 </table>

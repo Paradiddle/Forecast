@@ -40,6 +40,7 @@ function calculate_MonthModule()
 	this.data.total_income = this.meta.get('total_income');
 	this.data.entries = sortByIncomeThenAmount(getEntriesArrayForYearMonth(this.year, this.month), this.year, this.month);
 	this.data.end_balance = this.meta.get('est_end_balance');
+	this.data.tracked_balances = this.meta.get('tracked_balances');
 	this.data.meta = this.meta;
 	var currentStartBalance = this.meta.get('start_balance');
 	if(currentStartBalance != undefined)

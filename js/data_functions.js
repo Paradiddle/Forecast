@@ -247,6 +247,18 @@ function getEntriesTableTemplateData()
 
 function calculateAllMonthData()
 {
+	var tracked = monthly.filter(function (value) {
+		return typeof value.get('track') != "undefined";
+	});
+
+	var tracked_balances = {};
+
+	for (var i = 0; i < tracked.length; i++)
+	{
+		var track = tracked[i];
+		tracked_balances[track.get('name')] = 0;
+	}
+	
 	for(var y = 0; y < years.length; y++)
 	{
 		var yearString = years[y];
@@ -268,20 +280,39 @@ function calculateAllMonthData()
 			for(var e = 0; e < entries.length; e++)
 			{
 				var entry = entries[e];
+				var name = entry.get('name');
 				var amount = getModifiedAmount(entry, yearString, monthString);
 				if(typeof amount == "undefined")
 					continue;
-				if(amount > 0)
-					total_income += amount;
+				
+				if(_.indexOf(tracked, entry) != -1)
+				{
+					var track = entry.get('track');
+					if(y == track.yearIndex && m == track.monthIndex)
+					{
+						tracked_balances[name] = track.amount + amount;
+					} 
+					else if (y > track.yearIndex || (y == track.yearIndex && m >= track.monthIndex))
+					{
+						tracked_balances[name] += amount;
+					}
+				}
 				else
-					total_expenses += amount;
+				{
+					if(amount > 0)
+						total_income += amount;
+					else
+						total_expenses += amount;
+				}
 			}
 			var diff = total_income + total_expenses;
 			var start_balance = meta.get('start_balance');
 			var prevMonthMeta = monthsMeta.get(getPreviousMonthMeta(y, m));
 			var prevEstEndBalance = undefined;
-			if(prevMonthMeta != undefined)
+			if(typeof prevMonthMeta != "undefined")
+			{
 				prevEstEndBalance = prevMonthMeta.get('est_end_balance');
+			}
 			if(start_balance != undefined)
 			{
 				meta.set('est_end_balance', start_balance + diff);
@@ -302,8 +333,14 @@ function calculateAllMonthData()
 					}
 				}
 			}
+			
 			meta.set('total_income', total_income);
 			meta.set('total_expenses', total_expenses);
+			
+			var tb = _.clone(tracked_balances);
+			if(typeof tb == "undefined")
+				tb = {};
+			meta.set('tracked_balances', tb);
 			meta.set('difference', diff);
 			meta.set('next_month', getNextMonthMeta(y, m));
 			meta.set('prev_month', getPreviousMonthMeta(y, m));

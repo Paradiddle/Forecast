@@ -70,19 +70,29 @@ var colorPickers = {};
 function showMonthlyConfigurationDialog()
 {
 	getMonthlyConfigurationDialog().html(render_template('popup_monthly_configuration', monthly));
+	populateMonthYearSelectElements(getMonthlyConfigurationDialog());
 	$('.color_input').each(function(index, val) {
 		var $el = $(val);
 		var $row = $el.parents('.monthly_entry');
-		var name = $row.attr('name');
-		var picker = colorPickers[name];
+		var cid = $row.attr('name');
+		var model = monthly.getByCid(cid);
+		var picker = colorPickers[cid];
+		
+		var track = model.get('track');
+		if(typeof track != "undefined")
+		{
+			$row.find('.month_select').val(track.month);
+			$row.find('.year_select').val(track.year);
+			$row.find('#track_start_balance').val(track.amount);
+		}
 		
 		if(typeof picker != "undefined")
 		{
-			delete colorPickers[name];
+			delete colorPickers[cid];
 		}
 		picker = new jscolor.color(val);
 		colorChange({'target':val});
-		colorPickers[name] = picker;
+		colorPickers[cid] = picker;
 	});
 	getMonthlyConfigurationDialog().dialog("open");
 	
@@ -92,7 +102,6 @@ function showMonthlyConfigurationDialog()
 		pick.hidePicker();
 	}
 	
-	populateMonthYearSelectElements(getMonthlyConfigurationDialog());
 	$('#apply_button').focus();
 }
 
@@ -221,7 +230,8 @@ function validateColorConfigurations()
 	$dialog.find('.color_input').each(function (index, value)
 	{
 		var $val = $(value);
-		var cid = $val.parents('.monthly_entry').attr('name');
+		var $row = $val.parents('.monthly_entry');
+		var cid = $row.attr('name');
 		var good = /^#[0-9A-F]{3,6}$/.test($val.val());
 		if (!good)
 		{
@@ -234,14 +244,32 @@ function validateColorConfigurations()
 			$val.find('.' + cid).css('background-color', $val.val());
 			monthly.getByCid(cid).set('color', $val.val());
 		}
+		
+		var model = monthly.getByCid(cid);
+		var track = $row.find('.track_checkbox').prop('checked');
+		if(track)
+		{
+			var startMonth = $row.find('.month_select').val();
+			var startYear = $row.find('.year_select').val();
+			var monthIndex = $row.find('.month_select option:selected').index();
+			var yearIndex = $row.find('.year_select option:selected').index();
+			var startAmount = $row.find('#track_start_balance').val();
+			var track = {
+				'month': startMonth,
+				'year': startYear,
+				'monthIndex': monthIndex,
+				'yearIndex': yearIndex,
+				'amount': parseInt(startAmount)
+			};
+			model.set('track', track);
+		}
+		else
+		{
+			model.unset('track');
+		}
+		
 	});
 	return allGood;
-}
-
-function changeColorConfig(el)
-{
-	var $el = $(el);
-	console.log($el);
 }
 
 function applyColorConfigurations()
@@ -252,7 +280,6 @@ function applyColorConfigurations()
 		getMonthlyConfigurationDialog().dialog("close");
 		refreshEntries();
 	}
-	
 }
 
 function initializeValidation()

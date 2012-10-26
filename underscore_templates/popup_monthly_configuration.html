@@ -7,7 +7,7 @@
 			Color
 		</th>
 		<th>
-			Track Balance
+			Track Separately
 		</th>
 		<th>
 			Start Amount
@@ -21,12 +21,16 @@
 				<input class="color_input" value="<%=model.get('color')%>">
 			</td>
 			<td>
-				<input type="checkbox" value="track">
+				<% if(typeof model.get('track') != "undefined") { %>
+				<input class="track_checkbox" type="checkbox" value="track" checked="checked">
+				<% } else { %>
+				<input class="track_checkbox" type="checkbox" value="track">
+				<% } %>
 				<select class="month_select"></select>
 				<select class="year_select"></select>
 			</td>
 			<td>
-				<input class="fullWidth" type="text">
+				<input id="track_start_balance" class="fullWidth" type="text">
 			</td>
 		</tr>
 		<% }); %>
