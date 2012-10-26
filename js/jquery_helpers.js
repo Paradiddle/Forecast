@@ -93,12 +93,14 @@ function showMonthlyConfigurationDialog()
 		var pick = colorPickers[prop];
 		pick.hidePicker();
 	}
+	
+	populateMonthYearSelectElements(getMonthlyConfigurationDialog());
 	$('#apply_button').focus();
 }
 
 function colorChange(evt) {
 	var $picker = $(evt.target);
-	var $name = $picker.parents('.monthly_entry').find('#name_cell');
+	var $name = $picker.parents('.monthly_entry').find('#name_div');
 	$name.css('color', $picker.css('background-color'));
 }
 
@@ -151,12 +153,9 @@ function populateSelectElements()
 	{
 		years.push("" + i);
 	}
-	populateSelector($(idDropdownToMonth), months);
-	populateSelector($(idDropdownFromMonth), months);
-	populateSelector($('#selectorMonth'), months);
-	populateSelector($(idDropdownToYear), years);
-	populateSelector($(idDropdownFromYear), years);
-	populateSelector($('#selectorYear'), years);
+	
+	populateMonthYearSelectElements();
+	
 	populateSelector($(idDropdownNumCols), NUM_COLS);
 
 	// From year set to current year, to year set to next year
@@ -167,6 +166,29 @@ function populateSelectElements()
 	$(idDropdownToYear).val(d.getFullYear() + 1);
 	
 	updateMonthFilterIndexes();
+}
+
+function populateMonthYearSelectElements($filter)
+{
+	var monthFiller = getSelectFiller(months);
+	var yearFiller = getSelectFiller(years);
+	
+	var yearFilter = $('.year_select');
+	var monthFilter = $('.month_select');
+	if(typeof $filter != "undefined")
+	{
+		yearFilter = $filter.find(yearFilter);
+		monthFilter = $filter.find(monthFilter);
+	}
+	
+	console.log('num years: ' + yearFilter.size());
+	yearFilter.each(yearFiller);
+	monthFilter.each(monthFiller);
+}
+
+function getSelectFiller(array)
+{
+	return function(index, el) {populateSelector($(el), array)};
 }
 
 //Custom JQuery Validators
