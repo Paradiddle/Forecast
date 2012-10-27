@@ -1,5 +1,10 @@
 $(document).ready(function()
 {
+	updateContentHeight();
+	
+	$(window).resize(function() {
+		updateContentHeight();
+	});
 	_.templateSettings.variable = "data";
 	$('#budget_return').hide();		
 	jQuery.fn.outerHTML = function(s) {
@@ -38,8 +43,7 @@ $(document).ready(function()
 		width: 800
 	})
 	
-	$('#tabs').tabs();
-	
+
 	retrieveParseRefreshEntries();
 });
 

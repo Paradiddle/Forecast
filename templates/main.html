@@ -29,12 +29,17 @@
 		<!-- HEADER -->
 		
 		<div class="fullWidth Header">
-			<img src="images/logo.jpg" style="float:left; border:0; margin-top:10px;"/>
+			<div style="max-width:15%; float:left;"><img src="images/logo.jpg" width="100%"/></div>
+			
+			<div class="tabHolder">
+				<div class="tabs button" id="tab1">Entries</div>
+				<div class="tabs button" id="tab2">Share</div>
+			</div>
+			
 			
 			<div style="float: right;">
 				{{ message_pretext }} <a href={{url}}>{{url_linktext}}</a>{{message_posttext}}
 				<br />
-				<!--<img style="float: right; padding-top: 10px;" src="images/appengine-silver-120x30.gif" />-->
 			</div>
 				
 			<div style="clear:both"></div>
@@ -232,23 +237,18 @@
 				<div id="monthly_entries">{{ data }}</div>
 			</div>
 		</div>
-		<div class="content">
-			<div id="tabs">
-				<ul>
-					<li><a href="#entries">Entries</a></li>
-					<li><a href="#share">Share</a></li>
-				</ul>
-
-				<div id="entries"></div>
-				<div id="share">
-					<div>
-						<form onsubmit="addShare(); return false;">
-							<label>E-mail Address</label>
-							<input type="text" id="share_input" style="width: 300px;" />
-							<input type="button" class="button" name="click_share" onclick="addShare();" value="Share">
-						</form>
-						<div id="share_entries"></div>
-					</div>
+		<div class="content" height="">
+			<div id="entries" class="tab1 tabContent"></div>
+			<div id="share" class="tab2 tabContent">
+				<div>
+					<div class="shadow">
+					<form onsubmit="addShare(); return false;">
+						<label>E-mail Address</label>
+						<input type="text" id="share_input" style="width: 300px;" />
+						<input type="button" class="button" name="click_share" onclick="addShare();" value="Share">
+					</form>
+					<div id="share_entries"></div>
+						</div>
 				</div>
 			</div>
 		</div>

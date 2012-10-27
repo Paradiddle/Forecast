@@ -19,6 +19,22 @@ function initialElementSetup()
 	
 	//Hide the sort div
 	$('.sort').hide();
+	
+	$('.tab1').show();
+	$('.tab2').hide();
+	$('.tabs').click(function(){
+	var showWhichTab = $(this).attr("id");
+	$('.tabContent').hide();
+	$('.' + showWhichTab).show();
+});
+}
+
+
+
+function updateContentHeight()
+{
+	var newHeight = $(window).height() - 100;
+	$('.content').height(newHeight);
 }
 
 function openEditMonthlyModifications(year, month)
@@ -339,7 +355,6 @@ function switchToShare(event)
 {
 	var email = $(event.target).parents('.share_row').attr('name');
 	retrieveParseRefreshEntries(email);
-	$('#tabs').tabs('select', 0);
 }
 
 function switchBack()
