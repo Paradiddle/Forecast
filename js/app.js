@@ -75,7 +75,7 @@ var app = (function() {
 
 	pub.getSettings = function()
 	{
-		return settings;
+		return pub.settings;
 	};
 
 	pub.refreshEntries = function ()
@@ -318,15 +318,15 @@ var app = (function() {
 		yearMonthIteratorData = [];
 
 		// Iterate through each year from the starting year to the ending year
-		for (var currentYearNum = settings.fromYear; currentYearNum <= settings.toYear; currentYearNum++)
+		for (var currentYearNum = app.settings.fromYear; currentYearNum <= app.settings.toYear; currentYearNum++)
 		{
 			// If the current year is the first year of the selection then the starting
 			// month will be the selected starting month, otherwise we start at January.
-			var startingMonthNum = (currentYearNum == settings.fromYear) ? settings.fromMonth : 0;
+			var startingMonthNum = (currentYearNum == app.settings.fromYear) ? app.settings.fromMonth : 0;
 
 			// If the current year is the last year of the selection then the ending
 			// month will be the selected ending month, otherwise we end at December.
-			var endingMonthNum = (currentYearNum == settings.toYear) ? settings.toMonth : 11;
+			var endingMonthNum = (currentYearNum == app.settings.toYear) ? app.settings.toMonth : 11;
 
 			for (var currentMonthNum = startingMonthNum; currentMonthNum <= endingMonthNum; currentMonthNum++)
 			{
