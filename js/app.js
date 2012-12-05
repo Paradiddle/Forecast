@@ -290,7 +290,7 @@ var app = (function() {
 		app.modifications = new Backbone.Collection(data['modifications']);
 		app.sharing_with = data['sharing_with'];
 		app.shared = data['shared'];
-		settings = data['settings'];
+		app.settings = data['settings'];
 	};
 
 	pub.getOnlyRelevantPartsOfMonths = function ()
