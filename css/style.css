@@ -30,6 +30,13 @@ th{
 	text-align: left;
 }
 
+.tabContent{
+	background: url(/images/bgtexture.jpeg) top left repeat;
+	height:auto;
+	min-height:98%;
+	padding:1%;
+}
+
 tr.entries_first{
 	font-weight: 600;
 	height:20px;
@@ -37,10 +44,6 @@ tr.entries_first{
 
 tr.entries_first td{
 	padding:0;
-}
-
-.tableentries{
-	border-left:1px solid #555;
 }
 
 .entries_second{
@@ -143,6 +146,10 @@ label.preMonthMeta{
 	background:#fa2b31;
 }
 
+.discrepancy{
+	font-weight:bold;
+}
+
 .orangebg{
 	background:#ffbf1f;
 }
@@ -167,6 +174,7 @@ label.preMonthMeta{
 .Header{
 	position:fixed;
 	height:100px;
+	overflow:hidden;
 	background:white;
 	margin:0;
 	z-index:999;
@@ -191,7 +199,12 @@ input[type="text"]{
 .content{
 	width:85%;
 	float:right;
-	margin-top:100px;
+	right:0;
+	top:100px;
+	border-left:1px solid #999;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	position:fixed;
 }
 
 td.tables{
@@ -215,6 +228,16 @@ td.bottom div.shadow{
 	width:100%;
 	position:absolute;
 	box-shadow: 0 0 8px #555;
+}
+
+.shadow{
+	background:white;
+	height:auto;
+	width:92%;
+	margin:2%;
+	padding: 2%;
+	box-shadow: 0 0 8px #555;
+	
 }
 
 .whitecover{
@@ -342,3 +365,33 @@ td.bottom div.shadow{
 .configureButton{
 	background-image: url('/images/configure.png');
 }
+
+.tabHolder{
+	width:auto;
+	float:left;
+	margin-top:83px;
+	left:250px;
+}
+
+.tabs{
+	width:auto;
+	margin-right:5px;
+	height:20px;
+	float:left;
+}
+
+tr.startEndBalance{
+	background:#efefef;
+	font-size:14px;
+	text-transform:uppercase;
+	font-weight:bold;
+}
+
+.discrepancy{
+	width:auto;
+	padding-right:20px;
+	height:16px;
+	float:left;
+	background: url(/images/alert.png) center right no-repeat;
+}
+
