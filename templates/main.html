@@ -14,13 +14,7 @@
 		<script src="libjs/jquery-validate.js"></script>
 		<script src="libjs/underscore.js"></script>
 		<script src="libjs/backbone.js"></script>
-		<script src="js/main.js"></script>
-		<script src="js/data_functions.js"></script>
-		<script src="js/dialog_add_entry.js"></script>
-		<script src="js/dialog_edit_entry.js"></script>
-		<script src="js/jquery_helpers.js"></script>
-		<script src="js/client_server_functions.js"></script>
-		<script src="js/data_views.js"></script>
+		<script src="js/app.js"></script>
 		<script src="libjs/mousewheel.js"></script>  
 		<script src="libjs/scroll.js"></script>
 	</head>
@@ -103,10 +97,10 @@
 					</tr>
 					<tr>
 						<td>
-							<button class="button fullWidth" onclick="click_AddEntry();" id="addentry">Add Entry</button>
+							<button class="button fullWidth" onclick="dialogAddEntry.click_AddEntry();" id="addentry">Add Entry</button>
 						</td>
 						<td>
-							<button class="button fullWidth" onclick="hideEntryDialog(true);">Close</button>
+							<button class="button fullWidth" onclick="dialogAddEntry.hideEntryDialog(true);">Close</button>
 						</td>
 					</tr>
 				</table>
@@ -166,11 +160,11 @@
 					</tr>
 					<tr>
 						<td>
-							<button class="button fullWidth edit" onclick="applyEdit();">Apply</button>
-							<button class="button fullWidth delete" onclick="applyDelete();">Delete</button>
+							<button class="button fullWidth edit" onclick="dialogEditEntry.applyEdit();">Apply</button>
+							<button class="button fullWidth delete" onclick="dialogEditEntry.applyDelete();">Delete</button>
 						</td>
 						<td>
-							<button class="button fullWidth" onclick="hideEditEntryDialog(true);">Close</button>
+							<button class="button fullWidth" onclick="dialogEditEntry.hideEditEntryDialog(true);">Close</button>
 						</td>
 					</tr>
 				</table>
@@ -191,9 +185,9 @@
 			<div id="sidebar">
 				<label id="budget_name"></label>
 				<input type="button" value="return" onclick="switchBack();" id="budget_return">
-				<button onclick="saveData();" class="bluebutton modify_data">Save</button><br/>
-				<button class="button modify_data" onclick="showEntryDialogUnderEntryHeader(this)">+ ONE TIME ENTRY</button><br/>
-				<button class="button modify_data" onclick="showEntryDialogUnderMonthly(this)">+ MONTHLY ENTRY</button><br/>
+				<button onclick="server.saveData();" class="bluebutton modify_data">Save</button><br/>
+				<button class="button modify_data" onclick="dialogAddEntry.showEntryDialogUnderEntryHeader(this)">+ ONE TIME ENTRY</button><br/>
+				<button class="button modify_data" onclick="dialogAddEntry.showEntryDialogUnderMonthly(this)">+ MONTHLY ENTRY</button><br/>
 				<div style="background:#efefef; padding:4px 0 2px 0;width:100%;"><button class="button" onclick="toggleSort()">Filter</button></div>
 				<div class="sort">
 					<table width="100%" bgcolor="#efefef">
@@ -227,9 +221,9 @@
 				</div>
 				<span style="vertical-align: middle;">
 					<h2 style="margin:5px; display: inline; float: left;">Monthly Entries</h2>
-					<input type="button" style="float: left; padding-top: 10px; vertical-align: middle;" onclick="showMonthlyConfigurationDialog();" class="smallButton configureButton">
+					<input type="button" style="float: left; padding-top: 10px; vertical-align: middle;" onclick="jQueryHelpers.showMonthlyConfigurationDialog();" class="smallButton configureButton">
 				</span>
-				<div id="monthly_entries">{{ data }}</div>
+				<div style="float: left;" id="monthly_entries">{{ data }}</div>
 			</div>
 		</div>
 		<div class="content">
@@ -245,7 +239,7 @@
 						<form onsubmit="addShare(); return false;">
 							<label>E-mail Address</label>
 							<input type="text" id="share_input" style="width: 300px;" />
-							<input type="button" class="button" name="click_share" onclick="addShare();" value="Share">
+							<input type="button" class="button" name="click_share" onclick="jQueryHelpers.addShare();" value="Share">
 						</form>
 						<div id="share_entries"></div>
 					</div>

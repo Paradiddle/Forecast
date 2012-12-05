@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Matting</title>
+		<script src="libjs/jquery.js"></script>
+		<script src="libjs/underscore.js"></script>
+		<script src="libjs/backbone.js"></script>
+		<script src="mattingjs/matting.js"></script>
+	</head>
+	<body style="float: left; height: 100%; padding: 0px; margin: 0px;" margin="0">
+		<div id="sidebar" style="position:fixed; display: inline; float: left; width: 200px; height:100%;">
+			<form id="addPictureForm" onsubmit="return false;">
+				<table style="width: 100%;">
+					<tr>
+						<td>
+							<label>Name</label>
+						</td>
+						<td style="text-align: right;">
+							<input name="name" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label>Width</label>
+						</td>
+						<td style="text-align: right;">
+							<input name="width" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label>Height</label>
+						</td>
+						<td style="text-align: right;">
+							<input name="height" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2"><input id="add" type="button" value="Add Picture" style="width: 100%;"></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<select size="7" id="boxlist" style="width: 100%;">
+
+							</select>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="canvas" style="position: fixed; display: inline; left: 200px;">
+			<canvas id="myCanvas" style="left: 200px; border:0px solid #000000; margin: 0px; padding: 0px;"></canvas>
+		</div>
+	</body>
+</html>

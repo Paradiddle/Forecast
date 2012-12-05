@@ -3,7 +3,9 @@
 		<!-- YEAR MONTH -->
 		<td colspan="2">
 			<div class="year"><%- data.shortMonth + ' \'' + data.shortYear  %></div>
+			<% if(data.hasModifications) { %>
 			<input style="float: right; vertical-align: middle;" type="button" class="modify_data smallButton editButton" id="editMonthlies">
+			<% } %>
 		</td>
 		<!-- ADD BUTTON -->
 		<td align="right" valign="top">
@@ -29,7 +31,7 @@
 			<span class="serif">
 				<form id="startBalanceForm" style="margin: 0px;">
 					<% var sb = data.start_balance; %>
-					<label id="startBalanceLabel" class="start_balance_label"><%=formatDollars(sb, '--')%></label>
+					<label id="startBalanceLabel" class="start_balance_label"><%=app.formatDollars(sb, '--')%></label>
 					<input id="startBalanceInput" class="start_balance_input" type="text" />
 				</form>
 			</span>
@@ -43,7 +45,7 @@
 		</td>
 	</tr>
 		<% _.each(data.entries, function(entry, key, list) { %>
-		<% var amount = getModifiedAmount(entry, data.year, data.month); %>
+		<% var amount = app.getModifiedAmount(entry, data.year, data.month); %>
 		<% if(typeof amount == "undefined") return; %>
 	<!-- ACTUAL ENTRIES -->
 	<tr name="<%=key%>" class="entry_data editable_entry show_on_hover">
@@ -52,7 +54,7 @@
 			<%- entry.get('name') %>
 		</td>
 		<td>
-			<span class="<%-amount < 0?'expense':'income'%> serif"><%-amount < 0? formatDollars(Math.abs(amount), ''): ''%><%-amount > 0? formatDollars(amount, ''): ''%></span>
+			<span class="<%-amount < 0?'expense':'income'%> serif"><%-amount < 0? app.formatDollars(Math.abs(amount), ''): ''%><%-amount > 0? app.formatDollars(amount, ''): ''%></span>
 		</td>
 		<td style="float: right;">
 			<input type="button" class="modify_data to_show_on_hover smallButton editButton" id="editButton">
@@ -77,7 +79,7 @@
 			<label class="preMonthMeta">Totals</label>
 		</td>
 		<td>
-			<span class="serif income"><%=formatDollars(data.total_income, '') %></span>
+			<span class="serif income"><%=app.formatDollars(data.total_income, '') %></span>
 		</td>
 	</tr>
 	<tr>
@@ -85,7 +87,7 @@
 			
 		</td>
 		<td>
-			<span class="serif expense" style="text-decoration: underline;"><%=formatDollars(data.total_expenses, '')%></span>
+			<span class="serif expense" style="text-decoration: underline;"><%=app.formatDollars(data.total_expenses, '')%></span>
 		</td>
 	</tr>
 	<tr>
@@ -94,7 +96,7 @@
 		</td>
 		<td>
 			<% var difference = data.total_income + data.total_expenses; %>
-			<span class="serif <%= difference >= 0? 'income': 'expense'%>"><%=formatDollars(difference, '')%></span>
+			<span class="serif <%= difference >= 0? 'income': 'expense'%>"><%=app.formatDollars(difference, '')%></span>
 		</td>
 	</tr>
 	<tr style="height: 15px;">
@@ -107,7 +109,7 @@
 			<label class="preMonthMeta">Ending Balance:</label>
 		</td>
 		<td>
-			<span class="serif"><label><%=formatDollars(data.end_balance, '')%></label></span>
+			<span class="serif"><label><%=app.formatDollars(data.end_balance, '')%></label></span>
 		</td>
 		<td></td>
 	</tr>
@@ -119,7 +121,7 @@
 			<label class="preMonthMeta <%=blank%>">Discrepancy: </label>
 		</td>
 		<td>
-			<span class="serif <%=blank%>"><label><%=formatDollars(data.discrepancy, '$0')%></label></span>
+			<span class="serif <%=blank%>"><label><%=app.formatDollars(data.discrepancy, '$0')%></label></span>
 		</td>
 		<td></td>
 	</tr>
@@ -135,7 +137,7 @@
 			<%= key %>
 		</td>
 		<td class="serif">
-			<%= formatDollars(track, '$0') %>
+			<%= app.formatDollars(track, '$0') %>
 		</td>
 	</tr>
 	<% }); %>

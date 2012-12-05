@@ -15,6 +15,9 @@ handlers:
  
 - url: /libjs
   static_dir: libjs
+
+- url: /mattingjs
+  static_dir: mattingjs
   
 - url: /underscore_templates
   static_dir: underscore_templates

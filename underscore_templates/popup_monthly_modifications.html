@@ -16,13 +16,13 @@
 			<% var amount = modification.get('amount'); %>
 			<% var model = monthly.get(modification.get('name')); %>
 			<% if(typeof amount != "undefined") { %>
-				<%= model.get('amount') %> to <%= getModifiedAmount(model, data.year, data.month) %>
+				<%= model.get('amount') %> to <%= app.getModifiedAmount(model, data.year, data.month) %>
 			<%} else {%>
 				Deleted
 			<% } %>
 		</td>
 		<td width="20%">
-			<input type="button" class="smallButton deleteButton" onclick="click_DeleteMonthlyMod(this);">
+			<input type="button" class="smallButton deleteButton" onclick="jQueryHelpers.click_DeleteMonthlyMod(this);">
 		</td>
 	</tr>
 	<% }); %>

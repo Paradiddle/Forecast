@@ -116,6 +116,15 @@ def getData(entity, user):
     obj['shared'] = getSharedWith(user)
     return obj
 
+class Matting(webapp.RequestHandler):
+    def get(self):
+        template_values = {}
+        path = os.path.join(os.path.dirname(__file__), 'templates/matting.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        return ''
+
 class Entries(webapp.RequestHandler):        
     def get(self):
         user = users.get_current_user()
@@ -197,7 +206,8 @@ class Entries(webapp.RequestHandler):
 application = webapp.WSGIApplication([
     ('/', Login),
     ('/Entries', Entries),
-    ('/Share', Share)
+    ('/Share', Share),
+    ('/Matting', Matting)
 ], debug=True)
 
 def main():
