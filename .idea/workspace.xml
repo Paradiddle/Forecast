@@ -8,26 +8,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9adbfd94-7b88-40b9-98b1-d399afcd7c15" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/ant.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/app.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mattingjs/matting.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/matting.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/client_server_functions.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/data_functions.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/data_views.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/dialog_add_entry.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/dialog_edit_entry.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/jquery_helpers.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/js/main.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" afterPath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.yaml" afterPath="$PROJECT_DIR$/app.yaml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/style.css" afterPath="$PROJECT_DIR$/css/style.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app.js" afterPath="$PROJECT_DIR$/js/app.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/main.html" afterPath="$PROJECT_DIR$/templates/main.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/underscore_templates/month_module.html" afterPath="$PROJECT_DIR$/underscore_templates/month_module.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/underscore_templates/monthly_entries.html" afterPath="$PROJECT_DIR$/underscore_templates/monthly_entries.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/underscore_templates/popup_monthly_configuration.html" afterPath="$PROJECT_DIR$/underscore_templates/popup_monthly_configuration.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html" afterPath="$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html" />
     </list>
     <ignored path="ForecastBudget.iws" />
@@ -98,7 +82,7 @@
       <file leaf-file-name="entries_table.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/underscore_templates/entries_table.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="8" selection-start="500" selection-end="500" vertical-scroll-proportion="-8.125">
+            <state line="13" column="8" selection-start="442" selection-end="442" vertical-scroll-proportion="-0.625">
               <folding />
             </state>
           </provider>
@@ -107,16 +91,16 @@
       <file leaf-file-name="month_module.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/underscore_templates/month_module.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="43" column="42" selection-start="1286" selection-end="1286" vertical-scroll-proportion="-15.0">
+            <state line="43" column="42" selection-start="1286" selection-end="1286" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="monthly_entries.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="monthly_entries.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/underscore_templates/monthly_entries.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="38" selection-start="356" selection-end="356" vertical-scroll-proportion="0.34937888">
+            <state line="15" column="38" selection-start="356" selection-end="356" vertical-scroll-proportion="-9.375">
               <folding />
             </state>
           </provider>
@@ -125,7 +109,7 @@
       <file leaf-file-name="popup_monthly_configuration.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/underscore_templates/popup_monthly_configuration.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="30" selection-start="30" selection-end="30" vertical-scroll-proportion="-0.0">
+            <state line="0" column="30" selection-start="30" selection-end="30" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -134,7 +118,7 @@
       <file leaf-file-name="app.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="33" selection-start="1005" selection-end="1005" vertical-scroll-proportion="-6.3461537">
+            <state line="87" column="22" selection-start="2373" selection-end="2387" vertical-scroll-proportion="-10.884615">
               <folding />
             </state>
           </provider>
@@ -143,7 +127,7 @@
       <file leaf-file-name="popup_monthly_modifications.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="50" selection-start="548" selection-end="548" vertical-scroll-proportion="-11.25">
+            <state line="15" column="28" selection-start="375" selection-end="375" vertical-scroll-proportion="-9.375">
               <folding />
             </state>
           </provider>
@@ -158,19 +142,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="main.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/templates/main.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="226" column="18" selection-start="7795" selection-end="7795" vertical-scroll-proportion="-6.9166665">
+            <state line="220" column="74" selection-start="7385" selection-end="7385" vertical-scroll-proportion="0.8119859">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
+      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/css/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="156" column="29" selection-start="5172" selection-end="5172" vertical-scroll-proportion="0.0">
+            <state line="383" column="0" selection-start="5410" selection-end="5410" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -193,7 +177,6 @@
         <option value="$PROJECT_DIR$/underscore_templates/monthly_modifications.html" />
         <option value="$PROJECT_DIR$/underscore_templates/table_monthly_modifications.html" />
         <option value="$PROJECT_DIR$/underscore_templates/table_shares.html" />
-        <option value="$PROJECT_DIR$/css/style.css" />
         <option value="$PROJECT_DIR$/css/jquery.colourPicker.css" />
         <option value="$PROJECT_DIR$/js/jquery.colourPicker.js" />
         <option value="$PROJECT_DIR$/jscolor/jscolor.js" />
@@ -209,19 +192,20 @@
         <option value="$PROJECT_DIR$/js/jquery_helpers.js" />
         <option value="$PROJECT_DIR$/underscore_templates/month_module.html" />
         <option value="$PROJECT_DIR$/underscore_templates/monthly_entries.html" />
-        <option value="$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html" />
         <option value="$PROJECT_DIR$/underscore_templates/popup_monthly_configuration.html" />
         <option value="$PROJECT_DIR$/js/main.js" />
+        <option value="$PROJECT_DIR$/css/style.css" />
         <option value="$PROJECT_DIR$/js/app.js" />
+        <option value="$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html" />
         <option value="$PROJECT_DIR$/templates/main.html" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1920" />
-    <option name="y" value="120" />
-    <option name="width" value="1920" />
-    <option name="height" value="1080" />
+    <option name="x" value="967" />
+    <option name="y" value="22" />
+    <option name="width" value="947" />
+    <option name="height" value="1058" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -251,19 +235,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane">
-        <subPane />
-      </pane>
-      <pane id="Scope">
-        <subPane subId="Project Files">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -312,6 +283,19 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane">
+        <subPane />
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -329,8 +313,8 @@
     <property name="MemberChooser.showClasses" value="true" />
     <property name="FullScreen" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -401,17 +385,6 @@
         <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
-      <JSDebuggerConfigurationSettings>
-        <option name="engineId" value="embedded" />
-        <option name="fileUrl" />
-      </JSDebuggerConfigurationSettings>
-      <method>
-        <option name="AntTarget" enabled="false" />
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Maven.BeforeRunTask" enabled="false" />
-      </method>
-    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -437,6 +410,17 @@
         <option name="Make" enabled="true" />
         <option name="Maven.BeforeRunTask" enabled="false" />
         <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
+      <JSDebuggerConfigurationSettings>
+        <option name="engineId" value="embedded" />
+        <option name="fileUrl" />
+      </JSDebuggerConfigurationSettings>
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
     <list size="0" />
@@ -497,14 +481,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1920" y="120" width="1920" height="1080" extended-state="6" />
+    <frame x="967" y="22" width="947" height="1058" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.4960981" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2523462" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -514,15 +497,16 @@
       <window_info id="Kahlua" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2961418" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2171825" sideWeight="0.7476538" order="9" side_tool="true" content_ui="tabs" x="3473" y="489" width="287" height="294" />
+      <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2171825" sideWeight="0.7476538" order="9" side_tool="true" content_ui="tabs" x="3473" y="489" width="287" height="294" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39967984" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14354323" sideWeight="0.7476538" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27737227" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1430096" sideWeight="0.7476538" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2523462" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27737227" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -648,25 +632,6 @@
         <state line="4" column="43" selection-start="93" selection-end="93" vertical-scroll-proportion="0.022970904" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="186" column="19" selection-start="2318" selection-end="2318" vertical-scroll-proportion="0.02173913" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/jscolor/jscolor.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="4" selection-start="278" selection-end="278" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/underscore_templates/entries_table.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="8" selection-start="500" selection-end="500" vertical-scroll-proportion="-8.125">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mattingjs/matting.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="60" column="1" selection-start="1344" selection-end="1344" vertical-scroll-proportion="0.28892216">
@@ -674,16 +639,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/underscore_templates/month_module.html">
+    <entry file="file://$PROJECT_DIR$/underscore_templates/entries_table.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="42" selection-start="1286" selection-end="1286" vertical-scroll-proportion="-15.0">
+        <state line="13" column="8" selection-start="442" selection-end="442" vertical-scroll-proportion="-0.625">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html">
+    <entry file="file://$PROJECT_DIR$/underscore_templates/month_module.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="50" selection-start="548" selection-end="548" vertical-scroll-proportion="-11.25">
+        <state line="43" column="42" selection-start="1286" selection-end="1286" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -695,30 +660,51 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/app.js">
+    <entry file="file://$PROJECT_DIR$/jscolor/jscolor.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="33" selection-start="1005" selection-end="1005" vertical-scroll-proportion="-6.3461537">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="156" column="29" selection-start="5172" selection-end="5172" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/main.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="226" column="18" selection-start="7795" selection-end="7795" vertical-scroll-proportion="-6.9166665">
+        <state line="12" column="4" selection-start="278" selection-end="278" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/underscore_templates/monthly_entries.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="38" selection-start="356" selection-end="356" vertical-scroll-proportion="0.34937888">
+        <state line="15" column="38" selection-start="356" selection-end="356" vertical-scroll-proportion="-9.375">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="156" column="29" selection-start="5172" selection-end="5172" vertical-scroll-proportion="0.016891891">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="383" column="0" selection-start="5410" selection-end="5410" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/underscore_templates/popup_monthly_modifications.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="28" selection-start="375" selection-end="375" vertical-scroll-proportion="-9.375">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="87" column="22" selection-start="2373" selection-end="2387" vertical-scroll-proportion="-10.884615">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/main.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="220" column="74" selection-start="7385" selection-end="7385" vertical-scroll-proportion="0.8119859">
           <folding />
         </state>
       </provider>

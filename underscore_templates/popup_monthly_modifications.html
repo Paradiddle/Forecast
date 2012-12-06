@@ -14,7 +14,7 @@
 		</td>
 		<td width="40%">
 			<% var amount = modification.get('amount'); %>
-			<% var model = monthly.get(modification.get('name')); %>
+			<% var model = app.monthly.get(modification.get('name')); %>
 			<% if(typeof amount != "undefined") { %>
 				<%= model.get('amount') %> to <%= app.getModifiedAmount(model, data.year, data.month) %>
 			<%} else {%>

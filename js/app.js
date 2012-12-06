@@ -2,6 +2,13 @@ $(document).ready(function()
 {
 	_.templateSettings.variable = "data";
 
+	jQueryHelpers.updateContentHeight();
+
+	$(window).resize(function ()
+	{
+		jQueryHelpers.updateContentHeight();
+	});
+
 	// Setup and initialize custom validation for the entry dialog, ensuring things like only numbers are entered
 	// into the amount box, etc.
 	jQueryHelpers.initializeValidation();
@@ -80,7 +87,7 @@ var app = (function() {
 
 	pub.refreshEntries = function ()
 	{
-		var valid = app.validateFilter();
+		var valid = pub.validateFilter();
 		if (!valid)
 		{
 			alert("Not a valid to and from filter.");
@@ -88,22 +95,22 @@ var app = (function() {
 			return;
 		}
 
-		app.calculateAllMonthData();
-		if (app.dirtyFilter)
+		pub.calculateAllMonthData();
+		if (pub.dirtyFilter)
 		{
-			app.updateYearMonthIterator();
-			var data = app.getEntriesTableTemplateData();
+			pub.updateYearMonthIterator();
+			var data = pub.getEntriesTableTemplateData();
 			jQueryHelpers.setEntriesHtml(server.render_template('entries_table', data));
 		}
 
 		dataViews.recalculateAndRenderMonthModules();
 		jQueryHelpers.renderMonthlyEntries();
 
-		app.dirtyFilter = false;
+		pub.dirtyFilter = false;
 
-		$('.modify_data').toggle(app.viewing_other == undefined);
+		$('.modify_data').toggle(pub.viewing_other == undefined);
 		jQueryHelpers.postRenderMonthModules();
-		if (typeof app.viewing_other == "undefined")
+		if (typeof pub.viewing_other == "undefined")
 		{
 			$('#budget_name').hide();
 			$('#budget_return').hide();
@@ -111,7 +118,7 @@ var app = (function() {
 		else
 		{
 			$('#budget_name').show();
-			$('#budget_name').html("Viewing budget for '" + app.viewing_other + "'");
+			$('#budget_name').html("Viewing budget for '" + pub.viewing_other + "'");
 			$('#budget_return').show();
 		}
 	};
@@ -126,7 +133,7 @@ var app = (function() {
 
 	pub.updateStartBalance = function (year, month, val)
 	{
-		var m = app.monthsMeta.get(pub.months_meta_key(year, month));
+		var m = pub.monthsMeta.get(pub.months_meta_key(year, month));
 		m.set('start_balance', val);
 	};
 
@@ -186,7 +193,7 @@ var app = (function() {
 	pub.getModifiedAmount = function (model, year, month)
 	{
 		var id = year + ":" + month + ":" + model.get('name');
-		var mod = app.modifications.get(id);
+		var mod = pub.modifications.get(id);
 		if (typeof mod == "undefined")
 		{
 			return model.get('amount');
@@ -233,7 +240,7 @@ var app = (function() {
 	pub.putMonthlyModification = function (year, month, name, amount)
 	{
 		var id = year + ":" + month + ":" + name;
-		var mod = app.modifications.get(id);
+		var mod = pub.modifications.get(id);
 		if (typeof mod == "undefined")
 		{
 			mod = new Backbone.Model();
@@ -241,7 +248,7 @@ var app = (function() {
 			mod.set('month', month);
 			mod.set('name', name);
 			mod.set('id', id);
-			app.modifications.add(mod);
+			pub.modifications.add(mod);
 		}
 		mod.set('amount', amount);
 	};
@@ -250,8 +257,8 @@ var app = (function() {
 	{
 		pub.parseData(jsonData);
 		pub.loadSettings();
-		app.loaded = true;
-		app.viewing_other = jsonData['viewing_other'];
+		pub.loaded = true;
+		pub.viewing_other = jsonData['viewing_other'];
 		pub.refreshEntries();
 		jQueryHelpers.refreshSharedWith();
 	};
@@ -263,8 +270,8 @@ var app = (function() {
 
 	pub.getEntriesArrayForYearMonth = function (year, month)
 	{
-		var one_times = app.one_time.where({'year':year, 'month':month});
-		return one_times.concat(app.monthly.toArray());
+		var one_times = pub.one_time.where({'year':year, 'month':month});
+		return one_times.concat(pub.monthly.toArray());
 	};
 
 	pub.one_time_key = function (year, month, name)
@@ -274,7 +281,7 @@ var app = (function() {
 
 	pub.deleteEmail = function (email)
 	{
-		app.sharing_with.splice(app.sharing_with.indexOf(email), 1);
+		pub.sharing_with.splice(pub.sharing_with.indexOf(email), 1);
 	};
 
 	pub.months_meta_key = function (year, month)
@@ -284,18 +291,18 @@ var app = (function() {
 
 	pub.parseData = function (data)
 	{
-		app.monthly = new Backbone.Collection(data['monthly']);
-		app.one_time = new Backbone.Collection(data['one_time']);
-		app.monthsMeta = new Backbone.Collection(data['months']);
-		app.modifications = new Backbone.Collection(data['modifications']);
-		app.sharing_with = data['sharing_with'];
-		app.shared = data['shared'];
-		app.settings = data['settings'];
+		pub.monthly = new Backbone.Collection(data['monthly']);
+		pub.one_time = new Backbone.Collection(data['one_time']);
+		pub.monthsMeta = new Backbone.Collection(data['months']);
+		pub.modifications = new Backbone.Collection(data['modifications']);
+		pub.sharing_with = data['sharing_with'];
+		pub.shared = data['shared'];
+		pub.settings = data['settings'];
 	};
 
 	pub.getOnlyRelevantPartsOfMonths = function ()
 	{
-		return app.monthsMeta.map(function (value)
+		return pub.monthsMeta.map(function (value)
 		{
 			var sbal = value.get('start_balance');
 			if (typeof sbal != "undefined")
@@ -318,15 +325,15 @@ var app = (function() {
 		yearMonthIteratorData = [];
 
 		// Iterate through each year from the starting year to the ending year
-		for (var currentYearNum = app.settings.fromYear; currentYearNum <= app.settings.toYear; currentYearNum++)
+		for (var currentYearNum = pub.settings.fromYear; currentYearNum <= pub.settings.toYear; currentYearNum++)
 		{
 			// If the current year is the first year of the selection then the starting
 			// month will be the selected starting month, otherwise we start at January.
-			var startingMonthNum = (currentYearNum == app.settings.fromYear) ? app.settings.fromMonth : 0;
+			var startingMonthNum = (currentYearNum == pub.settings.fromYear) ? pub.settings.fromMonth : 0;
 
 			// If the current year is the last year of the selection then the ending
 			// month will be the selected ending month, otherwise we end at December.
-			var endingMonthNum = (currentYearNum == app.settings.toYear) ? app.settings.toMonth : 11;
+			var endingMonthNum = (currentYearNum == pub.settings.toYear) ? pub.settings.toMonth : 11;
 
 			for (var currentMonthNum = startingMonthNum; currentMonthNum <= endingMonthNum; currentMonthNum++)
 			{
@@ -337,7 +344,7 @@ var app = (function() {
 					year:currentYearStr,
 					month_num:currentMonthNum,
 					year_num:currentYearNum,
-					meta:app.monthsMeta.get(currentYearStr + ":" + currentMonthStr)
+					meta:pub.monthsMeta.get(currentYearStr + ":" + currentMonthStr)
 				};
 				yearMonthIteratorData.push(obj);
 			}
@@ -357,12 +364,12 @@ var app = (function() {
 		{
 			var month = yearMonthIteratorData[j];
 
-			app.monthData = {};
-			app.monthData.month = month.month;
-			app.monthData.year = month.year;
+			pub.monthData = {};
+			pub.monthData.month = month.month;
+			pub.monthData.year = month.year;
 
 			curIndex++;
-			rowMonthsData.push(app.monthData);
+			rowMonthsData.push(pub.monthData);
 			if (curIndex == numCols || month.month == "December")
 			{
 				curIndex = 0;
@@ -378,7 +385,7 @@ var app = (function() {
 
 	pub.calculateAllMonthData = function ()
 	{
-		var tracked = app.monthly.filter(function (value)
+		var tracked = pub.monthly.filter(function (value)
 		{
 			return typeof value.get('track') != "undefined";
 		});
@@ -400,12 +407,12 @@ var app = (function() {
 			{
 				var monthString = pub.months[m];
 				var id = yearString + ":" + monthString;
-				var meta = app.monthsMeta.get(id);
+				var meta = pub.monthsMeta.get(id);
 				if (typeof meta == 'undefined')
 				{
 					meta = new Backbone.Model();
 					meta.set('id', id);
-					app.monthsMeta.add(meta);
+					pub.monthsMeta.add(meta);
 				}
 
 				var entries = pub.getEntriesArrayForYearMonth(yearString, monthString);
@@ -441,7 +448,7 @@ var app = (function() {
 				}
 				var diff = total_income + total_expenses;
 				var start_balance = meta.get('start_balance');
-				var prevMonthMeta = app.monthsMeta.get(pub.getPreviousMonthMeta(y, m));
+				var prevMonthMeta = pub.monthsMeta.get(pub.getPreviousMonthMeta(y, m));
 				var prevEstEndBalance = undefined;
 				if (typeof prevMonthMeta != "undefined")
 				{
@@ -504,7 +511,7 @@ var app = (function() {
 		if (is_monthly)
 		{
 			key = name;
-			model = app.monthly.get(key);
+			model = pub.monthly.get(key);
 
 			if (typeof model != "undefined")
 				return false;
@@ -514,19 +521,19 @@ var app = (function() {
 			model = new Backbone.Model(data);
 			model.set('color', '#000000');
 			model.set('id', key);
-			app.monthly.add(model);
+			pub.monthly.add(model);
 		}
 		else
 		{
 			key = pub.one_time_key(year, month, name);
-			model = app.one_time.get(key);
+			model = pub.one_time.get(key);
 
 			if (typeof model != "undefined")
 				return false;
 
 			model = new Backbone.Model(data);
 			model.set('id', key);
-			app.one_time.add(model);
+			pub.one_time.add(model);
 		}
 		return true;
 	};
@@ -1047,7 +1054,22 @@ var jQueryHelpers = (function() {
 		});
 
 		$('#tabs').tabs();
+
+		$('.tab1').show();
+		$('.tab2').hide();
+		$('.tabs').click(function ()
+		{
+			var showWhichTab = $(this).attr("id");
+			$('.tabContent').hide();
+			$('.' + showWhichTab).show();
+		});
 	};
+
+	pub.updateContentHeight = function()
+	{
+		var newHeight = $(window).height() - 100;
+		$('.content').height(newHeight);
+	}
 
 	pub.openEditMonthlyModifications = function (year, month)
 	{
@@ -1374,7 +1396,6 @@ var jQueryHelpers = (function() {
 	{
 		var email = $(event.target).parents('.share_row').attr('name');
 		server.retrieveParseRefreshEntries(email);
-		$('#tabs').tabs('select', 0);
 	};
 
 	pub.switchBack = function ()
